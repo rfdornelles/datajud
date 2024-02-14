@@ -1,0 +1,11 @@
+Package: datajud
+Title: Pacote em R para consumir dados da API pública do DataJud - CNJ
+Version: 0.0.0.9000
+Authors@R: 
+    person("Rodrigo", "Dornelles", , "rodornelles@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-3709-4760"))
+Description: Pacote utilizado para extrair dados da API pública do Datajud.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
