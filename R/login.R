@@ -41,7 +41,8 @@ setar_email_identificacao <- function(email = NULL) {
     Sys.setenv(datajud_email_user = email)
     cat("Email configurado com sucesso:", email, "\n")
   } else {
-    cat("Email inválido. Por favor, forneça um email válido.\n")
+    stop("Email inválido. Por favor, forneça um email válido.\n")
+    return(FALSE)
   }
 
 }
@@ -71,7 +72,7 @@ obter_key_cnj <- function() {
 
   if(email_user == FALSE) {
 
-    warning("Usuário não identificado.\nPor favor, identifique-se com um email válido usando setar_email_identificacao(seu_email).")
+    stop("Usuário não identificado.\nPor favor, identifique-se com um email válido usando setar_email_identificacao(seu_email).")
     return(FALSE)
   }
 
@@ -91,4 +92,26 @@ obter_key_cnj <- function() {
 
   cat("Key configurada com sucesso:", key, "\n")
   invisible(key)
+}
+
+## resgatar a key da memoria
+
+get_key <- function() {
+
+  key <- Sys.getenv("datajud_key")
+
+  if(is.null(key) | key == "") {
+
+    email_user <- checar_identificacao_valida()
+
+    if(email_user == FALSE) {
+      stop("Usuário não identificado.\nPor favor, identifique-se com um email válido usando setar_email_identificacao(seu_email).")
+      return(FALSE)
+    }
+
+    key <- obter_key_cnj()
+
+  }
+
+  return(key)
 }
