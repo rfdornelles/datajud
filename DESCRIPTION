@@ -12,6 +12,7 @@ RoxygenNote: 7.3.1
 URL: https://github.com/rfdornelles/datajud
 BugReports: https://github.com/rfdornelles/datajud/issues
 Imports: 
+    cli,
     glue,
     httr,
     rstudioapi
