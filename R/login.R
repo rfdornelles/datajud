@@ -18,6 +18,14 @@ checar_identificacao_valida <- function() {
 
 }
 
+#' Title
+#'
+#' @param tribunal
+#'
+#' @export
+#'
+#' @examples
+
 ## função para setar usuario
 
 setar_email_identificacao <- function(email = NULL) {

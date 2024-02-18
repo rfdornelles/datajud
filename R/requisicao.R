@@ -1,5 +1,14 @@
 ## auxiliar para match de tribunal com o endpoint
 
+#' Title
+#'
+#' @param tribunal
+#'
+#' @return
+#'
+#'
+#' @examples
+
 aux_retorna_endpoint <- function(tribunal) {
 
   # limpar o nome do tribunal
@@ -102,6 +111,15 @@ aux_retorna_endpoint <- function(tribunal) {
 
 
 ## requisicoes
+
+#' Title
+#'
+#' @param tribunal
+#'
+#' @return
+#' @export
+#'
+#' @examples
 
 datajud_requisition <- function(tribunal, processo, sleep = 0.1) {
 
