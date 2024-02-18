@@ -15,4 +15,5 @@ Imports:
     cli,
     glue,
     httr,
+    purrr,
     rstudioapi
