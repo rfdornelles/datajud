@@ -4,7 +4,7 @@
 \alias{datajud_requisition}
 \title{Title}
 \usage{
-datajud_requisition(processo, tribunal = NULL, sleep = 0.1)
+datajud_requisition(processo, tribunal = NA, sleep = 0.1)
 }
 \arguments{
 \item{tribunal}{}

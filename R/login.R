@@ -20,7 +20,7 @@ checar_identificacao_valida <- function() {
 
 #' Title
 #'
-#' @param tribunal
+#' @param email
 #'
 #' @export
 #'
@@ -57,6 +57,12 @@ datajud_login <- function(email = NULL) {
 
 ## função auxiliar para gerar user_agent
 
+#' Title
+#'
+#' @return
+#'
+#'
+#' @examples
 user <- function() {
 
   email_user <- checar_identificacao_valida()
