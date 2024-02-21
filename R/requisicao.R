@@ -18,16 +18,21 @@ aux_retorna_endpoint <- function(tribunal) {
   # endpoint
   url_tribunal <- switch(
     tribunal_limpo,
+    # superiores
     "tst" = "https://api-publica.datajud.cnj.jus.br/api_publica_tst/_search",
     "tse" = "https://api-publica.datajud.cnj.jus.br/api_publica_tse/_search",
     "stj" = "https://api-publica.datajud.cnj.jus.br/api_publica_stj/_search",
     "stm" = "https://api-publica.datajud.cnj.jus.br/api_publica_stm/_search",
+
+    # federal comum
     "trf1" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf1/_search",
     "trf2" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf2/_search",
     "trf3" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf3/_search",
     "trf4" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf4/_search",
     "trf5" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf5/_search",
     "trf6" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf6/_search",
+
+    # estadual comum
     "tjac" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjac/_search",
     "tjal" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjal/_search",
     "tjam" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjam/_search",
@@ -35,6 +40,7 @@ aux_retorna_endpoint <- function(tribunal) {
     "tjba" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjba/_search",
     "tjce" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjce/_search",
     "tjdft" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjdft/_search",
+    "tjes" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjes/_search",
     "tjgo" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjgo/_search",
     "tjma" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjma/_search",
     "tjmg" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmg/_search",
@@ -49,8 +55,11 @@ aux_retorna_endpoint <- function(tribunal) {
     "tjrr" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjrr/_search",
     "tjrs" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjrs/_search",
     "tjsc" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjsc/_search",
+    "tjse" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjse/_search",
     "tjsp" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjsp/_search",
     "tjto" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjto/_search",
+
+    # trabalhista
     "trt1" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt1/_search",
     "trt2" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt2/_search",
     "trt3" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt3/_search",
@@ -75,6 +84,8 @@ aux_retorna_endpoint <- function(tribunal) {
     "trt22" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt22/_search",
     "trt23" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt23/_search",
     "trt24" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt24/_search",
+
+    # eleitoral
     "treac" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-ac/_search",
     "treal" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-al/_search",
     "tream" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-am/_search",
@@ -102,14 +113,105 @@ aux_retorna_endpoint <- function(tribunal) {
     "trese" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-se/_search",
     "tresp" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-sp/_search",
     "treto" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-to/_search",
+
+    # militar estadual
     "tjmmg" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmmg/_search",
     "tjmrs" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmrs/_search",
     "tjmsp" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmsp/_search",
-    NULL
+
+      NULL
   )
   return(url_tribunal)
 }
 
+## auxiliar para identificar tribunal pelo CNJ
+
+# conforme norma: https://atos.cnj.jus.br/files/compilado23285720221017634de539229ab.pdf
+# RESOLUÇÃO Nº 65, DE 16 DE DEZEMBRO DE 2008
+
+aux_identifica_tribunal <- function(cnj) {
+
+  cnj_limpo <- gsub("[^0-9]", "", cnj)
+
+  # validar se tem 20 dígitos
+  if (nchar(cnj_limpo) != 20) {
+    stop("Número do processo inválido")
+    return(NULL)
+  }
+
+  # extrair campo J e campo TR
+  campo_j <- substr(cnj_limpo, start = 14, stop = 14)
+  campo_tr <- substr(cnj_limpo, start = 15, stop = 16)
+
+  # separar o ramo da justiça
+  segmento_justica <- dplyr::case_when(
+    campo_j == "1" ~ "stf",
+    campo_j == "2" ~ "cnj",
+    campo_j == "3" ~ "stj",
+    campo_j == "4" ~ "trf",
+    campo_j == "5" ~ "trt",
+    campo_j == "6" ~ "tre",
+    campo_j == "7" ~ "jm",
+    campo_j == "8" ~ "tj",
+    campo_j == "9" ~ "tjm"
+  )
+
+  # separar o tribunal
+  segmento_regional <- dplyr::case_when(
+    campo_tr == "00" ~ "originario",
+    segmento_justica %in% c("trf",
+                            "tst",
+                            "jm") ~ campo_tr,
+    # se for estadual, eleitoral, militar estadual será a sigla
+    # do estado em ordem alfabetica
+    TRUE ~ dplyr::case_match(
+      campo_tr,
+      "01" ~ "ac",
+      "02" ~ "al",
+      "03" ~ "ap",
+      "04" ~ "am",
+      "05" ~ "ba",
+      "06" ~ "ce",
+      "07" ~ "df",
+      "08" ~ "es",
+      "09" ~ "go",
+      "10" ~ "ma",
+      "11" ~ "mt",
+      "12" ~ "ms",
+      "13" ~ "mg",
+      "14" ~ "pa",
+      "15" ~ "pb",
+      "16" ~ "pr",
+      "17" ~ "pe",
+      "18" ~ "pi",
+      "19" ~ "rj",
+      "20" ~ "rn",
+      "21" ~ "rs",
+      "22" ~ "ro",
+      "23" ~ "rr",
+      "24" ~ "sc",
+      "25" ~ "se",
+      "26" ~ "sp",
+      "27" ~ "to",
+      .default = NA_character_
+    )
+  )
+
+  # distribuir o endpoint de acordo com o tribunal
+
+  if (segmento_regional == "originario") {
+
+    resposta <-segmento_justica
+
+  } else {
+
+    resposta <- paste0(segmento_justica, segmento_regional)
+
+  }
+
+  return(c(resposta, aux_retorna_endpoint(resposta)))
+
+}
 
 ## requisicoes
 
@@ -122,12 +224,22 @@ aux_retorna_endpoint <- function(tribunal) {
 #'
 #' @examples
 
-datajud_requisition <- function(tribunal, processo, sleep = 0.1) {
+datajud_requisition <- function(processo, tribunal = NULL, sleep = 0.1) {
+
+  if(is.null(tribunal)) {
+
+    aux_identifica <- aux_identifica_tribunal(processo)
+    tribunal <- aux_identifica[1]
+    url_tribunal <- aux_identifica[2]
+
+  } else {
 
   url_tribunal <- aux_retorna_endpoint(tribunal)
 
+  }
+
   if(is.null(url_tribunal)) {
-    stop("Tribunal não encontrado")
+    stop(glue::glue("Tribunal {tribunal} não encontrado ou não disponível no Datajud"))
     return(FALSE)
   }
 
@@ -139,7 +251,7 @@ datajud_requisition <- function(tribunal, processo, sleep = 0.1) {
   }
 
   # checa se há key definida
-  key = get_key()
+  key = datajud:::get_key()
 
   # headers
   headers = c(
@@ -197,5 +309,6 @@ datajud_requisition <- function(tribunal, processo, sleep = 0.1) {
 
   cat(glue::glue("Sucesso!! Processo {processo} encontrado no tribunal {tribunal}"))
   Sys.sleep(sleep)
+  assign(x = "processo_datajud", value = resposta, envir = .GlobalEnv)
   invisible(resposta)
 }
