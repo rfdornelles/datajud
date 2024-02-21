@@ -28,7 +28,7 @@ checar_identificacao_valida <- function() {
 
 ## função para setar usuario
 
-setar_email_identificacao <- function(email = NULL) {
+datajud_login <- function(email = NULL) {
 
   if(is.null(email)) {
 
@@ -80,7 +80,7 @@ obter_key_cnj <- function() {
 
   if(email_user == FALSE) {
 
-    stop("Usuário não identificado.\nPor favor, identifique-se com um email válido usando setar_email_identificacao(seu_email).")
+    stop("Usuário não identificado.\nPor favor, identifique-se com um email válido usando datajud_login(seu_email).")
     return(FALSE)
   }
 
@@ -113,7 +113,7 @@ get_key <- function() {
     email_user <- checar_identificacao_valida()
 
     if(email_user == FALSE) {
-      stop("Usuário não identificado.\nPor favor, identifique-se com um email válido usando setar_email_identificacao(seu_email).")
+      stop("Usuário não identificado.\nPor favor, identifique-se com um email válido usando datajud_login(seu_email).")
       return(FALSE)
     }
 

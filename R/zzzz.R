@@ -32,7 +32,7 @@
       cli::cli_end()
       cli::cli_h1("Utilização")
       cli::cli_alert_info("Identifique-se com seu email usando:")
-      cli::cli_bullets("setar_email_identificacao(<seu email>)")
+      cli::cli_bullets("          datajud_login(<seu email>)")
       cli::cli_end()
     })
   )
