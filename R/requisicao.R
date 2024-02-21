@@ -25,12 +25,12 @@ aux_retorna_endpoint <- function(tribunal) {
     "stm" = "https://api-publica.datajud.cnj.jus.br/api_publica_stm/_search",
 
     # federal comum
-    "trf1" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf1/_search",
-    "trf2" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf2/_search",
-    "trf3" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf3/_search",
-    "trf4" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf4/_search",
-    "trf5" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf5/_search",
-    "trf6" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf6/_search",
+    "trf01" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf1/_search",
+    "trf02" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf2/_search",
+    "trf03" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf3/_search",
+    "trf04" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf4/_search",
+    "trf05" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf5/_search",
+    "trf06" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf6/_search",
 
     # estadual comum
     "tjac" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjac/_search",
@@ -60,15 +60,15 @@ aux_retorna_endpoint <- function(tribunal) {
     "tjto" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjto/_search",
 
     # trabalhista
-    "trt1" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt1/_search",
-    "trt2" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt2/_search",
-    "trt3" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt3/_search",
-    "trt4" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt4/_search",
-    "trt5" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt5/_search",
-    "trt6" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt6/_search",
-    "trt7" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt7/_search",
-    "trt8" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt8/_search",
-    "trt9" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt9/_search",
+    "trt01" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt1/_search",
+    "trt02" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt2/_search",
+    "trt03" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt3/_search",
+    "trt04" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt4/_search",
+    "trt05" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt5/_search",
+    "trt06" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt6/_search",
+    "trt07" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt7/_search",
+    "trt08" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt8/_search",
+    "trt09" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt9/_search",
     "trt10" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt10/_search",
     "trt11" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt11/_search",
     "trt12" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt12/_search",
@@ -161,7 +161,8 @@ aux_identifica_tribunal <- function(cnj) {
     campo_tr == "00" ~ "originario",
     segmento_justica %in% c("trf",
                             "tst",
-                            "jm") ~ campo_tr,
+                            "jm",
+                            "trt") ~ campo_tr,
     # se for estadual, eleitoral, militar estadual será a sigla
     # do estado em ordem alfabetica
     TRUE ~ dplyr::case_match(
@@ -220,13 +221,12 @@ aux_identifica_tribunal <- function(cnj) {
 #' @param tribunal
 #'
 #' @return
-#' @export
 #'
 #' @examples
 
-datajud_requisition <- function(processo, tribunal = NULL, sleep = 0.1) {
+datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
 
-  if(is.null(tribunal)) {
+  if(is.na(tribunal)) {
 
     aux_identifica <- aux_identifica_tribunal(processo)
     tribunal <- aux_identifica[1]
@@ -238,16 +238,16 @@ datajud_requisition <- function(processo, tribunal = NULL, sleep = 0.1) {
 
   }
 
-  if(is.null(url_tribunal)) {
-    stop(glue::glue("Tribunal {tribunal} não encontrado ou não disponível no Datajud"))
-    return(FALSE)
+  if(is.na(url_tribunal)) {
+    cli::cli_alert_danger(glue::glue("Tribunal {tribunal} não encontrado ou não disponível no Datajud"))
+    return(NULL)
   }
 
   # checa o numero do processo
   numero_cnj_limpo <- gsub("[^0-9]", "", processo)
   if(nchar(numero_cnj_limpo) != 20) {
     stop("Número do processo inválido")
-    return(FALSE)
+    return(NULL)
   }
 
   # checa se há key definida
@@ -285,7 +285,7 @@ datajud_requisition <- function(processo, tribunal = NULL, sleep = 0.1) {
                    Tribunal: {tribunal}\n"))
 
     stop("Erro na requisição")
-    return(FALSE)
+    return(NULL)
   }
 
   resposta <- httr::content(requisicao)
@@ -296,7 +296,7 @@ datajud_requisition <- function(processo, tribunal = NULL, sleep = 0.1) {
                                 1,
                                 "_source",
                                 "numeroProcesso")
-  print(cnj_localizado)
+
   if(is.null(cnj_localizado)) {
     stop(glue::glue("Processo {processo} não encontrado no tribunal {tribunal}"))
     return(NULL)
@@ -307,8 +307,127 @@ datajud_requisition <- function(processo, tribunal = NULL, sleep = 0.1) {
     return(NULL)
   }
 
-  cat(glue::glue("Sucesso!! Processo {processo} encontrado no tribunal {tribunal}"))
-  Sys.sleep(sleep)
-  assign(x = "processo_datajud", value = resposta, envir = .GlobalEnv)
+  cli::cli_alert_success(glue::glue("Sucesso!! Processo {processo} encontrado no tribunal {tribunal}"))
+
+  return(resposta)
+}
+
+## auxiliar para identificar variaveis "livres"
+
+aux_nomeia_saida <- function(nome_inicial = "datajud_resposta") {
+
+  nome <- nome_inicial
+
+  # loop para verificar se existe no environment global
+  i <- 1
+  while(exists(nome, envir = .GlobalEnv) & i <= 20) {
+    nome <- paste0("datajud_resposta_", i)
+    i <- i + 1
+  }
+
+  # se já existir 20 variáveis com o mesmo nome, sobrescreve e avisa
+  if(i > 20) {
+    nome <- nome_inicial
+    cli::cli_alert_info(glue::glue(
+      "Já existem +20 variáveis com o nome {nome}, sobrescrevendo a primeira."
+      )
+    )
+  }
+
+  return(nome)
+}
+## pesquisar processos
+
+#' Title
+#'
+#' @param tribunal
+#'
+#' @return
+#'
+#' @export
+#'
+#' @examples
+#'
+datajud_consultar_processo <- function(processo,
+                                       tribunal = NA,
+                                       sleep = 0.1) {
+
+  # checar se processo foi informado
+  processo <- as.character(processo)
+
+  if (length(processo) < 1 | any(processo == "")) {
+    cli::cli_alert_danger("Número do processo não informado")
+    return()
+  }
+
+  # checar se tribunal é null ou se têm o mesmo tamanho que processo
+  if(!is.na(tribunal) & length(tribunal) != length(processo)) {
+    cli::cli_alert_danger("O campo Tribunal não tem o mesmo tamanho que o campo processo.")
+    cli::cli_alert_info("Informe listas do mesmo tamanho ou deixe o campo tribunal em branco.")
+    return()
+  }
+
+  # checar se sleep é válido
+  if(!is.numeric(sleep) | sleep < 0 | sleep > 10000) {
+    cli::cli_alert_danger("Valor de sleep inválido. Informe número positivo inferior a 10.000.")
+    return()
+  }
+
+  # checar se o login foi realizado
+  if(datajud:::checar_identificacao_valida() == FALSE) {
+    cli::cli_alert_danger("Você precisa se identificar para realizar a consulta.")
+    cli::cli_alert_info("Use datajud::datajud_login()")
+    return()
+  }
+
+
+  # informar que a requisição está sendo feita
+  cli::cli_alert_info(
+    glue::glue("Consultando processo {length(processo)} no Datajud!")
+    )
+
+  # chamada segura da funcao
+  safe_requisition <- purrr::possibly(datajud_requisition,
+                                      otherwise = NULL,
+                                      quiet = FALSE)
+  # rodar loop
+  resposta <- purrr::map2(
+    .x = processo,
+    .y = tribunal,
+    .f = ~ {
+
+      resultado <- safe_requisition(.x, .y)
+
+      Sys.sleep(sleep)
+
+      return(resultado)
+    },
+
+    .progress = TRUE)
+
+  # checar sucesso
+  respostas_validas <- sum((resposta |> purrr::map_int(length)) > 0)
+
+  if (respostas_validas == 0) {
+    cli::cli_alert_danger("Nenhuma resposta válida encontrada.")
+    return(NULL)
+  }
+
+  # informar que a requisição foi finalizada
+  cli::cli_alert_info(
+    glue::glue("Requisição finalizada! {respostas_validas}/{length(processo)} processos consultados com sucesso!")
+  )
+
+  # nomear a variável de saída
+  nome_saida <- aux_nomeia_saida()
+
+  cli::cli_alert_success(glue::glue("Variável de saída: {nome_saida}"))
+  cli::cli_alert_info("Verifique a resposta da consulta com a função `datajud_ler_processo` ou `datajud_ler_movimentacoes`")
+
+
+  assign(x = nome_saida,
+         value = resposta,
+         envir = .GlobalEnv)
+
   invisible(resposta)
 }
