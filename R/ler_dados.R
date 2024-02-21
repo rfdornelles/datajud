@@ -99,28 +99,8 @@ processo <- tibble::tibble(
       data_atualizacao = lubridate::as_datetime(data_atualizacao)
     )
 
-cli::cli_alert_success(glue::glue("Processo {id} lido com sucesso!"))
+#cli::cli_alert_success(glue::glue("Processo {id} lido com sucesso!"))
+
 return(processo)
 }
 
-#####
-conteudo |>
-  purrr::pluck("hits", "hits") |>
-  purrr::map(~purrr::pluck(.x, "_source","id"))
-
-x <- conteudo |>
-  purrr::pluck("hits", "hits", 103)
-
-id <- purrr::pluck(x, "_source", "id")
-
-movimentos <- purrr::pluck(x, "_source", "movimentos")
-
-movimentos |>
-  purrr::map_df(read_movimentos) |>
-  dplyr::mutate(id = id) |>
-  dplyr::relocate(id)
-
-tibble::tibble(
-  id = id,
-
-)
