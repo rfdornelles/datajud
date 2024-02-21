@@ -1,42 +1,80 @@
-read_movimentos <- function(movimento) {
+ler_movimentos <- function(item) {
+
+  item <- purrr::pluck(item,
+                            "hits",
+                            "hits",
+                            1,
+                            "_source")
+
+  tribunal <- purrr::pluck(item, "tribunal")
+  numero_processo <- purrr::pluck(item, "numeroProcesso")
+  # data_ajuizamento <- purrr::pluck(item, "dataAjuizamento")
+  # data_atualizacao <- purrr::pluck(item, "dataHoraUltimaAtualizacao")
+
+  movimento <- purrr::pluck(item, "movimentos")
+
+  if (is.null(movimento)) {
+    return(NULL)
+  }
+
+  #print(movimento)
+  # print(tribunal)
+  # print(numero_processo)
+
+  tabela_movimentos <- purrr::map_df(
+    movimento,
+    .f = ~{
 
   tibble::tibble(
-    codigo_tpu = purrr::pluck(movimento, "codigo"),
-    nome_movimento = purrr::pluck(movimento, "nome"),
-    datahora_movimento = purrr::pluck(movimento, "dataHora"),
-    codigo_tabelado = purrr::pluck(movimento, "complementosTabelados", 1, "codigo"),
-    descricao_tabelado = purrr::pluck(movimento, "complementosTabelados", 1, "descricao"),
-    valor_tabelado = purrr::pluck(movimento, "complementosTabelados", 1, "valor"),
-    nome_tabelado = purrr::pluck(movimento, "complementosTabelados", 1, "nome"),
-    codigo_orgao_julgador = purrr::pluck(movimento, "orgaoJulgador", 1, "codigoOrgao"),
-    nome_orgao_julgador = purrr::pluck(movimento, "orgaoJulgador", 1, "nomeOrgao")
+    codigo_tpu = purrr::pluck(.x, "codigo"),
+    nome_movimento = purrr::pluck(.x, "nome"),
+    datahora_movimento = purrr::pluck(.x, "dataHora"),
+    codigo_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "codigo"),
+    descricao_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "descricao"),
+    valor_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "valor"),
+    nome_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "nome"),
+    codigo_orgao_julgador = purrr::pluck(.x, "orgaoJulgador", 1, "codigoOrgao"),
+    nome_orgao_julgador = purrr::pluck(.x, "orgaoJulgador", 1, "nomeOrgao")
   ) |>
     dplyr::mutate(
       dplyr::across(
         dplyr::everything(),
         ~ifelse(is.null(.x), NA, .x)
       )
-    ) |>
-    dplyr::mutate(
-      datahora_movimento = lubridate::as_datetime(datahora_movimento)
-    ) |>
-    dplyr::arrange(datahora_movimento)
+    )
+  })
 
+  tabela_movimentos <- tabela_movimentos |>
+    dplyr::mutate(
+      tribunal = tribunal,
+      numero_processo = numero_processo,
+      datahora_movimento = lubridate::as_datetime(
+        datahora_movimento,
+        tz = "UTC")
+    ) |>
+    dplyr::arrange(datahora_movimento) |>
+    dplyr::relocate(tribunal,
+                    numero_processo,
+                    datahora_movimento)
+
+    return(tabela_movimentos)
 }
 
 ###
 ler_processo <- function(dados) {
 
 # cabecalho
-item <- dados |>
-  purrr::pluck(#"hits", "hits", 1,
-    "_source")
+  item <- purrr::pluck(dados,
+                       "hits",
+                       "hits",
+                       1,
+                       "_source")
 
-# origem
-# origem <- dados |>
-#   purrr::pluck("hits", "hits", 1, "_index")
+  id <- purrr::pluck(item, "id")
 
-id <- purrr::pluck(item, "id")
+  if(is.null(id)) {
+    return(NULL)
+  }
 
 ## dados
 tribunal <- purrr::pluck(item, "tribunal")
@@ -104,3 +142,67 @@ processo <- tibble::tibble(
 return(processo)
 }
 
+### funcao para ler dados de processo
+
+#' Title
+#'
+#' @param base
+#'
+#' @return
+#' @export
+#'
+#' @examples
+datajud_ler_processo <- function(base = "datajud_resposta") {
+
+  if (!is.list(base)) {
+    if (!exists(base, envir = .GlobalEnv)) {
+      stop("Base de dados não encontrada")
+    }
+    base <- get(base, envir = .GlobalEnv)
+  }
+
+  if (!is.list(base)) {
+    stop("Base não é uma lista ou o nome de uma lista existente")
+  }
+
+# retornando os metadados do processo
+  resposta <- purrr::map_df(
+    base,
+    ler_processo
+  )
+
+  print(resposta)
+}
+
+### funcao para ler movimentações de processo
+
+#' Title
+#'
+#' @param base
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+datajud_ler_movimentacoes <- function(base = "datajud_resposta") {
+
+  if (!is.list(base)) {
+    if (!exists(base, envir = .GlobalEnv)) {
+      stop("Base de dados não encontrada")
+    }
+    base <- get(base, envir = .GlobalEnv)
+  }
+
+  if (!is.list(base)) {
+    stop("Base não é uma lista ou o nome de uma lista existente")
+  }
+
+  # retornando os metadados do processo
+  resposta <- purrr::map_df(
+    base,
+    ler_movimentos
+  )
+
+  print(resposta)
+}
