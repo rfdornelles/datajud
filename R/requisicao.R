@@ -173,7 +173,7 @@ aux_identifica_tribunal <- function(cnj) {
       "04" ~ "am",
       "05" ~ "ba",
       "06" ~ "ce",
-      "07" ~ "df",
+      "07" ~ "dft",
       "08" ~ "es",
       "09" ~ "go",
       "10" ~ "ma",
@@ -287,12 +287,13 @@ datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
     return(NULL)
   }
 
-  resposta <- httr::content(requisicao)
+  resposta <- httr::content(requisicao) |>
+    purrr::pluck("hits", "hits", 1)
   # return(resposta)
   cnj_localizado = purrr::pluck(resposta,
-                                "hits",
-                                "hits",
-                                1,
+                                # "hits",
+                                # "hits",
+                                # 1,
                                 "_source",
                                 "numeroProcesso")
 
