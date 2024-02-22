@@ -41,7 +41,6 @@ print(consulta_completa)
 }
 
 
-
 ## buscar assuntos
 
 # httr::GET("https://gateway.cloud.pje.jus.br/tpu/api/v1/publico/consulta/assuntos?nome=consumidor") |> httr::content() -> b
@@ -51,6 +50,17 @@ print(consulta_completa)
 
 
 ### funcao para requisicao por assunto / codigo
+#' Title
+#'
+#' @param tribunal
+#' @param lista_classe
+#' @param lista_orgao
+#' @param size
+#'
+#' @return
+#' @export
+#'
+#' @examples
 datajud_pesquisar_classe_orgao <- function(
     tribunal = NA,
     lista_classe = NULL,
@@ -67,6 +77,7 @@ datajud_pesquisar_classe_orgao <- function(
 
   # checa se há key definida
   key = get_key()
+
 
   # headers
   headers = c(
@@ -85,6 +96,7 @@ datajud_pesquisar_classe_orgao <- function(
 
   # tribunal
   url = aux_retorna_endpoint(tribunal)
+  if(is.null(url)) stop("Tribunal não encontrado ou não disponível no Datajud")
 
   # realizar requisicao
   requisicao <- httr::POST(
@@ -96,13 +108,14 @@ datajud_pesquisar_classe_orgao <- function(
 
   # extrair conteudo
   conteudo <- requisicao |>
-    httr::content()
+    httr::content() |>
+    purrr::pluck("hits", "hits")
 
   # extrair metadados
-  processos <- conteudo |>
-    purrr::pluck("hits", "hits") |>
-    purrr::map_df(purrr::possibly(ler_processo, quiet = FALSE),
-                  .progress = TRUE)
+  # processos <- conteudo |>
+  #   #purrr::pluck("hits", "hits") |>
+  #   purrr::map_df(purrr::possibly(ler_processo, quiet = FALSE),
+  #                 .progress = TRUE)
 
   # nomear a variável de saída
   nome_saida <- aux_nomeia_saida()
@@ -112,9 +125,9 @@ datajud_pesquisar_classe_orgao <- function(
 
 
   assign(x = nome_saida,
-         value = processos,
+         value = conteudo,
          envir = .GlobalEnv)
 
-  return(processos)
+  invisible(conteudo)
 }
 
