@@ -262,7 +262,6 @@ datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
   # body
   body = glue::glue(
     '{{
-      "size": 10000,
       "query": {{
         "match": {{
           "numeroProcesso": "{numero_cnj_limpo}"
