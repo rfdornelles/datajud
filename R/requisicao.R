@@ -1,14 +1,5 @@
 ## auxiliar para match de tribunal com o endpoint
 
-#' Title
-#'
-#' @param tribunal
-#'
-#' @return
-#'
-#'
-#' @examples
-
 aux_retorna_endpoint <- function(tribunal) {
 
   # limpar o nome do tribunal
@@ -214,16 +205,6 @@ aux_identifica_tribunal <- function(cnj) {
 
 }
 
-## requisicoes
-
-#' Title
-#'
-#' @param tribunal
-#'
-#' @return
-#'
-#' @examples
-
 datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
 
   if(is.na(tribunal)) {
@@ -338,16 +319,36 @@ aux_nomeia_saida <- function(nome_inicial = "datajud_resposta") {
 }
 ## pesquisar processos
 
-#' Title
+#' Consulta processos judiciais no Datajud
 #'
-#' @param tribunal
+#' Esta função realiza consultas de processos judiciais no Datajud, permitindo aos usuários
+#' buscar informações detalhadas por número de processo e tribunal específico. A função
+#' também suporta um intervalo de espera (`sleep`) entre as requisições para evitar sobrecarga
+#' no servidor. É necessário realizar identificação prévia através de `datajud_login` antes
+#' de executar consultas.
 #'
-#' @return
+#' @param processo Número do processo ou vetor de números dos processos a serem consultados.
+#'                 Deve ser fornecido como um valor ou vetor de caracteres.
+#' @param tribunal Identificador do tribunal correspondente ao(s) processo(s) sendo consultado(s).
+#'                 Se fornecido, deve ter o mesmo tamanho que o vetor `processo`.
+#' @param sleep Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
+#'              no servidor. O valor padrão é 0.1 segundos. Deve ser um número positivo.
+#'
+#' @return A função não retorna um valor diretamente ao ambiente de chamada, mas armazena
+#'         os resultados da consulta em uma variável nomeada no ambiente global. Esta variável
+#'         contém os detalhes dos processos consultados e pode ser acessada diretamente ou
+#'         através de funções específicas como `datajud_ler_processo` ou `datajud_ler_movimentacoes`.
 #'
 #' @export
 #'
 #' @examples
-#'
+#' # Após realizar o login com datajud_login():
+#' datajud_consultar_processo(processo = "0000001-89.2020.8.26.0000", tribunal = "TJSP")
+#' # Para consultar múltiplos processos com intervalo de espera customizado:
+#' datajud_consultar_processo(processo = c("0000001-89.2020.8.26.0000", "0000002-30.2021.8.26.0000"),
+#'                            tribunal = c("TJSP", "TJSP"),
+#'                            sleep = 1)
+
 datajud_consultar_processo <- function(processo,
                                        tribunal = NA,
                                        sleep = 0.1) {

@@ -50,17 +50,31 @@ print(consulta_completa)
 
 
 ### funcao para requisicao por assunto / codigo
-#' Title
+#' Pesquisa processos no Datajud por Classe e/ou Órgão Julgador
 #'
-#' @param tribunal
-#' @param lista_classe
-#' @param lista_orgao
-#' @param size
+#' Esta função realiza uma pesquisa no Datajud, permitindo filtrar processos por código de classe e/ou por código de órgão julgador.
+#' É possível especificar um tamanho máximo para a amostra de resultados retornados.
 #'
-#' @return
+#' @param tribunal Identificador do tribunal a ser consultado.
+#' @param lista_classe Vetor opcional de códigos de classe para filtrar os processos.
+#' @param lista_orgao Vetor opcional de códigos de órgão julgador para filtrar os processos.
+#' @param size Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.
+#'
+#' @return A função não retorna um valor diretamente, mas atribui a variável de saída (contendo os resultados da pesquisa) ao ambiente global.
+#' A função também emite mensagens de sucesso e informações sobre como verificar os resultados da pesquisa.
+#'
 #' @export
 #'
 #' @examples
+#' # Pesquisar processos no TJSP por classe de assunto 1116 e tamanho da amostra de 100
+#' datajud_pesquisar_classe_orgao(tribunal = "TJSP", lista_classe = c(1116), size = 100)
+#'
+#' # Pesquisar processos no TJMG por órgão julgador 13597 com o tamanho padrão da amostra
+#' datajud_pesquisar_classe_orgao(tribunal = "TJMG", lista_orgao = c(13597))
+#'
+#' # Pesquisar processos no TJRJ por classe de assunto e órgão julgador especificados
+#' datajud_pesquisar_classe_orgao(tribunal = "TJRJ", lista_classe = c(1116), lista_orgao = c(13597), size = 500)
+
 datajud_pesquisar_classe_orgao <- function(
     tribunal = NA,
     lista_classe = NULL,

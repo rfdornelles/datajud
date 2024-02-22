@@ -2,13 +2,30 @@
 % Please edit documentation in R/ler_dados.R
 \name{datajud_ler_movimentacoes}
 \alias{datajud_ler_movimentacoes}
-\title{Title}
+\title{Lê as movimentações de processos retornadas pelo Datajud}
 \usage{
 datajud_ler_movimentacoes(base = "datajud_resposta")
 }
 \arguments{
-\item{base}{}
+\item{base}{Lista contendo os dados dos processos ou o nome de uma variável global que
+armazena esses dados. Por padrão, utiliza "datajud_resposta", assumindo que
+os dados foram previamente armazenados com esse nome.}
+}
+\value{
+Imprime e retorna um data frame consolidado com as movimentações de todos os
+processos fornecidos. Cada linha representa uma movimentação específica, incluindo
+metadados relevantes para análises subsequentes.
 }
 \description{
-Title
+Esta função é utilizada para extrair e processar as movimentações dos processos
+judiciais obtidos a partir de uma pesquisa no Datajud. Ela pode operar diretamente
+sobre uma lista de processos ou sobre o nome de uma variável global que contém essa lista.
+É ideal para análises detalhadas das etapas processuais e suas características.
+}
+\examples{
+# Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
+datajud_ler_movimentacoes()
+
+# Se os dados das movimentações estiverem armazenados em uma variável customizada:
+datajud_ler_movimentacoes(base = minha_lista_movimentacoes)
 }

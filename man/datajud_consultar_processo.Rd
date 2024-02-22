@@ -2,13 +2,38 @@
 % Please edit documentation in R/requisicao.R
 \name{datajud_consultar_processo}
 \alias{datajud_consultar_processo}
-\title{Title}
+\title{Consulta processos judiciais no Datajud}
 \usage{
 datajud_consultar_processo(processo, tribunal = NA, sleep = 0.1)
 }
 \arguments{
-\item{tribunal}{}
+\item{processo}{Número do processo ou vetor de números dos processos a serem consultados.
+Deve ser fornecido como um valor ou vetor de caracteres.}
+
+\item{tribunal}{Identificador do tribunal correspondente ao(s) processo(s) sendo consultado(s).
+Se fornecido, deve ter o mesmo tamanho que o vetor \code{processo}.}
+
+\item{sleep}{Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
+no servidor. O valor padrão é 0.1 segundos. Deve ser um número positivo.}
+}
+\value{
+A função não retorna um valor diretamente ao ambiente de chamada, mas armazena
+os resultados da consulta em uma variável nomeada no ambiente global. Esta variável
+contém os detalhes dos processos consultados e pode ser acessada diretamente ou
+através de funções específicas como \code{datajud_ler_processo} ou \code{datajud_ler_movimentacoes}.
 }
 \description{
-Title
+Esta função realiza consultas de processos judiciais no Datajud, permitindo aos usuários
+buscar informações detalhadas por número de processo e tribunal específico. A função
+também suporta um intervalo de espera (\code{sleep}) entre as requisições para evitar sobrecarga
+no servidor. É necessário realizar identificação prévia através de \code{datajud_login} antes
+de executar consultas.
+}
+\examples{
+# Após realizar o login com datajud_login():
+datajud_consultar_processo(processo = "0000001-89.2020.8.26.0000", tribunal = "TJSP")
+# Para consultar múltiplos processos com intervalo de espera customizado:
+datajud_consultar_processo(processo = c("0000001-89.2020.8.26.0000", "0000002-30.2021.8.26.0000"),
+                           tribunal = c("TJSP", "TJSP"),
+                           sleep = 1)
 }

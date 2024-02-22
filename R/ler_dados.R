@@ -144,14 +144,26 @@ return(processo)
 
 ### funcao para ler dados de processo
 
-#' Title
+#' Lê os dados de processos retornados pelo Datajud
 #'
-#' @param base
+#' Após realizar uma pesquisa de processos com `datajud_pesquisar_classe_orgao`,
+#' esta função permite ler e manipular os dados dos processos retornados.
+#' Aceita tanto uma lista diretamente quanto o nome de uma variável global que contém a lista de processos.
 #'
-#' @return
+#' @param base Lista de processos ou o nome de uma variável global que contém os dados dos processos.
+#'             O padrão é "datajud_resposta", assumindo que os dados foram armazenados com esse nome.
+#'
+#' @return Imprime e retorna um data frame contendo os metadados dos processos.
+#'
 #' @export
 #'
 #' @examples
+#' # Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
+#' datajud_ler_processo()
+#' # Ou, se a lista de processos estiver armazenada em uma variável customizada:
+#' datajud_ler_processo(base = minha_lista_processos)
+
+
 datajud_ler_processo <- function(base = "datajud_resposta") {
 
   if (!is.list(base)) {
@@ -176,15 +188,30 @@ datajud_ler_processo <- function(base = "datajud_resposta") {
 
 ### funcao para ler movimentações de processo
 
-#' Title
+#' Lê as movimentações de processos retornadas pelo Datajud
 #'
-#' @param base
+#' Esta função é utilizada para extrair e processar as movimentações dos processos
+#' judiciais obtidos a partir de uma pesquisa no Datajud. Ela pode operar diretamente
+#' sobre uma lista de processos ou sobre o nome de uma variável global que contém essa lista.
+#' É ideal para análises detalhadas das etapas processuais e suas características.
 #'
-#' @return
+#' @param base Lista contendo os dados dos processos ou o nome de uma variável global que
+#'             armazena esses dados. Por padrão, utiliza "datajud_resposta", assumindo que
+#'             os dados foram previamente armazenados com esse nome.
+#'
+#' @return Imprime e retorna um data frame consolidado com as movimentações de todos os
+#'         processos fornecidos. Cada linha representa uma movimentação específica, incluindo
+#'         metadados relevantes para análises subsequentes.
+#'
 #' @export
 #'
 #' @examples
+#' # Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
+#' datajud_ler_movimentacoes()
 #'
+#' # Se os dados das movimentações estiverem armazenados em uma variável customizada:
+#' datajud_ler_movimentacoes(base = minha_lista_movimentacoes)
+
 datajud_ler_movimentacoes <- function(base = "datajud_resposta") {
 
   if (!is.list(base)) {

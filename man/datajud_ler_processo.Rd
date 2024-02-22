@@ -2,13 +2,25 @@
 % Please edit documentation in R/ler_dados.R
 \name{datajud_ler_processo}
 \alias{datajud_ler_processo}
-\title{Title}
+\title{Lê os dados de processos retornados pelo Datajud}
 \usage{
 datajud_ler_processo(base = "datajud_resposta")
 }
 \arguments{
-\item{base}{}
+\item{base}{Lista de processos ou o nome de uma variável global que contém os dados dos processos.
+O padrão é "datajud_resposta", assumindo que os dados foram armazenados com esse nome.}
+}
+\value{
+Imprime e retorna um data frame contendo os metadados dos processos.
 }
 \description{
-Title
+Após realizar uma pesquisa de processos com \code{datajud_pesquisar_classe_orgao},
+esta função permite ler e manipular os dados dos processos retornados.
+Aceita tanto uma lista diretamente quanto o nome de uma variável global que contém a lista de processos.
+}
+\examples{
+# Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
+datajud_ler_processo()
+# Ou, se a lista de processos estiver armazenada em uma variável customizada:
+datajud_ler_processo(base = minha_lista_processos)
 }
