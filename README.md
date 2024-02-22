@@ -1,5 +1,3 @@
-Pacote Datajud
-================
 
 # Pacote Datajud
 
