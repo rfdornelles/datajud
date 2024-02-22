@@ -1,9 +1,9 @@
 ler_movimentos <- function(item) {
 
   item <- purrr::pluck(item,
-                            "hits",
-                            "hits",
-                            1,
+                            # "hits",
+                            # "hits",
+                            # 1,
                             "_source")
 
   tribunal <- purrr::pluck(item, "tribunal")
@@ -65,9 +65,9 @@ ler_processo <- function(dados) {
 
 # cabecalho
   item <- purrr::pluck(dados,
-                       "hits",
-                       "hits",
-                       1,
+                       # "hits",
+                       # "hits",
+                       # 1,
                        "_source")
 
   id <- purrr::pluck(item, "id")
