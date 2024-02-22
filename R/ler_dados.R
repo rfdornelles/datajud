@@ -171,8 +171,13 @@ datajud_ler_processo <- function(base = "datajud_resposta") {
 # retornando os metadados do processo
   resposta <- purrr::map_df(
     base,
-    ler_processo
+    ler_processo,
+    .progress = TRUE
   )
+
+  # evitar duplicação de resposta
+  resposta <- dplyr::distinct(resposta)
+
 
   print(resposta)
 }
@@ -219,8 +224,13 @@ datajud_ler_movimentacoes <- function(base = "datajud_resposta") {
   # retornando os metadados do processo
   resposta <- purrr::map_df(
     base,
-    ler_movimentos
+    ler_movimentos,
+    .progress = TRUE
   )
 
+  # evitar duplicação de resposta
+  resposta <- dplyr::distinct(resposta)
+
+  # saída
   print(resposta)
 }
