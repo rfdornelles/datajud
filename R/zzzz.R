@@ -32,7 +32,12 @@
       cli::cli_end()
       cli::cli_h1("Utilização")
       cli::cli_alert_info("Identifique-se com seu email usando:")
-      cli::cli_bullets("          datajud_login(<seu email>)")
+      cli::cli_alert_success("          datajud_login(<seu email>)")
+      cli::cli_alert_success("          datajud_consultar_processo(<processo>)")
+      cli::cli_alert_success("          datajud_pesquisar_classe_orgao(<tribunal>, <classe>, <orgao>)")
+      cli::cli_alert_success("          datajud_ler_processo()")
+      cli::cli_alert_success("          datajud_ler_movimentacao()")
+
       cli::cli_end()
     })
   )
