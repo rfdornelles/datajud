@@ -6,7 +6,7 @@ monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
   clausula_assuntos <- ""
   if (!is.null(codigos_assunto) && length(codigos_assunto) > 0) {
     partes_assuntos <- purrr::map_chr(codigos_assunto,
-                                      ~glue::glue('{{"match": {{"classe.codigo": "{.x}"}}}}'))
+                                      ~glue::glue('{{"match": {{"classe.codigo": {.x}}}}}'))
     consulta_should_assuntos <- paste(partes_assuntos, collapse = ", ")
     clausula_assuntos <- glue::glue('"should": [{consulta_should_assuntos}], "minimum_should_match": 1')
   }
@@ -15,7 +15,7 @@ monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
   clausula_unidades <- ""
   if (!is.null(unidades_judiciarias) && length(unidades_judiciarias) > 0) {
     partes_unidades <- purrr::map_chr(unidades_judiciarias,
-                                      ~glue::glue('{{"match": {{"orgaoJulgador.codigo": "{.x}"}}}}'))
+                                      ~glue::glue('{{"match": {{"orgaoJulgador.codigo": {.x}}}}}'))
     consulta_filter_unidades <- paste(partes_unidades, collapse = ", ")
     clausula_unidades <- glue::glue('"filter": [{{"bool": {{"should": [{consulta_filter_unidades}]}}}}]')
   }
@@ -36,7 +36,7 @@ monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
       }}
     }}
   ')
-
+print(consulta_completa)
   return(consulta_completa)
 }
 
@@ -51,11 +51,19 @@ monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
 
 
 ### funcao para requisicao por assunto / codigo
-datajud_pesquisar_assunto_orgao <- function(
-    tribunal,
-    lista_assuntos = NULL,
-    lista_unidades = NULL,
-    size = 1000) {
+datajud_pesquisar_classe_orgao <- function(
+    tribunal = NA,
+    lista_classe = NULL,
+    lista_orgao = NULL,
+    size = 100) {
+
+  if(is.na(tribunal)) stop("Tribunal não informado")
+
+  if(is.null(lista_classe) & is.null(lista_orgao)) stop("Nenhum assunto ou unidade informados")
+
+  if(!is.numeric(size)) stop("Tamanho da amostra deve ser um número inteiro")
+
+  if(size < 1 | size > 10000) stop("Tamanho da amostra deve ser um número inteiro entre 1 e 10000")
 
   # checa se há key definida
   key = get_key()
@@ -69,9 +77,9 @@ datajud_pesquisar_assunto_orgao <- function(
 
   # montar body
   body <- monta_consulta_elasticsearch(
-    codigos_assunto = lista_assuntos,
-    unidades_judiciarias = lista_unidades,
-    size = size
+    codigos_assunto = lista_classe,
+    unidades_judiciarias = lista_orgao,
+    size = round(size)
   )
 
 
@@ -95,6 +103,17 @@ datajud_pesquisar_assunto_orgao <- function(
     purrr::pluck("hits", "hits") |>
     purrr::map_df(purrr::possibly(ler_processo, quiet = FALSE),
                   .progress = TRUE)
+
+  # nomear a variável de saída
+  nome_saida <- aux_nomeia_saida()
+
+  cli::cli_alert_success(glue::glue("Variável de saída: {nome_saida}"))
+  cli::cli_alert_info("Verifique a resposta da consulta com a função `datajud_ler_processo` ou `datajud_ler_movimentacoes`")
+
+
+  assign(x = nome_saida,
+         value = processos,
+         envir = .GlobalEnv)
 
   return(processos)
 }
