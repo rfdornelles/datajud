@@ -1,3 +1,9 @@
+## Funções auxiliares e de alto nível para extrair dados do Datajud, na modalidade de pesquisa por classe.codigo e/ou orgaoJulgador.codigo
+## sabemos que o Datajud se baseia em consulta do Elastic e, em tese, qualquer campo pode ser buscado
+## como TODO, uma função que permita busca por qualquer parâmetro
+
+## Aqui a função de alto nível é a datajud_pesquisar_classe_orgao, as demais são auxiliares
+
 monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
                                          unidades_judiciarias = NULL,
                                          size = 1000) {

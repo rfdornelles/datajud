@@ -1,16 +1,6 @@
-# .onLoad <- function(libname, pkgname) {
-#
-#   if(Sys.getenv("billing_project_id") == "") {
-#
-#     Sys.setenv(billing_project_set = FALSE)
-#
-#   } else {
-#
-#     Sys.setenv(billing_project_set = "user_has_set")
-#
-#   }
-#
-# }
+### Sabendo que o pacote se destina a users juristas, majoritariamente pouco habituados a tecnologia,
+## sigo a não-tão-boa prática de lembrar a utilização do pacote e os termos de uso a cada vez que o pacote é carregado
+## para que o usuário não esqueça deles.
 
 .onLoad <- function(libname, pkgname) {
   packageStartupMessage(

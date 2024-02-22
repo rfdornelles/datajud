@@ -1,3 +1,5 @@
+## Funções auxiliares e de alto nível para leitura dos dados já baixados do Datajud
+
 ler_movimentos <- function(item) {
 
   item <- purrr::pluck(item,
@@ -61,88 +63,77 @@ ler_movimentos <- function(item) {
 }
 
 ###
+# Função para ler os dados de um processo
 ler_processo <- function(dados) {
 
-# cabecalho
+  # Extrair o item do objeto de dados
   item <- purrr::pluck(dados,
-                       # "hits",
-                       # "hits",
-                       # 1,
                        "_source")
 
+  # Extrair o ID do processo
   id <- purrr::pluck(item, "id")
 
+  # Verificar se o ID é nulo e retornar NULL se for
   if(is.null(id)) {
     return(NULL)
   }
 
-## dados
-tribunal <- purrr::pluck(item, "tribunal")
-numero_processo <- purrr::pluck(item, "numeroProcesso")
-data_ajuizamento <- purrr::pluck(item, "dataAjuizamento")
+  ## Extrair os dados do processo
+  tribunal <- purrr::pluck(item, "tribunal")
+  numero_processo <- purrr::pluck(item, "numeroProcesso")
+  data_ajuizamento <- purrr::pluck(item, "dataAjuizamento")
+  data_atualizacao <- purrr::pluck(item, "dataHoraUltimaAtualizacao")
+  grau <- purrr::pluck(item, "grau")
+  nivel_sigilo <- purrr::pluck(item, "nivelSigilo")
+  formato <- purrr::pluck(item, "formato", "nome")
+  sistema <- purrr::pluck(item, "sistema", "nome")
+  classe_tpu <- purrr::pluck(item, "classe", "codigo")
+  classe_nome <- purrr::pluck(item, "classe", "nome")
+  assuntos <- purrr::pluck(item, "assuntos") |>
+    purrr::map_chr(
+      ~paste0( .x$codigo, " / ", .x$nome,
+               collapse = " | ")
+    )
+  orgao_jogador_codigo <- purrr::pluck(item, "orgaoJulgador", "codigo")
+  orgao_jogador_nome <- purrr::pluck(item, "orgaoJulgador", "nome")
+  orgao_jogador_ibge <- purrr::pluck(item, "orgaoJulgador", "codigoMunicipioIBGE")
 
-data_atualizacao <- purrr::pluck(item, "dataHoraUltimaAtualizacao")
-
-grau <- purrr::pluck(item, "grau")
-nivel_sigilo <- purrr::pluck(item, "nivelSigilo")
-formato <- purrr::pluck(item, "formato", "nome")
-sistema <- purrr::pluck(item, "sistema", "nome")
-
-classe_tpu <- purrr::pluck(item, "classe", "codigo")
-classe_nome <- purrr::pluck(item, "classe", "nome")
-
-assuntos <- purrr::pluck(item, "assuntos") |>
-  purrr::map_chr(
-    ~paste0( .x$codigo, " / ", .x$nome,
-             collapse = " | ")
+  # Criar um tibble com os dados do processo
+  processo <- tibble::tibble(
+    id = id,
+    tribunal = tribunal,
+    numero_processo = numero_processo,
+    data_ajuizamento = data_ajuizamento,
+    data_atualizacao = data_atualizacao,
+    grau = grau,
+    nivel_sigilo = nivel_sigilo,
+    formato = formato,
+    sistema = sistema,
+    classe_tpu = classe_tpu,
+    classe_nome = classe_nome,
+    assuntos = assuntos,
+    orgao_jogador_codigo = orgao_jogador_codigo,
+    orgao_jogador_nome = orgao_jogador_nome,
+    orgao_jogador_ibge = orgao_jogador_ibge
+  ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(),
+        ~ifelse(is.null(.x), NA, .x)
+      )
     )
 
-orgao_jogador_codigo <- purrr::pluck(item, "orgaoJulgador", "codigo")
-orgao_jogador_nome <- purrr::pluck(item, "orgaoJulgador", "nome")
-orgao_jogador_ibge <- purrr::pluck(item, "orgaoJulgador", "codigoMunicipioIBGE")
-
-#
-# movimentos <- purrr::pluck(item, "movimentos") |>
-#   purrr::map_df(read_movimentos)
-
-processo <- tibble::tibble(
-  id = id,
-  tribunal = tribunal,
-  numero_processo = numero_processo,
-  data_ajuizamento = data_ajuizamento,
-  data_atualizacao = data_atualizacao,
-  grau = grau,
-  nivel_sigilo = nivel_sigilo,
-  formato = formato,
-  sistema = sistema,
-  classe_tpu = classe_tpu,
-  classe_nome = classe_nome,
-  assuntos = assuntos,
-  orgao_jogador_codigo = orgao_jogador_codigo,
-  orgao_jogador_nome = orgao_jogador_nome,
-  orgao_jogador_ibge = orgao_jogador_ibge,
-  # movimentos = movimentos
-) |>
-  dplyr::mutate(
-    dplyr::across(
-      dplyr::everything(),
-      ~ifelse(is.null(.x), NA, .x)
-    ))
-  # ) |>
-  # tidyr::nest(data = movimentos)
-
+  # Converter as colunas de data para formato datetime
   processo <- processo |>
     dplyr::mutate(
       data_ajuizamento = lubridate::as_datetime(data_ajuizamento),
       data_atualizacao = lubridate::as_datetime(data_atualizacao)
     )
 
-#cli::cli_alert_success(glue::glue("Processo {id} lido com sucesso!"))
-
-return(processo)
+  return(processo)
 }
 
-### funcao para ler dados de processo
+### Função para ler os dados de um processo
 
 #' Lê os dados de processos retornados pelo Datajud
 #'

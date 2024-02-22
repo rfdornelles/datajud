@@ -1,3 +1,9 @@
+## Funções auxiliares e também de alto nível para buscar processos no Datajud
+## as auxiliares ajudam a identificar o endpoint, a identificar o tribunal pelo código CNJ e
+## o motor de consulta propriamente dito
+
+# A função de alto nível é a datajud_consultar_processo
+
 ## auxiliar para match de tribunal com o endpoint
 
 aux_retorna_endpoint <- function(tribunal) {

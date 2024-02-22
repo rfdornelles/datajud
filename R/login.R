@@ -1,3 +1,9 @@
+### Script com funções para informar o usuário nos headers e para obter a key do site do Datajud
+## como boa prática, exigimos que o user informe seu email para identificação
+## raspamos a key do site do CNJ para automatizar essa extração
+
+## Aqui a função de alto-nível é a datajud_login
+
 
 ## função para checar se a identificação foi feita
 checar_identificacao_valida <- function() {
