@@ -42,17 +42,10 @@ monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
       }}
     }}
   ')
-print(consulta_completa)
+
+  #print(consulta_completa)
   return(consulta_completa)
 }
-
-
-## buscar assuntos
-
-# httr::GET("https://gateway.cloud.pje.jus.br/tpu/api/v1/publico/consulta/assuntos?nome=consumidor") |> httr::content() -> b
-# b |> purrr::map_df(dplyr::bind_rows)
-
-# https://datajud-wiki.cnj.jus.br/api-publica/exemplos/exemplo2
 
 
 ### funcao para requisicao por assunto / codigo
