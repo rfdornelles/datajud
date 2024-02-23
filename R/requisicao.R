@@ -390,7 +390,7 @@ datajud_consultar_processo <- function(processo,
 
   # informar que a requisição está sendo feita
   cli::cli_alert_info(
-    glue::glue("Consultando processo {length(processo)} no Datajud!")
+    glue::glue("Consultando {length(processo)} processo(s) no Datajud!")
     )
 
   # chamada segura da funcao
