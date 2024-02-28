@@ -94,9 +94,9 @@ ler_processo <- function(dados) {
       ~paste0( .x$codigo, " / ", .x$nome,
                collapse = " | ")
     )
-  orgao_jogador_codigo <- purrr::pluck(item, "orgaoJulgador", "codigo")
-  orgao_jogador_nome <- purrr::pluck(item, "orgaoJulgador", "nome")
-  orgao_jogador_ibge <- purrr::pluck(item, "orgaoJulgador", "codigoMunicipioIBGE")
+  orgao_julgador_codigo <- purrr::pluck(item, "orgaoJulgador", "codigo")
+  orgao_julgador_nome <- purrr::pluck(item, "orgaoJulgador", "nome")
+  orgao_julgador_ibge <- purrr::pluck(item, "orgaoJulgador", "codigoMunicipioIBGE")
 
   # Criar um tibble com os dados do processo
   processo <- tibble::tibble(
@@ -112,9 +112,9 @@ ler_processo <- function(dados) {
     classe_tpu = classe_tpu,
     classe_nome = classe_nome,
     assuntos = assuntos,
-    orgao_jogador_codigo = orgao_jogador_codigo,
-    orgao_jogador_nome = orgao_jogador_nome,
-    orgao_jogador_ibge = orgao_jogador_ibge
+    orgao_julgador_codigo = orgao_julgador_codigo,
+    orgao_julgador_nome = orgao_julgador_nome,
+    orgao_julgador_ibge = orgao_julgador_ibge
   ) |>
     dplyr::mutate(
       dplyr::across(

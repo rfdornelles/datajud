@@ -6,6 +6,20 @@
 
 ## auxiliar para match de tribunal com o endpoint
 
+#' Retorna o endpoint correspondente ao tribunal informado
+#'
+#' Esta função auxiliar é destinada a identificar e retornar a URL do endpoint
+#' específico de um tribunal para consulta na API pública do DataJud.
+#'
+#' @param tribunal Um caractere que representa o código ou sigla do tribunal.
+#'
+#' @return Caractere com a URL do endpoint correspondente ao tribunal informado.
+#'
+#' @examples
+#' aux_retorna_endpoint("TST")
+#' aux_retorna_endpoint("trf01")
+#'
+#' @export
 aux_retorna_endpoint <- function(tribunal) {
 
   # limpar o nome do tribunal
@@ -125,6 +139,20 @@ aux_retorna_endpoint <- function(tribunal) {
 
 # conforme norma: https://atos.cnj.jus.br/files/compilado23285720221017634de539229ab.pdf
 # RESOLUÇÃO Nº 65, DE 16 DE DEZEMBRO DE 2008
+
+#' Identifica o tribunal com base no número CNJ de um processo
+#'
+#' A função analisa o número CNJ de um processo e retorna a sigla do tribunal correspondente,
+#' bem como o endpoint para consulta na API pública do DataJud.
+#'
+#' @param cnj Um caractere que representa o número CNJ de um processo.
+#'
+#' @return Um vetor com duas posições: a sigla do tribunal e a URL do endpoint correspondente.
+#'
+#' @examples
+#' aux_identifica_tribunal("0000102-03.2004.2.00.0000")
+#'
+#' @export
 
 aux_identifica_tribunal <- function(cnj) {
 

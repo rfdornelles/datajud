@@ -6,17 +6,17 @@
 \usage{
 datajud_pesquisar_classe_orgao(
   tribunal = NA,
-  lista_classe = NULL,
-  lista_orgao = NULL,
+  classe_codigo = NULL,
+  orgao_codigo = NULL,
   size = 100
 )
 }
 \arguments{
 \item{tribunal}{Identificador do tribunal a ser consultado.}
 
-\item{lista_classe}{Vetor opcional de códigos de classe para filtrar os processos.}
+\item{classe_codigo}{Vetor opcional de códigos de classe para filtrar os processos.}
 
-\item{lista_orgao}{Vetor opcional de códigos de órgão julgador para filtrar os processos.}
+\item{orgao_codigo}{Vetor opcional de códigos de órgão julgador para filtrar os processos.}
 
 \item{size}{Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.}
 }
@@ -30,11 +30,11 @@ Esta função realiza uma pesquisa no Datajud, permitindo filtrar processos por 
 }
 \examples{
 # Pesquisar processos no TJSP por classe de assunto 1116 e tamanho da amostra de 100
-datajud_pesquisar_classe_orgao(tribunal = "TJSP", lista_classe = c(1116), size = 100)
+datajud_pesquisar_classe_orgao(tribunal = "TJSP", classe_codigo = c(1116), size = 100)
 
 # Pesquisar processos no TJMG por órgão julgador 13597 com o tamanho padrão da amostra
-datajud_pesquisar_classe_orgao(tribunal = "TJMG", lista_orgao = c(13597))
+datajud_pesquisar_classe_orgao(tribunal = "TJMG", orgao_codigo = c(13597))
 
 # Pesquisar processos no TJRJ por classe de assunto e órgão julgador especificados
-datajud_pesquisar_classe_orgao(tribunal = "TJRJ", lista_classe = c(1116), lista_orgao = c(13597), size = 500)
+datajud_pesquisar_classe_orgao(tribunal = "TJRJ", classe_codigo = c(1116), orgao_codigo = c(13597), size = 500)
 }
