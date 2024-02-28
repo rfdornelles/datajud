@@ -19,3 +19,6 @@ Imports:
     jsonlite,
     purrr,
     rstudioapi
+Depends: 
+    R (>= 2.10)
+LazyData: true
