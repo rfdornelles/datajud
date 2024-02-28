@@ -13,4 +13,5 @@
 #'   \item{url}{URL do endpoint da API pública do tribunal.}
 #' }
 #' @source \url{https://datajud-wiki.cnj.jus.br/api-publica/endpoints/}
+#' @import tibble
 "tribunais"
