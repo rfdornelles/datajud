@@ -124,11 +124,21 @@ datajud_pesquisar_classe_orgao <- function(
     httr::content() |>
     purrr::pluck("hits", "hits")
 
-  # extrair metadados
-  # processos <- conteudo |>
-  #   #purrr::pluck("hits", "hits") |>
-  #   purrr::map_df(purrr::possibly(ler_processo, quiet = FALSE),
-  #                 .progress = TRUE)
+  # Verificar o resultado
+  if (is.null(conteudo) |
+      requisicao$status_code != "200") {
+
+    info_erro <- requisicao |>
+      httr::content() |>
+      purrr::pluck("error", "root_cause", 1)
+
+    cli::cli_alert_danger("Erro na requisição ou retorno vazio!")
+    cli::cli_alert_warning(glue::glue("Status code: {requisicao$status_code}"))
+    cli::cli_inform(glue::glue("Tipo de erro: {info_erro$type}"))
+    cli::cli_inform(glue::glue("Razão: {info_erro$reason}"))
+    cli::cli_inform(glue::glue("Linha: {info_erro$line} | Coluna: {info_erro$col}"))
+    return()
+  }
 
   # nomear a variável de saída
   nome_saida <- aux_nomeia_saida()
