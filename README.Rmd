@@ -2,7 +2,23 @@
 output: github_document
 ---
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+
 # Pacote Datajud
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
 
 O pacote Datajud é uma ferramenta não oficial desenvolvida para facilitar o acesso à API Pública do Datajud, disponibilizada pelo Conselho Nacional de Justiça (CNJ). Este documento fornece um guia sobre como instalar o pacote no R, aceitar os termos de uso do CNJ, e um fluxo básico de utilização do pacote.
 

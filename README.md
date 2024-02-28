@@ -1,5 +1,13 @@
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # Pacote Datajud
+
+<!-- badges: start -->
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
 
 O pacote Datajud é uma ferramenta não oficial desenvolvida para
 facilitar o acesso à API Pública do Datajud, disponibilizada pelo
@@ -16,8 +24,8 @@ portanto cuidado antes de utilizar em produção.
 
 ## Termos de Uso do CNJ
 
-A utilização do pacote Datajud implica na aceitação dos termos de uso
-estabelecidos pelo CNJ. Os principais pontos incluem:
+A utilização do pacote Datajud implica na aceitação tácita dos termos de
+uso estabelecidos pelo CNJ. Os principais pontos incluem:
 
 - **Aceitação Tacitamente**: Ao utilizar o pacote, você aceita
   tacitamente as condições estabelecidas pelo CNJ.
@@ -66,10 +74,23 @@ datajud_login("seu.email@dominio.com")
 
 Você pode iniciar a pesquisa de processos judiciais especificando o
 número do processo e o tribunal. Se não souber o Tribunal, o código
-tentará advinhar automaticamente
+tentará advinhar automaticamente.
+
+É indiferente o uso de pontos/traços pois serão ignorados.
 
 ``` r
 datajud_consultar_processo(processo = "numero_do_processo", tribunal = "sigla_do_tribunal")
+```
+
+É também possível pesquisar diversos processos em uma lista:
+
+``` r
+lista_cnj <- c("00008323520184013202", 
+               "07223914020178070001",
+               "00073039720138070015",
+               "00356079220168070018")
+
+datajud_consultar_processo(processo = lista_cnj)
 ```
 
 Para pesquisar por classe e órgão no tribunal especificado:
