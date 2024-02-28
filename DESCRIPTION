@@ -18,7 +18,8 @@ Imports:
     httr,
     jsonlite,
     purrr,
-    rstudioapi
+    rstudioapi,
+    tibble
 Depends: 
     R (>= 2.10)
 LazyData: true
