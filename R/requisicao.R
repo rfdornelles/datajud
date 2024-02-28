@@ -22,118 +22,36 @@
 #' @export
 aux_retorna_endpoint <- function(tribunal) {
 
-  # limpar o nome do tribunal
-  tribunal_limpo <- stringr::str_remove_all(tribunal,"[^a-zA-Z0-9]") |>
-    stringr::str_to_lower()
+    # Limpar o nome do tribunal
+    tribunal_limpo <- stringr::str_remove_all(tribunal, "[^a-zA-Z0-9]")  |>
+      stringr::str_to_lower()
 
-  # endpoint
-  url_tribunal <- switch(
-    tribunal_limpo,
-    # superiores
-    "tst" = "https://api-publica.datajud.cnj.jus.br/api_publica_tst/_search",
-    "tse" = "https://api-publica.datajud.cnj.jus.br/api_publica_tse/_search",
-    "stj" = "https://api-publica.datajud.cnj.jus.br/api_publica_stj/_search",
-    "stm" = "https://api-publica.datajud.cnj.jus.br/api_publica_stm/_search",
+    # Normalizar siglas que começam com trt ou trf
+    if (stringr::str_detect(tribunal_limpo, "^(trf|trt)")) {
 
-    # federal comum
-    "trf01" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf1/_search",
-    "trf02" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf2/_search",
-    "trf03" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf3/_search",
-    "trf04" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf4/_search",
-    "trf05" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf5/_search",
-    "trf06" = "https://api-publica.datajud.cnj.jus.br/api_publica_trf6/_search",
+      # Extrai os dois dígitos seguintes, ajustando se começar com 0
+      digitos <- stringr::str_extract(tribunal_limpo, "[0-9]{1,2}") |>
+        as.numeric()
 
-    # estadual comum
-    "tjac" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjac/_search",
-    "tjal" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjal/_search",
-    "tjam" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjam/_search",
-    "tjap" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjap/_search",
-    "tjba" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjba/_search",
-    "tjce" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjce/_search",
-    "tjdft" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjdft/_search",
-    "tjes" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjes/_search",
-    "tjgo" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjgo/_search",
-    "tjma" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjma/_search",
-    "tjmg" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmg/_search",
-    "tjms" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjms/_search",
-    "tjmt" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmt/_search",
-    "tjpa" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjpa/_search",
-    "tjpb" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjpb/_search",
-    "tjpe" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjpe/_search",
-    "tjpi" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjpi/_search",
-    "tjpr" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjpr/_search",
-    "tjro" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjro/_search",
-    "tjrr" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjrr/_search",
-    "tjrs" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjrs/_search",
-    "tjsc" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjsc/_search",
-    "tjse" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjse/_search",
-    "tjsp" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjsp/_search",
-    "tjto" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjto/_search",
+      # Reconstruir a sigla normalizada
+      tribunal_limpo <- paste0(stringr::str_extract(tribunal_limpo, "^(trf|trt)"), digitos)
+    }
 
-    # trabalhista
-    "trt01" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt1/_search",
-    "trt02" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt2/_search",
-    "trt03" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt3/_search",
-    "trt04" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt4/_search",
-    "trt05" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt5/_search",
-    "trt06" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt6/_search",
-    "trt07" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt7/_search",
-    "trt08" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt8/_search",
-    "trt09" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt9/_search",
-    "trt10" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt10/_search",
-    "trt11" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt11/_search",
-    "trt12" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt12/_search",
-    "trt13" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt13/_search",
-    "trt14" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt14/_search",
-    "trt15" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt15/_search",
-    "trt16" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt16/_search",
-    "trt17" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt17/_search",
-    "trt18" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt18/_search",
-    "trt19" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt19/_search",
-    "trt20" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt20/_search",
-    "trt21" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt21/_search",
-    "trt22" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt22/_search",
-    "trt23" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt23/_search",
-    "trt24" = "https://api-publica.datajud.cnj.jus.br/api_publica_trt24/_search",
+    # Buscar o endpoint na tabela
+    url_tribunal <- datajud::tribunais |>
+      dplyr::filter(stringr::str_to_lower(sigla) == tribunal_limpo) |>
+      dplyr::pull(url) |>
+      unique()
 
-    # eleitoral
-    "treac" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-ac/_search",
-    "treal" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-al/_search",
-    "tream" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-am/_search",
-    "treap" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-ap/_search",
-    "treba" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-ba/_search",
-    "trece" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-ce/_search",
-    "tredft" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-dft/_search",
-    "trees" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-es/_search",
-    "trego" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-go/_search",
-    "trema" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-ma/_search",
-    "tremg" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-mg/_search",
-    "trems" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-ms/_search",
-    "tremt" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-mt/_search",
-    "trepa" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-pa/_search",
-    "trepb" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-pb/_search",
-    "trepe" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-pe/_search",
-    "trepi" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-pi/_search",
-    "trepr" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-pr/_search",
-    "trerj" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-rj/_search",
-    "trern" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-rn/_search",
-    "trero" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-ro/_search",
-    "trerr" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-rr/_search",
-    "trers" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-rs/_search",
-    "tresc" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-sc/_search",
-    "trese" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-se/_search",
-    "tresp" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-sp/_search",
-    "treto" = "https://api-publica.datajud.cnj.jus.br/api_publica_tre-to/_search",
+    if (length(url_tribunal) == 0) {
+      cli::cli_abort("Tribunal não encontrado ou não disponível no Datajud")
+    } else if (length(url_tribunal) > 1) {
+      cli::cli_abort("Múltiplas URLs encontradas para a sigla fornecida")
+    }
 
-    # militar estadual
-    "tjmmg" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmmg/_search",
-    "tjmrs" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmrs/_search",
-    "tjmsp" = "https://api-publica.datajud.cnj.jus.br/api_publica_tjmsp/_search",
-
-      NULL
-  )
-  return(url_tribunal)
+    return(url_tribunal[1])
 }
+
 
 ## auxiliar para identificar tribunal pelo CNJ
 
@@ -150,7 +68,7 @@ aux_retorna_endpoint <- function(tribunal) {
 #' @return Um vetor com duas posições: a sigla do tribunal e a URL do endpoint correspondente.
 #'
 #' @examples
-#' aux_identifica_tribunal("0000102-03.2004.2.00.0000")
+#' aux_identifica_tribunal("0000102-03.2004.8.26.0000")
 #'
 #' @export
 
