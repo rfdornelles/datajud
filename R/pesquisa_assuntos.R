@@ -4,14 +4,14 @@
 
 ## Aqui a função de alto nível é a datajud_pesquisar_classe_orgao, as demais são auxiliares
 
-monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
-                                         unidades_judiciarias = NULL,
+monta_consulta_elasticsearch <- function(assunto_codigo = NULL,
+                                         orgao_codigo = NULL,
                                          size = 1000) {
 
   # Partes da consulta para assuntos, se fornecidos
   clausula_assuntos <- ""
-  if (!is.null(codigos_assunto) && length(codigos_assunto) > 0) {
-    partes_assuntos <- purrr::map_chr(codigos_assunto,
+  if (!is.null(assunto_codigo) && length(assunto_codigo) > 0) {
+    partes_assuntos <- purrr::map_chr(assunto_codigo,
                                       ~glue::glue('{{"match": {{"classe.codigo": {.x}}}}}'))
     consulta_should_assuntos <- paste(partes_assuntos, collapse = ", ")
     clausula_assuntos <- glue::glue('"should": [{consulta_should_assuntos}], "minimum_should_match": 1')
@@ -19,8 +19,8 @@ monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
 
   # Partes da consulta para unidades judiciárias, se fornecidas
   clausula_unidades <- ""
-  if (!is.null(unidades_judiciarias) && length(unidades_judiciarias) > 0) {
-    partes_unidades <- purrr::map_chr(unidades_judiciarias,
+  if (!is.null(orgao_codigo) && length(orgao_codigo) > 0) {
+    partes_unidades <- purrr::map_chr(orgao_codigo,
                                       ~glue::glue('{{"match": {{"orgaoJulgador.codigo": {.x}}}}}'))
     consulta_filter_unidades <- paste(partes_unidades, collapse = ", ")
     clausula_unidades <- glue::glue('"filter": [{{"bool": {{"should": [{consulta_filter_unidades}]}}}}]')
@@ -55,8 +55,8 @@ monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
 #' É possível especificar um tamanho máximo para a amostra de resultados retornados.
 #'
 #' @param tribunal Identificador do tribunal a ser consultado.
-#' @param lista_classe Vetor opcional de códigos de classe para filtrar os processos.
-#' @param lista_orgao Vetor opcional de códigos de órgão julgador para filtrar os processos.
+#' @param classe_codigo Vetor opcional de códigos de classe para filtrar os processos.
+#' @param orgao_codigo Vetor opcional de códigos de órgão julgador para filtrar os processos.
 #' @param size Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.
 #'
 #' @return A função não retorna um valor diretamente, mas atribui a variável de saída (contendo os resultados da pesquisa) ao ambiente global.
@@ -66,23 +66,23 @@ monta_consulta_elasticsearch <- function(codigos_assunto = NULL,
 #'
 #' @examples
 #' # Pesquisar processos no TJSP por classe de assunto 1116 e tamanho da amostra de 100
-#' datajud_pesquisar_classe_orgao(tribunal = "TJSP", lista_classe = c(1116), size = 100)
+#' datajud_pesquisar_classe_orgao(tribunal = "TJSP", classe_codigo = c(1116), size = 100)
 #'
 #' # Pesquisar processos no TJMG por órgão julgador 13597 com o tamanho padrão da amostra
-#' datajud_pesquisar_classe_orgao(tribunal = "TJMG", lista_orgao = c(13597))
+#' datajud_pesquisar_classe_orgao(tribunal = "TJMG", orgao_codigo = c(13597))
 #'
 #' # Pesquisar processos no TJRJ por classe de assunto e órgão julgador especificados
-#' datajud_pesquisar_classe_orgao(tribunal = "TJRJ", lista_classe = c(1116), lista_orgao = c(13597), size = 500)
+#' datajud_pesquisar_classe_orgao(tribunal = "TJRJ", classe_codigo = c(1116), orgao_codigo = c(13597), size = 500)
 
 datajud_pesquisar_classe_orgao <- function(
     tribunal = NA,
-    lista_classe = NULL,
-    lista_orgao = NULL,
+    classe_codigo = NULL,
+    orgao_codigo = NULL,
     size = 100) {
 
   if(is.na(tribunal)) stop("Tribunal não informado")
 
-  if(is.null(lista_classe) & is.null(lista_orgao)) stop("Nenhum assunto ou unidade informados")
+  if(is.null(classe_codigo) & is.null(orgao_codigo)) stop("Nenhum assunto ou unidade informados")
 
   if(!is.numeric(size)) stop("Tamanho da amostra deve ser um número inteiro")
 
@@ -101,8 +101,8 @@ datajud_pesquisar_classe_orgao <- function(
 
   # montar body
   body <- monta_consulta_elasticsearch(
-    codigos_assunto = lista_classe,
-    unidades_judiciarias = lista_orgao,
+    assunto_codigo = classe_codigo,
+    orgao_codigo = orgao_codigo,
     size = round(size)
   )
 
