@@ -1,0 +1,9 @@
+# Atualiza semanalmente as actions usadas pelos workflows do GitHub.
+# As dependências R declaradas em DESCRIPTION não possuem ecossistema
+# nativo no Dependabot; sua atualização será tratada em issue própria.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
