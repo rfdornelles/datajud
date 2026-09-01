@@ -13,6 +13,12 @@ test_that("cliente usa argumento antes da variável de ambiente", {
   expect_identical(cliente$timeout, 10)
 })
 
+test_that("cliente sem e-mail não adiciona e-mail ao User-Agent", {
+  cliente <- datajud::datajud_cliente("chave-teste", email = "")
+  expect_identical(cliente$email, "")
+  expect_false(any(grepl("e-mail", as.character(datajud:::cliente_user_agent(cliente)))))
+})
+
 test_that("impressão do cliente não expõe a chave", {
   cliente <- datajud::datajud_cliente("segredo-nao-imprimir", email = "a@b.org")
   saida <- testthat::capture_messages(print(cliente))

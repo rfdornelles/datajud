@@ -7,8 +7,7 @@
 datajud_ler_processo(base)
 }
 \arguments{
-\item{base}{Lista de processos ou o nome de uma variável global que contém os dados dos processos.
-O padrão é "datajud_resposta", assumindo que os dados foram armazenados com esse nome.}
+\item{base}{Lista de respostas de processos retornadas pela API.}
 }
 \value{
 Imprime e retorna um data frame contendo os metadados dos processos.
@@ -20,9 +19,7 @@ Aceita tanto uma lista diretamente quanto o nome de uma variável global que con
 }
 \examples{
 \dontrun{
-# Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
-datajud_ler_processo()
-# Ou, se a lista de processos estiver armazenada em uma variável customizada:
-datajud_ler_processo(base = minha_lista_processos)
+resposta <- datajud_consultar_processo(processo, cliente)
+datajud_ler_processo(resposta)
 }
 }

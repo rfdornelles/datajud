@@ -208,6 +208,7 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
     body = body,
     httr::add_headers(headers),
     cliente_user_agent(cliente),
+    httr::timeout(cliente$timeout)
   )
 
   if (requisicao$status_code != 200) {
@@ -261,10 +262,7 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
 #' @param sleep Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
 #'              no servidor. O valor padrão é 0.1 segundos. Deve ser um número positivo.
 #'
-#' @return A função não retorna um valor diretamente ao ambiente de chamada, mas armazena
-#'         os resultados da consulta em uma variável nomeada no ambiente global. Esta variável
-#'         contém os detalhes dos processos consultados e pode ser acessada diretamente ou
-#'         através de funções específicas como `datajud_ler_processo` ou `datajud_ler_movimentacoes`.
+#' @return Uma lista com uma resposta por processo. Respostas que falharem podem ser `NULL`.
 #'
 #' @export
 #'

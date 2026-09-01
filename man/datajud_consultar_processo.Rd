@@ -19,10 +19,7 @@ Se fornecido, deve ter o mesmo tamanho que o vetor \code{processo}.}
 no servidor. O valor padrão é 0.1 segundos. Deve ser um número positivo.}
 }
 \value{
-A função não retorna um valor diretamente ao ambiente de chamada, mas armazena
-os resultados da consulta em uma variável nomeada no ambiente global. Esta variável
-contém os detalhes dos processos consultados e pode ser acessada diretamente ou
-através de funções específicas como \code{datajud_ler_processo} ou \code{datajud_ler_movimentacoes}.
+Uma lista com uma resposta por processo. Respostas que falharem podem ser \code{NULL}.
 }
 \description{
 Esta função realiza consultas de processos judiciais no Datajud, permitindo aos usuários

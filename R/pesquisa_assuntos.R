@@ -60,8 +60,7 @@ monta_consulta_elasticsearch <- function(assunto_codigo = NULL,
 #' @param orgao_codigo Vetor opcional de códigos de órgão julgador para filtrar os processos.
 #' @param size Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.
 #'
-#' @return A função não retorna um valor diretamente, mas atribui a variável de saída (contendo os resultados da pesquisa) ao ambiente global.
-#' A função também emite mensagens de sucesso e informações sobre como verificar os resultados da pesquisa.
+#' @return Uma lista com os processos encontrados pela consulta.
 #'
 #' @export
 #'
@@ -78,7 +77,7 @@ monta_consulta_elasticsearch <- function(assunto_codigo = NULL,
 #' }
 
 datajud_pesquisar_classe_orgao <- function(
-    tribunal = NA,
+    tribunal,
     cliente,
     classe_codigo = NULL,
     orgao_codigo = NULL,
@@ -119,7 +118,8 @@ datajud_pesquisar_classe_orgao <- function(
     url = url,
     body = body,
     httr::add_headers(headers),
-    cliente_user_agent(cliente)
+    cliente_user_agent(cliente),
+    httr::timeout(cliente$timeout)
   )
 
   # extrair conteudo
