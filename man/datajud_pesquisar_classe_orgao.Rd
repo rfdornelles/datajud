@@ -6,6 +6,7 @@
 \usage{
 datajud_pesquisar_classe_orgao(
   tribunal = NA,
+  cliente,
   classe_codigo = NULL,
   orgao_codigo = NULL,
   size = 100
@@ -13,6 +14,8 @@ datajud_pesquisar_classe_orgao(
 }
 \arguments{
 \item{tribunal}{Identificador do tribunal a ser consultado.}
+
+\item{cliente}{Objeto criado por \code{datajud_cliente()}.}
 
 \item{classe_codigo}{Vetor opcional de códigos de classe para filtrar os processos.}
 

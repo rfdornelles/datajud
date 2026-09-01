@@ -4,7 +4,7 @@
 \alias{datajud_ler_movimentacoes}
 \title{Lê as movimentações de processos retornadas pelo Datajud}
 \usage{
-datajud_ler_movimentacoes(base = "datajud_resposta")
+datajud_ler_movimentacoes(base)
 }
 \arguments{
 \item{base}{Lista contendo os dados dos processos ou o nome de uma variável global que

@@ -157,17 +157,10 @@ ler_processo <- function(dados) {
 #' }
 
 
-datajud_ler_processo <- function(base = "datajud_resposta") {
+datajud_ler_processo <- function(base) {
 
   if (!is.list(base)) {
-    if (!exists(base, envir = .GlobalEnv)) {
-      stop("Base de dados n\u00E3o encontrada")
-    }
-    base <- get(base, envir = .GlobalEnv)
-  }
-
-  if (!is.list(base)) {
-    stop("Base n\u00E3o \u00E9 uma lista ou o nome de uma lista existente")
+    stop("base deve ser uma lista de respostas do Datajud")
   }
 
 # retornando os metadados do processo
@@ -181,7 +174,7 @@ datajud_ler_processo <- function(base = "datajud_resposta") {
   resposta <- dplyr::distinct(resposta)
 
 
-  print(resposta)
+  resposta
 }
 
 ### funcao para ler movimentações de processo
@@ -212,17 +205,10 @@ datajud_ler_processo <- function(base = "datajud_resposta") {
 #' datajud_ler_movimentacoes(base = minha_lista_movimentacoes)
 #' }
 
-datajud_ler_movimentacoes <- function(base = "datajud_resposta") {
+datajud_ler_movimentacoes <- function(base) {
 
   if (!is.list(base)) {
-    if (!exists(base, envir = .GlobalEnv)) {
-      stop("Base de dados n\u00E3o encontrada")
-    }
-    base <- get(base, envir = .GlobalEnv)
-  }
-
-  if (!is.list(base)) {
-    stop("Base n\u00E3o \u00E9 uma lista ou o nome de uma lista existente")
+    stop("base deve ser uma lista de respostas do Datajud")
   }
 
   # retornando os metadados do processo
@@ -236,5 +222,5 @@ datajud_ler_movimentacoes <- function(base = "datajud_resposta") {
   resposta <- dplyr::distinct(resposta)
 
   # saída
-  print(resposta)
+  resposta
 }

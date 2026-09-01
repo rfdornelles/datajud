@@ -157,7 +157,9 @@ aux_identifica_tribunal <- function(cnj) {
 
 }
 
-datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
+datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
+
+  validar_cliente(cliente)
 
   if(is.na(tribunal)) {
 
@@ -183,12 +185,9 @@ datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
     return(NULL)
   }
 
-  # checa se há key definida
-  key = datajud:::get_key()
-
   # headers
   headers = c(
-    'Authorization' = paste0('APIKey ', key),
+    'Authorization' = paste0('APIKey ', cliente$api_key),
     'Content-Type' = 'application/json'
   )
 
@@ -208,7 +207,7 @@ datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
     url = url_tribunal,
     body = body,
     httr::add_headers(headers),
-    user()
+    cliente_user_agent(cliente),
   )
 
   if (requisicao$status_code != 200) {
@@ -245,30 +244,6 @@ datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
   return(resposta)
 }
 
-## auxiliar para identificar variaveis "livres"
-
-aux_nomeia_saida <- function(nome_inicial = "datajud_resposta") {
-
-  nome <- nome_inicial
-
-  # loop para verificar se existe no environment global
-  i <- 1
-  while(exists(nome, envir = .GlobalEnv) & i <= 20) {
-    nome <- paste0("datajud_resposta_", i)
-    i <- i + 1
-  }
-
-  # se já existir 20 variáveis com o mesmo nome, sobrescreve e avisa
-  if(i > 20) {
-    nome <- nome_inicial
-    cli::cli_alert_info(glue::glue(
-      "J\u00E1 existem +20 vari\u00E1veis com o nome {nome}, sobrescrevendo a primeira."
-      )
-    )
-  }
-
-  return(nome)
-}
 ## pesquisar processos
 
 #' Consulta processos judiciais no Datajud
@@ -276,11 +251,11 @@ aux_nomeia_saida <- function(nome_inicial = "datajud_resposta") {
 #' Esta função realiza consultas de processos judiciais no Datajud, permitindo aos usuários
 #' buscar informações detalhadas por número de processo e tribunal específico. A função
 #' também suporta um intervalo de espera (`sleep`) entre as requisições para evitar sobrecarga
-#' no servidor. É necessário realizar identificação prévia através de `datajud_login` antes
-#' de executar consultas.
+#' no servidor. É necessário fornecer um cliente criado por `datajud_cliente()`.
 #'
 #' @param processo Número do processo ou vetor de números dos processos a serem consultados.
 #'                 Deve ser fornecido como um valor ou vetor de caracteres.
+#' @param cliente Objeto criado por `datajud_cliente()`.
 #' @param tribunal Identificador do tribunal correspondente ao(s) processo(s) sendo consultado(s).
 #'                 Se fornecido, deve ter o mesmo tamanho que o vetor `processo`.
 #' @param sleep Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
@@ -295,8 +270,9 @@ aux_nomeia_saida <- function(nome_inicial = "datajud_resposta") {
 #'
 #' @examples
 #' \dontrun{
-#' # Após realizar o login com datajud_login():
-#' datajud_consultar_processo(processo = "0000001-89.2020.8.26.0000", tribunal = "TJSP")
+#' # Criar o cliente e consultar um processo:
+#' cliente <- datajud_cliente(api_key = "sua-chave")
+#' datajud_consultar_processo("0000001-89.2020.8.26.0000", cliente, tribunal = "TJSP")
 #' # Para consultar múltiplos processos com intervalo de espera customizado:
 #' datajud_consultar_processo(processo = c("0000001-89.2020.8.26.0000", "0000002-30.2021.8.26.0000"),
 #'                            tribunal = c("TJSP", "TJSP"),
@@ -304,6 +280,7 @@ aux_nomeia_saida <- function(nome_inicial = "datajud_resposta") {
 #' }
 
 datajud_consultar_processo <- function(processo,
+                                       cliente,
                                        tribunal = NA,
                                        sleep = 0.1) {
 
@@ -328,12 +305,7 @@ datajud_consultar_processo <- function(processo,
     return()
   }
 
-  # checar se o login foi realizado
-  if(datajud:::checar_identificacao_valida() == FALSE) {
-    cli::cli_alert_danger("Voc\u00EA precisa se identificar para realizar a consulta.")
-    cli::cli_alert_info("Use datajud::datajud_login()")
-    return()
-  }
+  validar_cliente(cliente)
 
 
   # informar que a requisição está sendo feita
@@ -351,7 +323,7 @@ datajud_consultar_processo <- function(processo,
     .y = tribunal,
     .f = ~ {
 
-      resultado <- safe_requisition(.x, .y)
+      resultado <- safe_requisition(.x, cliente, .y)
 
       Sys.sleep(sleep)
 
@@ -373,16 +345,5 @@ datajud_consultar_processo <- function(processo,
     glue::glue("Requisi\u00E7\u00E3o finalizada! {respostas_validas}/{length(processo)} processos consultados com sucesso!")
   )
 
-  # nomear a variável de saída
-  nome_saida <- aux_nomeia_saida()
-
-  cli::cli_alert_success(glue::glue("Vari\u00E1vel de sa\u00EDda: {nome_saida}"))
-  cli::cli_alert_info("Verifique a resposta da consulta com a fun\u00E7\u00E3o `datajud_ler_processo` ou `datajud_ler_movimentacoes`")
-
-
-  assign(x = nome_saida,
-         value = resposta,
-         envir = .GlobalEnv)
-
-  invisible(resposta)
+  resposta
 }
