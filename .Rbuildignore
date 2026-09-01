@@ -4,6 +4,7 @@
 ^README\.Rmd$
 ^data-raw$
 ^\.cache$
+^\.github$
 ^roadmap$
 ^scripts$
 ^datajud\.Rcheck$
