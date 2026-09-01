@@ -1,0 +1,31 @@
+name: Cobertura de testes
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    name: Medir cobertura no R 4.2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+      - name: Configurar R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.2'
+          use-public-rspm: true
+      - name: Instalar dependências
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          needs: coverage
+          extra-packages: any::covr
+          cache: true
+      - name: Gerar relatório de cobertura
+        run: |
+          Rscript -e 'resultado <- covr::package_coverage(); print(resultado); cat("Cobertura total: ", covr::percent_coverage(resultado), "%\\n", sep = "")'
