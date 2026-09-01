@@ -74,7 +74,8 @@ aux_retorna_endpoint <- function(tribunal) {
 
 aux_identifica_tribunal <- function(cnj) {
 
-  cnj_limpo <- gsub("[^0-9]", "", cnj)
+  if (length(cnj) != 1L || is.na(cnj)) stop("N\u00FAmero do processo inv\u00E1lido")
+  cnj_limpo <- normalizar_numero_cnj(cnj)
 
   # validar se tem 20 dígitos
   if (nchar(cnj_limpo) != 20) {
@@ -157,6 +158,15 @@ aux_identifica_tribunal <- function(cnj) {
 
 }
 
+normalizar_numero_cnj <- function(processo) {
+  if (length(processo) != 1L || is.na(processo) || !nzchar(trimws(processo))) {
+    stop("N\u00FAmero do processo inv\u00E1lido")
+  }
+  limpo <- gsub("[^0-9]", "", processo)
+  if (nchar(limpo) != 20L) stop("N\u00FAmero do processo inv\u00E1lido")
+  limpo
+}
+
 datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
 
   validar_cliente(cliente)
@@ -179,11 +189,7 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
   }
 
   # checa o numero do processo
-  numero_cnj_limpo <- gsub("[^0-9]", "", processo)
-  if(nchar(numero_cnj_limpo) != 20) {
-    stop("N\u00FAmero do processo inv\u00E1lido")
-    return(NULL)
-  }
+  numero_cnj_limpo <- normalizar_numero_cnj(processo)
 
   # headers
   headers = c(
@@ -285,22 +291,19 @@ datajud_consultar_processo <- function(processo,
   # checar se processo foi informado
   processo <- as.character(processo)
 
-  if (length(processo) < 1 | any(processo == "")) {
-    cli::cli_alert_danger("N\u00FAmero do processo n\u00E3o informado")
-    return()
+  if (length(processo) < 1L || anyNA(processo) || any(!nzchar(trimws(processo)))) {
+    cli::cli_abort("N\u00FAmero do processo n\u00E3o informado")
   }
 
   # checar se tribunal é null ou se têm o mesmo tamanho que processo
-  if(!is.na(tribunal) & length(tribunal) != length(processo)) {
-    cli::cli_alert_danger("O campo Tribunal n\u00E3o tem o mesmo tamanho que o campo processo.")
-    cli::cli_alert_info("Informe listas do mesmo tamanho ou deixe o campo tribunal em branco.")
-    return()
+  if (length(tribunal) == 0L || length(tribunal) > 1L && length(tribunal) != length(processo) ||
+      length(tribunal) > 1L && anyNA(tribunal)) {
+    cli::cli_abort("O campo Tribunal n\u00E3o tem o mesmo tamanho que o campo processo.")
   }
 
   # checar se sleep é válido
-  if(!is.numeric(sleep) | sleep < 0 | sleep > 10000) {
-    cli::cli_alert_danger("Valor de sleep inv\u00E1lido. Informe n\u00FAmero positivo inferior a 10.000.")
-    return()
+  if(!is.numeric(sleep) || length(sleep) != 1L || !is.finite(sleep) || sleep < 0 || sleep > 60) {
+    cli::cli_abort("Valor de sleep inv\u00E1lido. Informe n\u00FAmero positivo entre 0 e 60.")
   }
 
   validar_cliente(cliente)
@@ -316,9 +319,10 @@ datajud_consultar_processo <- function(processo,
                                       otherwise = NULL,
                                       quiet = FALSE)
   # rodar loop
+  tribunais <- if (length(tribunal) == 1L) rep(tribunal, length(processo)) else tribunal
   resposta <- purrr::map2(
     .x = processo,
-    .y = tribunal,
+    .y = tribunais,
     .f = ~ {
 
       resultado <- safe_requisition(.x, cliente, .y)
