@@ -12,6 +12,7 @@ test_that("fixture válida pode ser lida por processo e movimentos", {
   expect_equal(nrow(movimentos), 1L)
   expect_equal(processo$orgao_julgador_codigo, 1234)
   expect_equal(processo$orgao_julgador_nome, "1ª Vara Cível")
+  expect_equal(processo$id, "processo-exemplo-1")
   expect_equal(movimentos$codigo_tpu, 51)
   expect_equal(movimentos$nome_orgao_julgador, "1ª Vara Cível")
 })
