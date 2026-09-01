@@ -51,7 +51,7 @@ datajud_cliente <- function(api_key = NULL, email = NULL, timeout = 30,
     cli::cli_abort("O e-mail informado \u00E9 inv\u00E1lido.")
   }
   if (!is.numeric(timeout) || length(timeout) != 1L || !is.finite(timeout) || timeout <= 0) {
-    cli::cli_abort("timeout deve ser um número positivo.")
+    cli::cli_abort("timeout deve ser um n\u00FAmero positivo.")
   }
   if (!is.numeric(max_tentativas) || length(max_tentativas) != 1L ||
       !is.finite(max_tentativas) || max_tentativas < 1 || max_tentativas != round(max_tentativas)) {
