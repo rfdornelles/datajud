@@ -16,9 +16,9 @@
     "assuntos": [
       {"codigo": 899, "nome": "Indenização por dano moral"}
     ],
-    "orgaoJulgador": [
-      {"codigo": 1234, "nome": "1ª Vara Cível", "codigoMunicipioIBGE": 3550308}
-    ],
+    "orgaoJulgador": {
+      "codigo": 1234, "nome": "1ª Vara Cível", "codigoMunicipioIBGE": 3550308
+    },
     "movimentos": [
       {
         "codigo": 51,
@@ -28,7 +28,7 @@
           {"codigo": 1, "descricao": "Complemento", "valor": "Exemplo", "nome": "Tipo"}
         ],
         "orgaoJulgador": [
-          {"codigoOrgao": 1234, "nome": "1ª Vara Cível"}
+          {"codigoOrgao": 1234, "nomeOrgao": "1ª Vara Cível"}
         ]
       }
     ]
