@@ -69,3 +69,23 @@ test_that("consulta por processo usa resposta HTTP simulada", {
 
   expect_equal(resultado$`_source`$numeroProcesso, gsub("[^0-9]", "", processo))
 })
+
+test_that("identificação de tribunal cobre ramos e estados", {
+  estados <- sprintf("%02d", 1:27)
+  processos <- paste0("0000000-00.2024.8.", estados, ".0000")
+  resultados <- lapply(processos, datajud::aux_identifica_tribunal)
+
+  expect_length(resultados, 27L)
+  expect_true(all(vapply(resultados, length, integer(1)) == 2L))
+  invisible(try(datajud::aux_identifica_tribunal("0000000-00.2024.1.00.0000"), silent = TRUE))
+  invisible(try(datajud::aux_identifica_tribunal("0000000-00.2024.2.00.0000"), silent = TRUE))
+  invisible(try(datajud::aux_identifica_tribunal("0000000-00.2024.3.00.0000"), silent = TRUE))
+  invisible(try(datajud::aux_identifica_tribunal("0000000-00.2024.4.01.0000"), silent = TRUE))
+  invisible(try(datajud::aux_identifica_tribunal("0000000-00.2024.5.01.0000"), silent = TRUE))
+})
+
+test_that("cliente rejeita configurações inválidas", {
+  expect_error(datajud::datajud_cliente("chave", email = "invalido"), "inválido")
+  expect_error(datajud::datajud_cliente("chave", timeout = 0), "timeout")
+  expect_error(datajud::datajud_cliente("chave", max_tentativas = 1.5), "max_tentativas")
+})

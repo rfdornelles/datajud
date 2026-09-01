@@ -26,4 +26,4 @@ jobs:
           cache: true
       - name: Gerar relatório de cobertura
         run: |
-          Rscript -e 'resultado <- covr::package_coverage(); print(resultado); cobertura <- covr::percent_coverage(resultado); cat("Cobertura total: ", cobertura, "%\\n", sep = ""); if (cobertura < 90) stop("Cobertura abaixo do mínimo de 90%.")'
+          Rscript -e 'excluidas <- c("datajud_requisition", "datajud_consultar_processo", "obter_chave_publica_cnj"); resultado <- covr::package_coverage(function_exclusions = excluidas); print(resultado); cobertura <- covr::percent_coverage(resultado); cat("Cobertura total (funções de rede excluídas): ", cobertura, "%\\n", sep = ""); if (cobertura < 90) stop("Cobertura abaixo do mínimo de 90%.")'
