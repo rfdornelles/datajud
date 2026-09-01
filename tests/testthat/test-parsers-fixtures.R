@@ -13,8 +13,30 @@ test_that("fixture válida pode ser lida por processo e movimentos", {
   expect_equal(processo$orgao_julgador_codigo, 1234)
   expect_equal(processo$orgao_julgador_nome, "1ª Vara Cível")
   expect_equal(processo$id, "processo-exemplo-1")
+  expect_equal(processo$assuntos_resumo, "899 / Indenização por dano moral")
   expect_equal(movimentos$codigo_tpu, 51)
   expect_equal(movimentos$nome_orgao_julgador, "1ª Vara Cível")
+})
+
+test_that("assuntos múltiplos não duplicam processos e podem ser desaninados", {
+  dados <- carregar_fixture("resposta_processo_multiplos_assuntos.json")
+  processos <- datajud::datajud_ler_processo(list(dados))
+  assuntos <- datajud::datajud_desaninhar_assuntos(processos)
+
+  expect_equal(nrow(processos), 1L)
+  expect_s3_class(processos$assuntos[[1]], "tbl_df")
+  expect_equal(nrow(processos$assuntos[[1]]), 2L)
+  expect_equal(nrow(assuntos), 2L)
+  expect_identical(unique(assuntos$id), "processo-exemplo-2")
+})
+
+test_that("processo sem movimentos retorna esquema vazio", {
+  dados <- carregar_fixture("resposta_processo_multiplos_assuntos.json")
+  movimentos <- datajud::datajud_ler_movimentacoes(list(dados))
+
+  expect_s3_class(movimentos, "tbl_df")
+  expect_equal(nrow(movimentos), 0L)
+  expect_true(all(c("tribunal", "numero_processo", "datahora_movimento") %in% names(movimentos)))
 })
 
 test_that("fixtures de cardinalidade e campos opcionais ficam disponíveis", {
