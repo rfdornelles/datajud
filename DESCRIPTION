@@ -17,9 +17,12 @@ Imports:
     glue,
     httr,
     jsonlite,
+    lubridate,
     purrr,
     rstudioapi,
-    tibble
+    stringr,
+    tibble,
+    xml2
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1.0)
 LazyData: true
