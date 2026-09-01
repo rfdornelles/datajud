@@ -19,8 +19,10 @@ esta função permite ler e manipular os dados dos processos retornados.
 Aceita tanto uma lista diretamente quanto o nome de uma variável global que contém a lista de processos.
 }
 \examples{
+\dontrun{
 # Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
 datajud_ler_processo()
 # Ou, se a lista de processos estiver armazenada em uma variável customizada:
 datajud_ler_processo(base = minha_lista_processos)
+}
 }

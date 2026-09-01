@@ -65,6 +65,7 @@ monta_consulta_elasticsearch <- function(assunto_codigo = NULL,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Pesquisar processos no TJSP por classe de assunto 1116 e tamanho da amostra de 100
 #' datajud_pesquisar_classe_orgao(tribunal = "TJSP", classe_codigo = c(1116), size = 100)
 #'
@@ -73,6 +74,7 @@ monta_consulta_elasticsearch <- function(assunto_codigo = NULL,
 #'
 #' # Pesquisar processos no TJRJ por classe de assunto e órgão julgador especificados
 #' datajud_pesquisar_classe_orgao(tribunal = "TJRJ", classe_codigo = c(1116), orgao_codigo = c(13597), size = 500)
+#' }
 
 datajud_pesquisar_classe_orgao <- function(
     tribunal = NA,
@@ -80,13 +82,13 @@ datajud_pesquisar_classe_orgao <- function(
     orgao_codigo = NULL,
     size = 100) {
 
-  if(is.na(tribunal)) stop("Tribunal não informado")
+  if(is.na(tribunal)) stop("Tribunal n\u00E3o informado")
 
   if(is.null(classe_codigo) & is.null(orgao_codigo)) stop("Nenhum assunto ou unidade informados")
 
-  if(!is.numeric(size)) stop("Tamanho da amostra deve ser um número inteiro")
+  if(!is.numeric(size)) stop("Tamanho da amostra deve ser um n\u00FAmero inteiro")
 
-  if(size < 1 | size > 10000) stop("Tamanho da amostra deve ser um número inteiro entre 1 e 10000")
+  if(size < 1 | size > 10000) stop("Tamanho da amostra deve ser um n\u00FAmero inteiro entre 1 e 10000")
 
   # checa se há key definida
   key = get_key()
@@ -109,7 +111,7 @@ datajud_pesquisar_classe_orgao <- function(
 
   # tribunal
   url = aux_retorna_endpoint(tribunal)
-  if(is.null(url)) stop("Tribunal não encontrado ou não disponível no Datajud")
+  if(is.null(url)) stop("Tribunal n\u00E3o encontrado ou n\u00E3o dispon\u00EDvel no Datajud")
 
   # realizar requisicao
   requisicao <- httr::POST(
@@ -132,10 +134,10 @@ datajud_pesquisar_classe_orgao <- function(
       httr::content() |>
       purrr::pluck("error", "root_cause", 1)
 
-    cli::cli_alert_danger("Erro na requisição ou retorno vazio!")
+    cli::cli_alert_danger("Erro na requisi\u00E7\u00E3o ou retorno vazio!")
     cli::cli_alert_warning(glue::glue("Status code: {requisicao$status_code}"))
     cli::cli_inform(glue::glue("Tipo de erro: {info_erro$type}"))
-    cli::cli_inform(glue::glue("Razão: {info_erro$reason}"))
+    cli::cli_inform(glue::glue("Raz\u00E3o: {info_erro$reason}"))
     cli::cli_inform(glue::glue("Linha: {info_erro$line} | Coluna: {info_erro$col}"))
     return()
   }
@@ -143,8 +145,8 @@ datajud_pesquisar_classe_orgao <- function(
   # nomear a variável de saída
   nome_saida <- aux_nomeia_saida()
 
-  cli::cli_alert_success(glue::glue("Variável de saída: {nome_saida}"))
-  cli::cli_alert_info("Verifique a resposta da consulta com a função `datajud_ler_processo` ou `datajud_ler_movimentacoes`")
+  cli::cli_alert_success(glue::glue("Vari\u00E1vel de sa\u00EDda: {nome_saida}"))
+  cli::cli_alert_info("Verifique a resposta da consulta com a fun\u00E7\u00E3o `datajud_ler_processo` ou `datajud_ler_movimentacoes`")
 
 
   assign(x = nome_saida,
@@ -153,4 +155,3 @@ datajud_pesquisar_classe_orgao <- function(
 
   invisible(conteudo)
 }
-
