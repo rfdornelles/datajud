@@ -32,6 +32,7 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           needs: check
+          extra-packages: any::rcmdcheck
 
       - name: Executar R CMD check
         uses: r-lib/actions/check-r-package@v2
@@ -55,6 +56,7 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           needs: check
+          extra-packages: any::rcmdcheck
       - name: Executar teste de integração protegido
         run: |
           if [ -z "$CNJ_API_KEY" ]; then
