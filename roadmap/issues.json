@@ -1,0 +1,1053 @@
+{
+  "versao_schema": 1,
+  "repositorio": "rfdornelles/datajud",
+  "proprietario_projeto": "rfdornelles",
+  "idioma": "pt-BR",
+  "projeto": {
+    "titulo": "Datajud — Roadmap de melhorias",
+    "descricao": "Planejamento, aprovação e acompanhamento das melhorias de confiabilidade, segurança e usabilidade do pacote Datajud.",
+    "github": {
+      "numero": 4,
+      "id": "PVT_kwHOAdrCIM4BiIzz",
+      "url": "https://github.com/users/rfdornelles/projects/4"
+    },
+    "campos": [
+      {
+        "nome": "Etapa",
+        "opcoes": [
+          "Backlog",
+          "Pronta",
+          "Em andamento",
+          "Em revisão",
+          "Concluída"
+        ]
+      },
+      {
+        "nome": "Decisão",
+        "opcoes": [
+          "Aguardando aprovação",
+          "Aprovada",
+          "Rejeitada"
+        ]
+      },
+      {
+        "nome": "Fase",
+        "opcoes": [
+          "Fase 0",
+          "Fase 1",
+          "Fase 2",
+          "Fase 3",
+          "Fase 4",
+          "Fase 5",
+          "Fase 6"
+        ]
+      },
+      {
+        "nome": "Prioridade",
+        "opcoes": [
+          "Crítica",
+          "Alta",
+          "Média",
+          "Contínua"
+        ]
+      }
+    ]
+  },
+  "politica_execucao": {
+    "aprovacao": "A issue somente pode começar quando o campo Decisão estiver como Aprovada.",
+    "concorrencia": 1,
+    "entrega": "Uma issue por branch e por pull request.",
+    "merge": "Somente o mantenedor revisa e realiza o merge.",
+    "idioma": "Issues, pull requests, commits, comentários, mensagens e documentação em português.",
+    "estado_dinamico": "O GitHub Project é a fonte de verdade para aprovação e andamento."
+  },
+  "milestones": [
+    {
+      "titulo": "v0.1.0",
+      "descricao": "Estabilização do pacote, testes e contratos explícitos sem estado global."
+    },
+    {
+      "titulo": "v0.2.0",
+      "descricao": "Cliente HTTP interno seguro, reutilizável e resiliente."
+    },
+    {
+      "titulo": "v0.3.0",
+      "descricao": "Pesquisa por assunto, classe e órgão julgador."
+    },
+    {
+      "titulo": "v0.4.0",
+      "descricao": "Paginação determinística e coleta incremental em disco."
+    },
+    {
+      "titulo": "v0.5.0",
+      "descricao": "Datasets TPU e descoberta local de códigos."
+    },
+    {
+      "titulo": "v1.0.0",
+      "descricao": "Documentação completa, governança e auditoria para o primeiro release estável."
+    }
+  ],
+  "labels": [
+    {
+      "nome": "roadmap",
+      "cor": "1D76DB",
+      "descricao": "Item pertencente ao roadmap oficial do pacote."
+    },
+    {
+      "nome": "infraestrutura",
+      "cor": "5319E7",
+      "descricao": "Infraestrutura de desenvolvimento, testes ou release."
+    },
+    {
+      "nome": "correção",
+      "cor": "D73A4A",
+      "descricao": "Correção de comportamento incorreto."
+    },
+    {
+      "nome": "funcionalidade",
+      "cor": "0E8A16",
+      "descricao": "Nova capacidade pública ou interna."
+    },
+    {
+      "nome": "documentação",
+      "cor": "0075CA",
+      "descricao": "Documentação, exemplos e comunicação pública."
+    },
+    {
+      "nome": "segurança",
+      "cor": "B60205",
+      "descricao": "Credenciais, dados sensíveis ou robustez de comunicação."
+    },
+    {
+      "nome": "quebra de compatibilidade",
+      "cor": "FBCA04",
+      "descricao": "Alteração intencional de interface em pacote experimental."
+    }
+  ],
+  "issues": [
+    {
+      "id": "F0-I01",
+      "ordem": 1,
+      "fase": 0,
+      "prioridade": "Crítica",
+      "milestone": "v0.1.0",
+      "titulo": "Zerar falhas do baseline de instalação e verificação",
+      "motivacao": "O pacote atualmente falha no R CMD check por exemplos com rede, vetorização incorreta e problemas de portabilidade.",
+      "escopo": [
+        "Auditar DESCRIPTION, Imports e usos de pacote::função.",
+        "Manter R (>= 4.1.0) por causa do pipe nativo.",
+        "Regenerar NAMESPACE e páginas man com roxygen2.",
+        "Corrigir codificação, exemplos executados indevidamente, chamadas datajud::: e variáveis globais detectadas.",
+        "Executar instalação e R CMD check em biblioteca limpa."
+      ],
+      "fora_de_escopo": [
+        "Criar novas funções de pesquisa.",
+        "Alterar ainda o transporte HTTP."
+      ],
+      "criterios_aceite": [
+        "O pacote instala e carrega em uma biblioteca limpa.",
+        "R CMD check termina sem erros ou avisos atribuíveis ao pacote.",
+        "Nenhum exemplo de rede é executado pelo check padrão.",
+        "Todas as dependências usadas em R/ estão declaradas."
+      ],
+      "testes": [
+        "R CMD build seguido de R CMD check --as-cran no artefato fonte.",
+        "Carregamento em sessão R limpa."
+      ],
+      "dependencias": [],
+      "labels": [
+        "roadmap",
+        "infraestrutura",
+        "correção"
+      ],
+      "github": {
+        "numero": 4,
+        "url": "https://github.com/rfdornelles/datajud/issues/4",
+        "id": "I_kwDOLSozQ88AAAABPMESAQ",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48CN8"
+      }
+    },
+    {
+      "id": "F0-I02",
+      "ordem": 2,
+      "fase": 0,
+      "prioridade": "Crítica",
+      "milestone": "v0.1.0",
+      "titulo": "Implantar testes unitários offline e fixtures sanitizadas",
+      "motivacao": "Não existe suíte automatizada e o comportamento só pode ser validado por chamadas reais à API.",
+      "escopo": [
+        "Adicionar testthat >= 3.0.0 e configurar a edição 3.",
+        "Criar tests/testthat.R e organizar testes por unidade funcional.",
+        "Criar fixtures pequenas para respostas válidas, vazias, incompletas e erros Elasticsearch.",
+        "Isolar comunicação HTTP para permitir simulação sem rede ou chave.",
+        "Garantir que fixtures e snapshots não contenham credenciais."
+      ],
+      "fora_de_escopo": [
+        "Executar testes reais na suíte unitária padrão."
+      ],
+      "criterios_aceite": [
+        "A suíte padrão funciona totalmente offline.",
+        "Fixtures cobrem zero, um e vários assuntos e movimentos opcionais ausentes.",
+        "Nenhuma credencial aparece em fixtures, snapshots ou logs."
+      ],
+      "testes": [
+        "devtools::test() sem conectividade de rede.",
+        "Busca automatizada por padrões de chaves nos artefatos de teste."
+      ],
+      "dependencias": [
+        "F0-I01"
+      ],
+      "labels": [
+        "roadmap",
+        "infraestrutura"
+      ],
+      "github": {
+        "numero": 5,
+        "url": "https://github.com/rfdornelles/datajud/issues/5",
+        "id": "I_kwDOLSozQ88AAAABPMEbyA",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48CWM"
+      }
+    },
+    {
+      "id": "F0-I03",
+      "ordem": 3,
+      "fase": 0,
+      "prioridade": "Crítica",
+      "milestone": "v0.1.0",
+      "titulo": "Adicionar integração contínua para R mínimo e atual",
+      "motivacao": "Mudanças podem quebrar instalação, testes ou compatibilidade sem detecção automática.",
+      "escopo": [
+        "Adicionar workflow de R CMD check para R 4.1 e versão atual.",
+        "Executar testes offline como verificação obrigatória.",
+        "Adicionar job real opcional, manual e não bloqueante.",
+        "Usar cache de dependências sem versionar artefatos gerados."
+      ],
+      "fora_de_escopo": [
+        "Publicação automática de releases."
+      ],
+      "criterios_aceite": [
+        "Pull requests executam checks para a versão mínima e atual do R.",
+        "A matriz obrigatória não exige rede nem segredos.",
+        "O smoke test real não bloqueia a suíte determinística."
+      ],
+      "testes": [
+        "Validar sintaxe do workflow e observar uma execução completa no pull request."
+      ],
+      "dependencias": [
+        "F0-I02"
+      ],
+      "labels": [
+        "roadmap",
+        "infraestrutura"
+      ],
+      "github": {
+        "numero": 6,
+        "url": "https://github.com/rfdornelles/datajud/issues/6",
+        "id": "I_kwDOLSozQ88AAAABPMEmuw",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48CfM"
+      }
+    },
+    {
+      "id": "F1-I01",
+      "ordem": 4,
+      "fase": 1,
+      "prioridade": "Alta",
+      "milestone": "v0.1.0",
+      "titulo": "Criar cliente explícito e remover todo estado global",
+      "motivacao": "As funções criam objetos ocultamente no ambiente global e dependem de estado implícito, contrariando composição e previsibilidade.",
+      "escopo": [
+        "Implementar datajud_cliente() com chave, e-mail opcional, timeout e limite de tentativas.",
+        "Resolver credenciais por argumento e variáveis DATAJUD_API_KEY e DATAJUD_EMAIL sem alterar o ambiente.",
+        "Remover assign(), .GlobalEnv, salvar_global e busca de objetos por nome.",
+        "Fazer funções públicas retornarem valores visíveis e compatíveis com atribuição e pipe.",
+        "Remover datajud_login() no mesmo release e registrar a quebra em NEWS.md.",
+        "Imprimir o cliente sem chave, headers ou outros dados sensíveis."
+      ],
+      "fora_de_escopo": [
+        "Centralizar todo o transporte HTTP, tratado na fase 2."
+      ],
+      "criterios_aceite": [
+        "Nenhuma função pública lê ou grava .GlobalEnv.",
+        "A criação do cliente não chama Sys.setenv().",
+        "O e-mail é opcional e integra o User-Agent quando informado.",
+        "A chave nunca aparece em print, erros ou objetos serializados."
+      ],
+      "testes": [
+        "Testar precedência de argumento sobre variável de ambiente.",
+        "Testar cliente com e sem e-mail.",
+        "Capturar console e confirmar redação completa da credencial.",
+        "Confirmar ausência de novos objetos no ambiente global após cada função."
+      ],
+      "dependencias": [
+        "F0-I03"
+      ],
+      "labels": [
+        "roadmap",
+        "funcionalidade",
+        "segurança",
+        "quebra de compatibilidade"
+      ],
+      "github": {
+        "numero": 7,
+        "url": "https://github.com/rfdornelles/datajud/issues/7",
+        "id": "I_kwDOLSozQ88AAAABPMEwFQ",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48Cp4"
+      }
+    },
+    {
+      "id": "F1-I02",
+      "ordem": 5,
+      "fase": 1,
+      "prioridade": "Alta",
+      "milestone": "v0.1.0",
+      "titulo": "Corrigir validação CNJ, identificação de tribunal e vetorização",
+      "motivacao": "Consultas vetorizadas falham, tribunais escalares não são reciclados corretamente e há mapeamentos incorretos para ramos superiores.",
+      "escopo": [
+        "Normalizar processos para exatamente 20 dígitos e validar dígito verificador módulo 97.",
+        "Corrigir mapeamento dos segmentos e tribunais conforme a Resolução CNJ nº 65.",
+        "Aceitar tribunal escalar, um tribunal por processo ou NA escalar para inferência.",
+        "Rejeitar comprimentos incompatíveis, NA misto, processo vazio e entradas ambíguas.",
+        "Validar pausa como escalar finito entre 0 e 60 segundos.",
+        "Preservar a ordem da entrada nas consultas múltiplas."
+      ],
+      "fora_de_escopo": [
+        "Executar consultas em paralelo."
+      ],
+      "criterios_aceite": [
+        "Todos os formatos vetoriais documentados funcionam sem condições de comprimento maior que um.",
+        "CNJs inválidos falham antes de qualquer requisição.",
+        "Todos os ramos judiciais possuem inferência e endpoint testados."
+      ],
+      "testes": [
+        "Casos unitário, vetorizado, reciclagem, inferência e comprimento incompatível.",
+        "Vetores de CNJs válidos e inválidos por tamanho, conteúdo e dígito.",
+        "Tabela de casos para Justiça Estadual, Federal, Trabalho, Eleitoral, Militar e tribunais superiores."
+      ],
+      "dependencias": [
+        "F1-I01"
+      ],
+      "labels": [
+        "roadmap",
+        "correção"
+      ],
+      "github": {
+        "numero": 8,
+        "url": "https://github.com/rfdornelles/datajud/issues/8",
+        "id": "I_kwDOLSozQ88AAAABPME6cQ",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48Czs"
+      }
+    },
+    {
+      "id": "F1-I03",
+      "ordem": 6,
+      "fase": 1,
+      "prioridade": "Alta",
+      "milestone": "v0.1.0",
+      "titulo": "Estabilizar parsers de processos, assuntos e movimentos",
+      "motivacao": "Processos com múltiplos assuntos geram linhas duplicadas, processos sem assuntos desaparecem e movimentos ausentes causam erro.",
+      "escopo": [
+        "Retornar uma linha por processo em datajud_ler_processo().",
+        "Representar assuntos como list-column de tibbles e adicionar assuntos_resumo.",
+        "Criar datajud_desaninhar_assuntos().",
+        "Estabilizar tipos e colunas para zero, um ou vários assuntos.",
+        "Estabilizar datajud_ler_movimentacoes() para zero movimentos e campos opcionais ausentes.",
+        "Converter datas explicitamente e retornar objetos sem impressão obrigatória."
+      ],
+      "fora_de_escopo": [
+        "Persistir grandes coletas em disco."
+      ],
+      "criterios_aceite": [
+        "Zero assuntos preserva a linha do processo com list-column vazia.",
+        "Múltiplos assuntos não alteram a cardinalidade da tabela de processos.",
+        "Zero movimentos retorna tibble vazio com esquema documentado.",
+        "Os resultados podem ser usados diretamente em atribuição e pipes."
+      ],
+      "testes": [
+        "Fixtures com zero, um e múltiplos assuntos.",
+        "Fixtures com movimentos completos, opcionais ausentes e lista vazia.",
+        "Asserções de cardinalidade, classes e tipos de todas as colunas."
+      ],
+      "dependencias": [
+        "F1-I01"
+      ],
+      "labels": [
+        "roadmap",
+        "correção",
+        "funcionalidade"
+      ],
+      "github": {
+        "numero": 9,
+        "url": "https://github.com/rfdornelles/datajud/issues/9",
+        "id": "I_kwDOLSozQ88AAAABPMFE4Q",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48C_8"
+      }
+    },
+    {
+      "id": "F1-I04",
+      "ordem": 7,
+      "fase": 1,
+      "prioridade": "Alta",
+      "milestone": "v0.1.0",
+      "titulo": "Sincronizar documentação, exemplos, mensagens e licenciamento",
+      "motivacao": "README, páginas de ajuda e mensagem de inicialização usam nomes incorretos ou contratos que não correspondem ao código exportado.",
+      "escopo": [
+        "Corrigir argumentos antigos e nomes de funções no README.Rmd.",
+        "Regenerar README.md, NAMESPACE e páginas man.",
+        "Proteger todos os exemplos que acessam rede.",
+        "Revisar mensagem de inicialização e consistência entre Datajud e DataJud.",
+        "Distinguir licença GPL-3 do software das condições de uso da API e dos dados do CNJ.",
+        "Adicionar NEWS.md com todas as quebras do release."
+      ],
+      "fora_de_escopo": [
+        "Criar as vinhetas completas da fase 6."
+      ],
+      "criterios_aceite": [
+        "Todos os exemplos públicos usam assinaturas existentes.",
+        "README.md é reproduzível a partir de README.Rmd.",
+        "Nenhuma documentação sugere criação de objeto global.",
+        "A licença do código e os termos da API são descritos separadamente."
+      ],
+      "testes": [
+        "Executar exemplos offline e R CMD check.",
+        "Comparar assinaturas exportadas com exemplos do README e man."
+      ],
+      "dependencias": [
+        "F1-I02",
+        "F1-I03"
+      ],
+      "labels": [
+        "roadmap",
+        "documentação",
+        "quebra de compatibilidade"
+      ],
+      "github": {
+        "numero": 10,
+        "url": "https://github.com/rfdornelles/datajud/issues/10",
+        "id": "I_kwDOLSozQ88AAAABPMFQ-Q",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48DIs"
+      }
+    },
+    {
+      "id": "F2-I01",
+      "ordem": 8,
+      "fase": 2,
+      "prioridade": "Alta",
+      "milestone": "v0.2.0",
+      "titulo": "Centralizar transporte HTTP em httr2 e JSON estruturado",
+      "motivacao": "O código duplica requisições, interpola JSON manualmente e trata respostas de maneiras incompatíveis.",
+      "escopo": [
+        "Substituir httr por httr2.",
+        "Criar uma única camada interna para endpoint, headers, autenticação, User-Agent, timeout, corpo e decodificação.",
+        "Representar queries como listas R e serializar preservando arrays de um elemento.",
+        "Sanitizar requisições antes de armazenar ou imprimir metadados.",
+        "Migrar todas as funções de consulta existentes para o transporte comum.",
+        "Remover chamadas internas datajud::: e dependências que deixarem de ser usadas."
+      ],
+      "fora_de_escopo": [
+        "Adicionar os novos filtros de assunto e classe."
+      ],
+      "criterios_aceite": [
+        "Existe um único caminho de comunicação HTTP no pacote.",
+        "Nenhum valor de query é interpolado em texto JSON.",
+        "Vetores unitários em terms permanecem arrays JSON.",
+        "Objetos retornados não contêm Authorization ou chave."
+      ],
+      "testes": [
+        "Inspecionar o corpo serializado de requisições simuladas.",
+        "Testar endpoints e headers sem realizar rede.",
+        "Confirmar remoção do transporte antigo com busca estática."
+      ],
+      "dependencias": [
+        "F1-I04"
+      ],
+      "labels": [
+        "roadmap",
+        "infraestrutura",
+        "segurança"
+      ],
+      "github": {
+        "numero": 11,
+        "url": "https://github.com/rfdornelles/datajud/issues/11",
+        "id": "I_kwDOLSozQ88AAAABPMFbyQ",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48DQ8"
+      }
+    },
+    {
+      "id": "F2-I02",
+      "ordem": 9,
+      "fase": 2,
+      "prioridade": "Alta",
+      "milestone": "v0.2.0",
+      "titulo": "Padronizar credenciais, tentativas e erros seguros",
+      "motivacao": "Falhas HTTP produzem mensagens genéricas, a extração da chave depende da posição de uma tag HTML e não há política segura de repetição.",
+      "escopo": [
+        "Validar status, tipo de conteúdo e padrão da chave pública antes de criar o cliente.",
+        "Localizar a chave por contexto e formato, sem selecionar o terceiro elemento strong.",
+        "Traduzir erros 400, 401/403, 404, 429 e 5xx para condições acionáveis em português.",
+        "Repetir somente 429 e falhas transitórias 5xx, respeitando Retry-After e limite do cliente.",
+        "Não renovar automaticamente a credencial em ciclos após 401/403.",
+        "Redigir corpos, URLs e headers potencialmente sensíveis."
+      ],
+      "fora_de_escopo": [
+        "Repetir erros de validação ou autenticação indefinidamente."
+      ],
+      "criterios_aceite": [
+        "Cada classe de status possui condição e mensagem testada.",
+        "A página oficial alterada ou sem chave produz erro claro.",
+        "Retry-After é respeitado e o número de tentativas é limitado.",
+        "Nenhuma mensagem revela credenciais ou corpo sensível."
+      ],
+      "testes": [
+        "Respostas simuladas 400, 401, 403, 404, 429, 500, 502 e 503.",
+        "HTML válido, alterado, ausente, não HTML e resposta não 200.",
+        "Snapshots sanitizados das mensagens em português."
+      ],
+      "dependencias": [
+        "F2-I01"
+      ],
+      "labels": [
+        "roadmap",
+        "segurança",
+        "correção"
+      ],
+      "github": {
+        "numero": 12,
+        "url": "https://github.com/rfdornelles/datajud/issues/12",
+        "id": "I_kwDOLSozQ88AAAABPMFlYw",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48DdA"
+      }
+    },
+    {
+      "id": "F3-I01",
+      "ordem": 10,
+      "fase": 3,
+      "prioridade": "Alta",
+      "milestone": "v0.3.0",
+      "titulo": "Registrar o contrato oficial e criar cache reproduzível da wiki",
+      "motivacao": "Campos, tipos, operadores e limites precisam ser rastreáveis à documentação vigente antes da estabilização da pesquisa.",
+      "escopo": [
+        "Criar downloader reproduzível do sitemap completo da wiki oficial.",
+        "Armazenar o conteúdo em .cache/datajud-wiki/, ignorado pelo Git.",
+        "Versionar manifesto com URL, horário, status e hash de cada página.",
+        "Registrar nota técnica para campos long, total value/relation, size, search_after e formato de erros.",
+        "Adicionar probe real opcional e sanitizado para detectar divergências do contrato."
+      ],
+      "fora_de_escopo": [
+        "Versionar uma cópia integral da wiki."
+      ],
+      "criterios_aceite": [
+        "O download pode ser repetido sem adicionar a wiki ao Git.",
+        "Toda decisão do construtor referencia fonte, data e evidência.",
+        "O probe opcional nunca imprime a chave pública completa."
+      ],
+      "testes": [
+        "Executar o downloader em diretório temporário com sitemap reduzido.",
+        "Validar hashes e detecção de página ausente ou alterada.",
+        "Validar fixtures do contrato sem rede."
+      ],
+      "dependencias": [
+        "F2-I02"
+      ],
+      "labels": [
+        "roadmap",
+        "documentação",
+        "infraestrutura"
+      ],
+      "github": {
+        "numero": 13,
+        "url": "https://github.com/rfdornelles/datajud/issues/13",
+        "id": "I_kwDOLSozQ88AAAABPMFwNQ",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48Dlk"
+      }
+    },
+    {
+      "id": "F3-I02",
+      "ordem": 11,
+      "fase": 3,
+      "prioridade": "Alta",
+      "milestone": "v0.3.0",
+      "titulo": "Implementar o construtor puro de consultas",
+      "motivacao": "A pesquisa precisa combinar assunto, classe e órgão de maneira segura, validável e independente da rede.",
+      "escopo": [
+        "Implementar construtor interno puro para assunto_codigo, classe_codigo, orgao_codigo, size, cursor e ordenação.",
+        "Aplicar OR dentro de cada vetor e AND entre categorias.",
+        "Implementar exigir_todos_assuntos com um filtro por código.",
+        "Usar terms com arrays preservados e bool/filter.",
+        "Ordenar por @timestamp e id.keyword.",
+        "Rejeitar ausência de filtros, NA, valores vazios, negativos ou não inteiros."
+      ],
+      "fora_de_escopo": [
+        "Executar a requisição HTTP."
+      ],
+      "criterios_aceite": [
+        "A função é determinística e não acessa rede, ambiente ou relógio.",
+        "O JSON decodificado preserva caminhos, tipos, arrays e composição esperados.",
+        "size aceita apenas inteiros de 1 a 10000.",
+        "O cursor é tratado como valor opaco retornado pela API."
+      ],
+      "testes": [
+        "Cada filtro isolado e todas as combinações.",
+        "Um e vários códigos por categoria.",
+        "Todos os assuntos versus qualquer assunto.",
+        "Entradas inválidas e round-trip da serialização JSON."
+      ],
+      "dependencias": [
+        "F3-I01"
+      ],
+      "labels": [
+        "roadmap",
+        "funcionalidade"
+      ],
+      "github": {
+        "numero": 14,
+        "url": "https://github.com/rfdornelles/datajud/issues/14",
+        "id": "I_kwDOLSozQ88AAAABPMF6wA",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48Dxk"
+      }
+    },
+    {
+      "id": "F3-I03",
+      "ordem": 12,
+      "fase": 3,
+      "prioridade": "Alta",
+      "milestone": "v0.3.0",
+      "titulo": "Implementar pesquisa geral por assunto, classe e órgão",
+      "motivacao": "O pacote não oferece uma função geral que diferencie assunto e classe e devolva resultados programaticamente.",
+      "escopo": [
+        "Implementar datajud_pesquisar_processos() com entrada principal e cliente explícito.",
+        "Retornar datajud_resultado com hits, consulta sanitizada e metadados.",
+        "Incluir tribunal, total value/relation, quantidade recebida e próximo cursor.",
+        "Distinguir resposta vazia de erro HTTP.",
+        "Implementar print() compacto e as_tibble() inicial.",
+        "Documentar buscas isoladas, múltiplas e combinadas."
+      ],
+      "fora_de_escopo": [
+        "Coletar automaticamente várias páginas."
+      ],
+      "criterios_aceite": [
+        "Assunto, classe e órgão são filtros independentes.",
+        "Resposta vazia retorna objeto válido com zero hits.",
+        "Metadados preservam a relação eq ou gte do total.",
+        "O resultado não contém credenciais nem depende do ambiente global."
+      ],
+      "testes": [
+        "Pesquisa simulada por cada filtro e todas as combinações.",
+        "Resposta com total eq, total gte, hits e nenhum hit.",
+        "Impressão compacta e conversão para tibble.",
+        "Inspeção recursiva por nomes e valores sensíveis."
+      ],
+      "dependencias": [
+        "F3-I02"
+      ],
+      "labels": [
+        "roadmap",
+        "funcionalidade"
+      ],
+      "github": {
+        "numero": 15,
+        "url": "https://github.com/rfdornelles/datajud/issues/15",
+        "id": "I_kwDOLSozQ88AAAABPMooqQ",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48nlc"
+      }
+    },
+    {
+      "id": "F3-I04",
+      "ordem": 13,
+      "fase": 3,
+      "prioridade": "Alta",
+      "milestone": "v0.3.0",
+      "titulo": "Remover a pesquisa legada e publicar a migração",
+      "motivacao": "O pacote é experimental e a interface antiga confunde classe com assunto e cria objetos globais.",
+      "escopo": [
+        "Remover datajud_pesquisar_classe_orgao() sem wrapper de depreciação.",
+        "Remover documentação, aliases e código interno exclusivo da função antiga.",
+        "Adicionar tabela de migração para datajud_pesquisar_processos().",
+        "Registrar a quebra em NEWS.md e README."
+      ],
+      "fora_de_escopo": [
+        "Manter aliases indefinidamente."
+      ],
+      "criterios_aceite": [
+        "A função antiga não é exportada nem documentada.",
+        "Não existe reutilização interna de assunto_codigo para classe_codigo.",
+        "A documentação fornece substituição concreta para cada argumento antigo."
+      ],
+      "testes": [
+        "Confirmar exports e tópicos man após documentação.",
+        "Executar exemplos de migração offline."
+      ],
+      "dependencias": [
+        "F3-I03"
+      ],
+      "labels": [
+        "roadmap",
+        "documentação",
+        "quebra de compatibilidade"
+      ],
+      "github": {
+        "numero": 16,
+        "url": "https://github.com/rfdornelles/datajud/issues/16",
+        "id": "I_kwDOLSozQ88AAAABPMoz3w",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48n4I"
+      }
+    },
+    {
+      "id": "F4-I01",
+      "ordem": 14,
+      "fase": 4,
+      "prioridade": "Média",
+      "milestone": "v0.4.0",
+      "titulo": "Implementar paginação determinística por cursor",
+      "motivacao": "Resultados acima de uma página precisam ser continuados sem duplicação, lacunas ou loops infinitos.",
+      "escopo": [
+        "Expor cursor manual em datajud_pesquisar_processos().",
+        "Usar ordenação composta @timestamp e id.keyword.",
+        "Detectar cursor final, página vazia e repetição de cursor.",
+        "Preservar metadados de página e consulta.",
+        "Manter requisições sequenciais e respeitar pausa."
+      ],
+      "fora_de_escopo": [
+        "Paralelismo de páginas."
+      ],
+      "criterios_aceite": [
+        "Duas páginas consecutivas não repetem o desempate de fronteira.",
+        "Cursor repetido encerra com erro acionável.",
+        "Página vazia encerra normalmente a paginação."
+      ],
+      "testes": [
+        "Sequência simulada com empates de timestamp.",
+        "Cursor ausente, final, repetido e malformado.",
+        "Smoke test real opcional com duas páginas pequenas."
+      ],
+      "dependencias": [
+        "F3-I03"
+      ],
+      "labels": [
+        "roadmap",
+        "funcionalidade"
+      ],
+      "github": {
+        "numero": 17,
+        "url": "https://github.com/rfdornelles/datajud/issues/17",
+        "id": "I_kwDOLSozQ88AAAABPMo-2Q",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48oGk"
+      }
+    },
+    {
+      "id": "F4-I02",
+      "ordem": 15,
+      "fase": 4,
+      "prioridade": "Média",
+      "milestone": "v0.4.0",
+      "titulo": "Implementar coleta incremental NDJSON com retomada",
+      "motivacao": "Coletas grandes não devem crescer linearmente na memória nem perder páginas concluídas após uma falha.",
+      "escopo": [
+        "Implementar datajud_coletar_processos() com diretório obrigatório.",
+        "Gravar um arquivo NDJSON por página por meio de arquivo temporário e renomeação atômica.",
+        "Criar manifesto com consulta sanitizada, hash, cursores, contagens, checksums e estado.",
+        "Retomar somente quando consulta e versão do esquema forem compatíveis.",
+        "Limitar registros, páginas e pausa com padrões seguros.",
+        "Preservar coleta parcial e registrar a página que falhou."
+      ],
+      "fora_de_escopo": [
+        "Sobrescrever destrutivamente uma coleta incompatível.",
+        "Usar Arrow como dependência obrigatória."
+      ],
+      "criterios_aceite": [
+        "No máximo uma página de hits fica em memória.",
+        "O retorno contém caminhos e metadados, mas não todos os hits.",
+        "Uma interrupção pode ser retomada sem duplicar páginas.",
+        "Manifestos nunca contêm chave ou headers sensíveis."
+      ],
+      "testes": [
+        "Coleta completa, limite atingido e página vazia.",
+        "Falha intermediária seguida de retomada.",
+        "Consulta incompatível, checksum inválido e cursor repetido.",
+        "Asserção de que o objeto retornado não carrega hits."
+      ],
+      "dependencias": [
+        "F4-I01"
+      ],
+      "labels": [
+        "roadmap",
+        "funcionalidade",
+        "infraestrutura"
+      ],
+      "github": {
+        "numero": 18,
+        "url": "https://github.com/rfdornelles/datajud/issues/18",
+        "id": "I_kwDOLSozQ88AAAABPMpI_g",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48oPQ"
+      }
+    },
+    {
+      "id": "F4-I03",
+      "ordem": 16,
+      "fase": 4,
+      "prioridade": "Média",
+      "milestone": "v0.4.0",
+      "titulo": "Consolidar classes, impressão, conversão e leitura por página",
+      "motivacao": "Resultados em memória e coletas em disco precisam de uma experiência uniforme sem materialização acidental de todo o volume.",
+      "escopo": [
+        "Consolidar invariantes da classe datajud_resultado.",
+        "Implementar classe leve datajud_coleta.",
+        "Implementar datajud_abrir_coleta() e datajud_ler_pagina().",
+        "Criar print() compacto para ambas as classes.",
+        "Permitir que parsers processem resultado ou uma página da coleta.",
+        "Documentar explicitamente quais operações materializam dados."
+      ],
+      "fora_de_escopo": [
+        "Uma função implícita que leia todas as páginas para a memória."
+      ],
+      "criterios_aceite": [
+        "Imprimir uma coleta não lê arquivos de hits.",
+        "Ler uma página não carrega as demais.",
+        "Os parsers aceitam as entradas documentadas com tipos estáveis.",
+        "Nenhuma classe armazena cliente ou credencial."
+      ],
+      "testes": [
+        "Snapshots compactos de print().",
+        "Instrumentar leituras para confirmar acesso somente à página solicitada.",
+        "Conversão de resultado e página para tibbles equivalentes."
+      ],
+      "dependencias": [
+        "F4-I02"
+      ],
+      "labels": [
+        "roadmap",
+        "funcionalidade"
+      ],
+      "github": {
+        "numero": 19,
+        "url": "https://github.com/rfdornelles/datajud/issues/19",
+        "id": "I_kwDOLSozQ88AAAABPMpTog",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48oYY"
+      }
+    },
+    {
+      "id": "F5-I01",
+      "ordem": 17,
+      "fase": 5,
+      "prioridade": "Média",
+      "milestone": "v0.5.0",
+      "titulo": "Gerar datasets TPU oficiais e reproduzíveis",
+      "motivacao": "Usuários precisam descobrir códigos sem download durante o uso comum e com rastreabilidade à fonte oficial.",
+      "escopo": [
+        "Descobrir automaticamente a versão vigente das TPU de assuntos e classes no SGT/CNJ.",
+        "Criar scripts reproduzíveis em data-raw/ com URL, versão, data e hash.",
+        "Tratar arquivos XLS que são HTML, codificação legada, legendas e tabelas aninhadas.",
+        "Gerar datajud_assuntos e datajud_classes com uma linha por código.",
+        "Tipar códigos, pai, status e datas e usar list-columns para segmentos e graus.",
+        "Falhar na atualização quando nome, pai ou status conflitarem entre fontes."
+      ],
+      "fora_de_escopo": [
+        "Baixar TPU durante o carregamento ou uso normal do pacote."
+      ],
+      "criterios_aceite": [
+        "Datasets são reproduzíveis a partir da fonte oficial registrada.",
+        "Cada código aparece uma única vez.",
+        "Itens ativos e inativos e sua hierarquia são preservados.",
+        "A documentação informa versão e estratégia de atualização."
+      ],
+      "testes": [
+        "Fixture HTML com extensão XLS, acentos legados, legendas e glossário aninhado.",
+        "Detecção de duplicata compatível e conflito incompatível.",
+        "Validação de tipos, chaves, pais e datas."
+      ],
+      "dependencias": [
+        "F0-I03"
+      ],
+      "labels": [
+        "roadmap",
+        "funcionalidade",
+        "infraestrutura"
+      ],
+      "github": {
+        "numero": 20,
+        "url": "https://github.com/rfdornelles/datajud/issues/20",
+        "id": "I_kwDOLSozQ88AAAABPMpd9Q",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48ogg"
+      }
+    },
+    {
+      "id": "F5-I02",
+      "ordem": 18,
+      "fase": 5,
+      "prioridade": "Média",
+      "milestone": "v0.5.0",
+      "titulo": "Criar busca local de assuntos e classes",
+      "motivacao": "Pessoas com pouca experiência em R precisam localizar o código TPU pelo nome e usá-lo diretamente na pesquisa.",
+      "escopo": [
+        "Implementar datajud_buscar_assunto() e datajud_buscar_classe().",
+        "Aceitar código exato, nome exato, prefixo e texto parcial.",
+        "Normalizar caixa e acentos de forma determinística.",
+        "Permitir filtro por ativos, código pai e limite de resultados.",
+        "Ordenar por relevância: código, nome exato, prefixo e substring.",
+        "Integrar exemplos com datajud_pesquisar_processos()."
+      ],
+      "fora_de_escopo": [
+        "Busca remota ou fuzzy probabilística."
+      ],
+      "criterios_aceite": [
+        "A busca por texto ignora caixa e acentos.",
+        "O código retornado pode ser usado diretamente na consulta.",
+        "A ordenação é estável e documentada.",
+        "A navegação por pai preserva hierarquia e status."
+      ],
+      "testes": [
+        "Código exato, nome exato, prefixo, substring e ausência de resultado.",
+        "Termos com e sem acento e com caixa diferente.",
+        "Filtros de ativos, pai e limite."
+      ],
+      "dependencias": [
+        "F5-I01",
+        "F3-I03"
+      ],
+      "labels": [
+        "roadmap",
+        "funcionalidade"
+      ],
+      "github": {
+        "numero": 21,
+        "url": "https://github.com/rfdornelles/datajud/issues/21",
+        "id": "I_kwDOLSozQ88AAAABPMpm_g",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48om8"
+      }
+    },
+    {
+      "id": "F6-I01",
+      "ordem": 19,
+      "fase": 6,
+      "prioridade": "Contínua",
+      "milestone": "v1.0.0",
+      "titulo": "Criar vinhetas e dicionário completo dos retornos",
+      "motivacao": "A API estabilizada precisa de fluxos completos e de um contrato de dados compreensível para usuários iniciantes.",
+      "escopo": [
+        "Criar vinheta de autenticação, limites, tentativas e erros.",
+        "Criar vinheta de busca por assunto, classe e órgão.",
+        "Criar vinheta de paginação, coleta em disco e retomada.",
+        "Documentar o dicionário de datajud_resultado, processos, assuntos, movimentos, coleta e TPU.",
+        "Incluir exemplos offline executáveis e exemplos de rede protegidos."
+      ],
+      "fora_de_escopo": [
+        "Duplicar integralmente a documentação da API do CNJ."
+      ],
+      "criterios_aceite": [
+        "Uma pessoa consegue autenticar, localizar códigos, pesquisar e paginar seguindo apenas as vinhetas.",
+        "Todos os campos retornados possuem tipo e cardinalidade documentados.",
+        "Construção das vinhetas não exige rede."
+      ],
+      "testes": [
+        "Construir todas as vinhetas em ambiente limpo e offline.",
+        "Executar exemplos e links internos.",
+        "Comparar dicionário com nomes e tipos produzidos pelas fixtures."
+      ],
+      "dependencias": [
+        "F3-I04",
+        "F4-I03",
+        "F5-I02"
+      ],
+      "labels": [
+        "roadmap",
+        "documentação"
+      ],
+      "github": {
+        "numero": 22,
+        "url": "https://github.com/rfdornelles/datajud/issues/22",
+        "id": "I_kwDOLSozQ88AAAABPMpweg",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48oxs"
+      }
+    },
+    {
+      "id": "F6-I02",
+      "ordem": 20,
+      "fase": 6,
+      "prioridade": "Contínua",
+      "milestone": "v1.0.0",
+      "titulo": "Instituir políticas de contribuição, compatibilidade e release",
+      "motivacao": "O pacote precisa de regras explícitas para evolução da API, revisão e qualidade de releases.",
+      "escopo": [
+        "Adicionar guia de contribuição em português.",
+        "Documentar política de compatibilidade e mudanças incompatíveis após v1.0.0.",
+        "Definir checklist de documentação, testes, check, segredos e atualização de dados.",
+        "Padronizar ortografia, estilo tidyverse e linguagem das mensagens.",
+        "Configurar proteção de main e checks obrigatórios sem habilitar merge automático."
+      ],
+      "fora_de_escopo": [
+        "Conceder permissão de merge ao agente."
+      ],
+      "criterios_aceite": [
+        "Contribuições possuem instruções reproduzíveis.",
+        "Mudanças públicas seguem uma política de ciclo de vida após v1.0.0.",
+        "Main exige revisão e CI verde.",
+        "Somente o mantenedor realiza merges."
+      ],
+      "testes": [
+        "Validar links e comandos do guia de contribuição.",
+        "Inspecionar ruleset ou proteção da branch após configuração.",
+        "Executar checklist em uma branch de teste."
+      ],
+      "dependencias": [
+        "F6-I01"
+      ],
+      "labels": [
+        "roadmap",
+        "documentação",
+        "infraestrutura"
+      ],
+      "github": {
+        "numero": 23,
+        "url": "https://github.com/rfdornelles/datajud/issues/23",
+        "id": "I_kwDOLSozQ88AAAABPMp6eA",
+        "item_id": "PVTI_lAHOAdrCIM4BiIzzzg48o8M"
+      }
+    },
+    {
+      "id": "F6-I03",
+      "ordem": 21,
+      "fase": 6,
+      "prioridade": "Contínua",
+      "milestone": "v1.0.0",
+      "titulo": "Preparar o release estável e executar auditoria final",
+      "motivacao": "O primeiro release estável só deve ser preparado depois de comprovar contrato, segurança, documentação e reprodutibilidade.",
+      "escopo": [
+        "Executar documentação, testes, cobertura e R CMD check em biblioteca limpa.",
+        "Auditar segredos, credenciais, arquivos grandes e cache ignorado.",
+        "Verificar todas as assinaturas e exemplos públicos.",
+        "Revalidar o contrato da API e a versão das TPU.",
+        "Atualizar versão, NEWS.md e checklist de release.",
+        "Abrir pull request de preparação; tag e publicação permanecem sob decisão do mantenedor."
+      ],
+      "fora_de_escopo": [
+        "Criar tag ou publicar release sem autorização específica do mantenedor."
+      ],
+      "criterios_aceite": [
+        "R CMD check termina sem erros, avisos ou notas atribuíveis ao pacote.",
+        "A suíte padrão é offline e o smoke test opcional está documentado.",
+        "Nenhum segredo ou cópia da wiki está versionado.",
+        "README, referência e vinhetas correspondem à API exportada."
+      ],
+      "testes": [
+        "Matriz completa do CI em R mínimo e atual.",
+        "Varredura de segredos e inspeção de arquivos versionados.",
+        "Instalação e execução dos exemplos em ambiente limpo.",
+        "Smoke test oficial opcional e sanitizado."
+      ],
+      "dependencias": [
+        "F6-I02"
+      ],
+      "labels": [
+        "roadmap",
+        "infraestrutura",
+        "documentação",
+        "segurança"
+      ],
+      "github": {
+        "numero": null,
+        "url": null,
+        "id": null,
+        "item_id": null
+      }
+    }
+  ]
+}
