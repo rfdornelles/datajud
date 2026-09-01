@@ -1,0 +1,15 @@
+{
+  "_index": "datajud",
+  "_id": "processo-exemplo-2",
+  "_source": {
+    "id": "processo-exemplo-2",
+    "tribunal": "TJSP",
+    "numeroProcesso": "1000002-34.2024.8.26.0100",
+    "classe": {"codigo": 1116, "nome": "Ação de conhecimento"},
+    "assuntos": [
+      {"codigo": 899, "nome": "Indenização por dano moral"},
+      {"codigo": 900, "nome": "Responsabilidade civil"}
+    ],
+    "movimentos": []
+  }
+}

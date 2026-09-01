@@ -1,0 +1,36 @@
+{
+  "_index": "datajud",
+  "_id": "processo-exemplo-1",
+  "_score": 1,
+  "_source": {
+    "id": "processo-exemplo-1",
+    "tribunal": "TJSP",
+    "numeroProcesso": "1000001-23.2024.8.26.0100",
+    "dataAjuizamento": "2024-01-10T12:00:00.000Z",
+    "dataHoraUltimaAtualizacao": "2024-01-15T12:00:00.000Z",
+    "grau": "G1",
+    "nivelSigilo": 0,
+    "formato": {"nome": "Eletrônico"},
+    "sistema": {"nome": "SAJ"},
+    "classe": {"codigo": 1116, "nome": "Ação de conhecimento"},
+    "assuntos": [
+      {"codigo": 899, "nome": "Indenização por dano moral"}
+    ],
+    "orgaoJulgador": {
+      "codigo": 1234, "nome": "1ª Vara Cível", "codigoMunicipioIBGE": 3550308
+    },
+    "movimentos": [
+      {
+        "codigo": 51,
+        "nome": "Distribuição",
+        "dataHora": "2024-01-10T12:30:00.000Z",
+        "complementosTabelados": [
+          {"codigo": 1, "descricao": "Complemento", "valor": "Exemplo", "nome": "Tipo"}
+        ],
+        "orgaoJulgador": [
+          {"codigoOrgao": 1234, "nomeOrgao": "1ª Vara Cível"}
+        ]
+      }
+    ]
+  }
+}
