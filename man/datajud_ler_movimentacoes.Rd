@@ -4,12 +4,10 @@
 \alias{datajud_ler_movimentacoes}
 \title{Lê as movimentações de processos retornadas pelo Datajud}
 \usage{
-datajud_ler_movimentacoes(base = "datajud_resposta")
+datajud_ler_movimentacoes(base)
 }
 \arguments{
-\item{base}{Lista contendo os dados dos processos ou o nome de uma variável global que
-armazena esses dados. Por padrão, utiliza "datajud_resposta", assumindo que
-os dados foram previamente armazenados com esse nome.}
+\item{base}{Lista contendo os dados dos processos retornados pela API.}
 }
 \value{
 Imprime e retorna um data frame consolidado com as movimentações de todos os
@@ -18,16 +16,12 @@ metadados relevantes para análises subsequentes.
 }
 \description{
 Esta função é utilizada para extrair e processar as movimentações dos processos
-judiciais obtidos a partir de uma pesquisa no Datajud. Ela pode operar diretamente
-sobre uma lista de processos ou sobre o nome de uma variável global que contém essa lista.
+judiciais obtidos a partir de uma pesquisa no Datajud. Ela opera sobre uma lista
+de processos fornecida diretamente.
 É ideal para análises detalhadas das etapas processuais e suas características.
 }
 \examples{
 \dontrun{
-# Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
-datajud_ler_movimentacoes()
-
-# Se os dados das movimentações estiverem armazenados em uma variável customizada:
-datajud_ler_movimentacoes(base = minha_lista_movimentacoes)
+datajud_ler_movimentacoes(resposta)
 }
 }

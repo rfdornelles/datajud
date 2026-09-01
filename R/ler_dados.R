@@ -142,7 +142,7 @@ ler_processo <- function(dados) {
 #' Aceita tanto uma lista diretamente quanto o nome de uma variável global que contém a lista de processos.
 #'
 #' @param base Lista de processos ou o nome de uma variável global que contém os dados dos processos.
-#'             O padrão é "datajud_resposta", assumindo que os dados foram armazenados com esse nome.
+#' @param base Lista de respostas de processos retornadas pela API.
 #'
 #' @return Imprime e retorna um data frame contendo os metadados dos processos.
 #'
@@ -150,24 +150,15 @@ ler_processo <- function(dados) {
 #'
 #' @examples
 #' \dontrun{
-#' # Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
-#' datajud_ler_processo()
-#' # Ou, se a lista de processos estiver armazenada em uma variável customizada:
-#' datajud_ler_processo(base = minha_lista_processos)
+#' resposta <- datajud_consultar_processo(processo, cliente)
+#' datajud_ler_processo(resposta)
 #' }
 
 
-datajud_ler_processo <- function(base = "datajud_resposta") {
+datajud_ler_processo <- function(base) {
 
   if (!is.list(base)) {
-    if (!exists(base, envir = .GlobalEnv)) {
-      stop("Base de dados n\u00E3o encontrada")
-    }
-    base <- get(base, envir = .GlobalEnv)
-  }
-
-  if (!is.list(base)) {
-    stop("Base n\u00E3o \u00E9 uma lista ou o nome de uma lista existente")
+    stop("base deve ser uma lista de respostas do Datajud")
   }
 
 # retornando os metadados do processo
@@ -181,7 +172,7 @@ datajud_ler_processo <- function(base = "datajud_resposta") {
   resposta <- dplyr::distinct(resposta)
 
 
-  print(resposta)
+  resposta
 }
 
 ### funcao para ler movimentações de processo
@@ -189,13 +180,11 @@ datajud_ler_processo <- function(base = "datajud_resposta") {
 #' Lê as movimentações de processos retornadas pelo Datajud
 #'
 #' Esta função é utilizada para extrair e processar as movimentações dos processos
-#' judiciais obtidos a partir de uma pesquisa no Datajud. Ela pode operar diretamente
-#' sobre uma lista de processos ou sobre o nome de uma variável global que contém essa lista.
+#' judiciais obtidos a partir de uma pesquisa no Datajud. Ela opera sobre uma lista
+#' de processos fornecida diretamente.
 #' É ideal para análises detalhadas das etapas processuais e suas características.
 #'
-#' @param base Lista contendo os dados dos processos ou o nome de uma variável global que
-#'             armazena esses dados. Por padrão, utiliza "datajud_resposta", assumindo que
-#'             os dados foram previamente armazenados com esse nome.
+#' @param base Lista contendo os dados dos processos retornados pela API.
 #'
 #' @return Imprime e retorna um data frame consolidado com as movimentações de todos os
 #'         processos fornecidos. Cada linha representa uma movimentação específica, incluindo
@@ -205,24 +194,13 @@ datajud_ler_processo <- function(base = "datajud_resposta") {
 #'
 #' @examples
 #' \dontrun{
-#' # Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
-#' datajud_ler_movimentacoes()
-#'
-#' # Se os dados das movimentações estiverem armazenados em uma variável customizada:
-#' datajud_ler_movimentacoes(base = minha_lista_movimentacoes)
+#' datajud_ler_movimentacoes(resposta)
 #' }
 
-datajud_ler_movimentacoes <- function(base = "datajud_resposta") {
+datajud_ler_movimentacoes <- function(base) {
 
   if (!is.list(base)) {
-    if (!exists(base, envir = .GlobalEnv)) {
-      stop("Base de dados n\u00E3o encontrada")
-    }
-    base <- get(base, envir = .GlobalEnv)
-  }
-
-  if (!is.list(base)) {
-    stop("Base n\u00E3o \u00E9 uma lista ou o nome de uma lista existente")
+    stop("base deve ser uma lista de respostas do Datajud")
   }
 
   # retornando os metadados do processo
@@ -236,5 +214,5 @@ datajud_ler_movimentacoes <- function(base = "datajud_resposta") {
   resposta <- dplyr::distinct(resposta)
 
   # saída
-  print(resposta)
+  resposta
 }

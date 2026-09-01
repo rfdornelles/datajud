@@ -5,7 +5,8 @@
 \title{Pesquisa processos no Datajud por Classe e/ou Órgão Julgador}
 \usage{
 datajud_pesquisar_classe_orgao(
-  tribunal = NA,
+  tribunal,
+  cliente,
   classe_codigo = NULL,
   orgao_codigo = NULL,
   size = 100
@@ -14,6 +15,8 @@ datajud_pesquisar_classe_orgao(
 \arguments{
 \item{tribunal}{Identificador do tribunal a ser consultado.}
 
+\item{cliente}{Objeto criado por \code{datajud_cliente()}.}
+
 \item{classe_codigo}{Vetor opcional de códigos de classe para filtrar os processos.}
 
 \item{orgao_codigo}{Vetor opcional de códigos de órgão julgador para filtrar os processos.}
@@ -21,8 +24,7 @@ datajud_pesquisar_classe_orgao(
 \item{size}{Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.}
 }
 \value{
-A função não retorna um valor diretamente, mas atribui a variável de saída (contendo os resultados da pesquisa) ao ambiente global.
-A função também emite mensagens de sucesso e informações sobre como verificar os resultados da pesquisa.
+Uma lista com os processos encontrados pela consulta.
 }
 \description{
 Esta função realiza uma pesquisa no Datajud, permitindo filtrar processos por código de classe e/ou por código de órgão julgador.

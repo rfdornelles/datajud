@@ -1,145 +1,84 @@
-### Script com funções para informar o usuário nos headers e para obter a key do site do Datajud
-## como boa prática, exigimos que o user informe seu email para identificação
-## raspamos a key do site do CNJ para automatizar essa extração
+# Chave pública vigente publicada pelo CNJ em 01/09/2026.
+DATAJUD_CHAVE_PUBLICA_ATUAL <- "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 
-## Aqui a função de alto-nível é a datajud_login
-
-
-## função para checar se a identificação foi feita
-checar_identificacao_valida <- function() {
-
-  # puxa do environment o email e a key
-  email_identificado <- Sys.getenv("datajud_email_user")
-
-  # Padrão de expressão regular para validar email
-  email_pattern <- "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-
-  # checa se os valores estão definidos
-  if (!grepl(email_pattern, email_identificado)) {
-    return(FALSE)
-
-  } else {
-    return(email_identificado)
-  }
-
-}
-
-#' Configura o email do usuário para identificação no Datajud
+#' Obtém a chave pública vigente na Wiki do CNJ
 #'
-#' Esta função permite ao usuário configurar um email para identificação junto ao CNJ,
-#' facilitando o acesso e a utilização dos serviços do Datajud. O email fornecido é validado
-#' através de uma expressão regular para garantir que está no formato correto. Uma vez validado,
-#' o email é armazenado como uma variável de ambiente para uso posterior nas requisições ao Datajud.
-#'
-#' @param email Endereço de email para identificação do usuário junto ao CNJ.
-#'              Se NULL, uma caixa de diálogo será exibida (no RStudio) para que o usuário
-#'              possa fornecer seu email manualmente.
-#'
-#' @return Não retorna um valor diretamente, mas configura uma variável de ambiente
-#'         `datajud_email_user` com o email fornecido após validação.
-#'
+#' @param url URL da página oficial de acesso da API.
+#' @return A chave pública como caractere de comprimento um.
 #' @export
+obter_chave_publica_cnj <- function(
+    url = "https://datajud-wiki.cnj.jus.br/api-publica/acesso/") {
+  resposta <- httr::GET(url, httr::timeout(20))
+  if (httr::status_code(resposta) != 200L) {
+    cli::cli_abort("N\u00E3o foi poss\u00EDvel obter a chave p\u00FAblica do CNJ (HTTP {httr::status_code(resposta)}).")
+  }
+
+  texto <- resposta |>
+    httr::content(as = "text", encoding = "UTF-8") |>
+    xml2::read_html() |>
+    xml2::xml_text()
+  chave <- stringr::str_match(texto, "APIKey\\s+([A-Za-z0-9+/=]{20,})")[, 2]
+  if (is.na(chave) || !nzchar(chave)) {
+    cli::cli_abort("A p\u00E1gina do CNJ n\u00E3o cont\u00E9m uma chave p\u00FAblica reconhec\u00EDvel.")
+  }
+  chave
+}
+
+#' Cria um cliente explícito para a API do Datajud
 #'
-#' @examples
-#' \dontrun{
-#' # Configurar o email do usuário manualmente
-#' datajud_login(email = "seu.email@dominio.com")
-#'
-#' # Solicitar que o usuário forneça o email via caixa de diálogo (RStudio)
-#' datajud_login()
-#' }
-
-datajud_login <- function(email = NULL) {
-
-  if(is.null(email)) {
-
-    email <- rstudioapi::showPrompt(
-      title = "Identifica\u00E7\u00E3o",
-      message = "Por favor, forne\u00E7a um email para identifica\u00E7\u00E3o junto ao CNJ:",
-      default = ""
+#' @param api_key Chave da API. Quando omitida, usa `DATAJUD_API_KEY`.
+#' @param email E-mail opcional para identificação no User-Agent. Quando omitido,
+#'   usa `DATAJUD_EMAIL`.
+#' @param timeout Tempo máximo de espera de cada requisição, em segundos.
+#' @param max_tentativas Número máximo de tentativas reservado ao cliente HTTP.
+#' @return Um objeto da classe `datajud_cliente`.
+#' @export
+datajud_cliente <- function(api_key = NULL, email = NULL, timeout = 30,
+                            max_tentativas = 3) {
+  chave <- if (is.null(api_key)) Sys.getenv("DATAJUD_API_KEY", unset = "") else api_key
+  if (!nzchar(chave)) {
+    chave <- tryCatch(
+      obter_chave_publica_cnj(),
+      error = function(e) DATAJUD_CHAVE_PUBLICA_ATUAL
     )
-
-
   }
-  # Padrão de expressão regular para validar email
-  email_pattern <- "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-
-  # Verificar se é um email válido
-  if(grepl(email_pattern, email)) {
-    # Se for, setar environment
-    Sys.setenv(datajud_email_user = email)
-    cat("Email configurado com sucesso:", email, "\n")
-  } else {
-    stop("Email inv\u00E1lido. Por favor, forne\u00E7a um email v\u00E1lido.\n")
-    return(FALSE)
+  endereco <- if (is.null(email)) Sys.getenv("DATAJUD_EMAIL", unset = "") else email
+  if (!is.character(chave) || length(chave) != 1L || !nzchar(chave)) {
+    cli::cli_abort("Informe api_key ou configure DATAJUD_API_KEY.")
   }
-
+  if (!is.character(endereco) || length(endereco) != 1L ||
+      (nzchar(endereco) && !grepl("^[^@[:space:]]+@[^@[:space:]]+\\.[^@[:space:]]+$", endereco))) {
+    cli::cli_abort("O e-mail informado \u00E9 inv\u00E1lido.")
+  }
+  if (!is.numeric(timeout) || length(timeout) != 1L || !is.finite(timeout) || timeout <= 0) {
+    cli::cli_abort("timeout deve ser um n\u00FAmero positivo.")
+  }
+  if (!is.numeric(max_tentativas) || length(max_tentativas) != 1L ||
+      !is.finite(max_tentativas) || max_tentativas < 1 || max_tentativas != round(max_tentativas)) {
+    cli::cli_abort("max_tentativas deve ser um inteiro positivo.")
+  }
+  structure(list(api_key = chave, email = endereco, timeout = timeout,
+                 max_tentativas = as.integer(max_tentativas)),
+            class = "datajud_cliente")
 }
 
-## função auxiliar para gerar user_agent
-user <- function() {
-
-  email_user <- checar_identificacao_valida()
-
-  if(email_user == FALSE) {
-    return(email_user)
-  }
-
-  return(
-    httr::user_agent(paste("Pacote {datajud} para R - email:", email_user))
-  )
-
+#' @export
+print.datajud_cliente <- function(x, ...) {
+  cli::cli_text("<datajud_cliente>")
+  cli::cli_text("E-mail: {if (nzchar(x$email)) x$email else 'n\u00E3o informado'}")
+  cli::cli_text("Timeout: {x$timeout}s | Tentativas: {x$max_tentativas}")
+  invisible(x)
 }
 
-## função para obter key do site do CNJ
-
-obter_key_cnj <- function() {
-
-  # checar se usuario foi identificado
-  email_user <- checar_identificacao_valida()
-
-  if(email_user == FALSE) {
-
-    stop("Usu\u00E1rio n\u00E3o identificado.\nPor favor, identifique-se com um email v\u00E1lido usando datajud_login(seu_email).")
-    return(FALSE)
-  }
-
-  # url do site do CNJ
-  url <- "https://datajud-wiki.cnj.jus.br/api-publica/acesso/"
-
-  # puxa a key do site
-  key <- httr::GET(url,
-                   user()) |>
-    httr::content() |>
-    xml2::xml_find_all("//strong") |>
-    xml2::xml_text() |>
-    purrr::pluck(3)
-
-  # seta a key no environment
-  Sys.setenv(datajud_key = key)
-
-  cat("Key configurada com sucesso:", key, "\n")
-  invisible(key)
+cliente_user_agent <- function(cliente) {
+  texto <- "Pacote datajud para R"
+  if (nzchar(cliente$email)) texto <- paste0(texto, " - e-mail: ", cliente$email)
+  httr::user_agent(texto)
 }
 
-## resgatar a key da memoria
-
-get_key <- function() {
-
-  key <- Sys.getenv("datajud_key")
-
-  if(is.null(key) | key == "") {
-
-    email_user <- checar_identificacao_valida()
-
-    if(email_user == FALSE) {
-      stop("Usu\u00E1rio n\u00E3o identificado.\nPor favor, identifique-se com um email v\u00E1lido usando datajud_login(seu_email).")
-      return(FALSE)
-    }
-
-    key <- obter_key_cnj()
-
+validar_cliente <- function(cliente) {
+  if (!inherits(cliente, "datajud_cliente")) {
+    cli::cli_abort("cliente deve ser criado com datajud_cliente().")
   }
-
-  return(key)
+  invisible(cliente)
 }

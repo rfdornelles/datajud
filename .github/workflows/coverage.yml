@@ -1,0 +1,29 @@
+name: Cobertura de testes
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    name: Medir cobertura no R 4.2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+      - name: Configurar R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.2'
+          use-public-rspm: true
+      - name: Instalar dependências
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          needs: coverage
+          extra-packages: any::covr
+          cache: true
+      - name: Gerar relatório de cobertura
+        run: |
+          Rscript -e 'excluidas <- c("datajud_requisition", "datajud_consultar_processo", "obter_chave_publica_cnj"); resultado <- covr::package_coverage(function_exclusions = excluidas); print(resultado); cobertura <- covr::percent_coverage(resultado); cat("Cobertura total (funções de rede excluídas): ", cobertura, "%\\n", sep = ""); if (cobertura < 90) stop("Cobertura abaixo do mínimo de 90%.")'

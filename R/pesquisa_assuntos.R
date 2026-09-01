@@ -55,12 +55,12 @@ monta_consulta_elasticsearch <- function(assunto_codigo = NULL,
 #' É possível especificar um tamanho máximo para a amostra de resultados retornados.
 #'
 #' @param tribunal Identificador do tribunal a ser consultado.
+#' @param cliente Objeto criado por `datajud_cliente()`.
 #' @param classe_codigo Vetor opcional de códigos de classe para filtrar os processos.
 #' @param orgao_codigo Vetor opcional de códigos de órgão julgador para filtrar os processos.
 #' @param size Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.
 #'
-#' @return A função não retorna um valor diretamente, mas atribui a variável de saída (contendo os resultados da pesquisa) ao ambiente global.
-#' A função também emite mensagens de sucesso e informações sobre como verificar os resultados da pesquisa.
+#' @return Uma lista com os processos encontrados pela consulta.
 #'
 #' @export
 #'
@@ -77,7 +77,8 @@ monta_consulta_elasticsearch <- function(assunto_codigo = NULL,
 #' }
 
 datajud_pesquisar_classe_orgao <- function(
-    tribunal = NA,
+    tribunal,
+    cliente,
     classe_codigo = NULL,
     orgao_codigo = NULL,
     size = 100) {
@@ -90,13 +91,12 @@ datajud_pesquisar_classe_orgao <- function(
 
   if(size < 1 | size > 10000) stop("Tamanho da amostra deve ser um n\u00FAmero inteiro entre 1 e 10000")
 
-  # checa se há key definida
-  key = get_key()
+  validar_cliente(cliente)
 
 
   # headers
   headers = c(
-    'Authorization' = paste0('APIKey ', key),
+    'Authorization' = paste0('APIKey ', cliente$api_key),
     'Content-Type' = 'application/json'
   )
 
@@ -118,7 +118,8 @@ datajud_pesquisar_classe_orgao <- function(
     url = url,
     body = body,
     httr::add_headers(headers),
-    datajud:::user()
+    cliente_user_agent(cliente),
+    httr::timeout(cliente$timeout)
   )
 
   # extrair conteudo
@@ -142,16 +143,5 @@ datajud_pesquisar_classe_orgao <- function(
     return()
   }
 
-  # nomear a variável de saída
-  nome_saida <- aux_nomeia_saida()
-
-  cli::cli_alert_success(glue::glue("Vari\u00E1vel de sa\u00EDda: {nome_saida}"))
-  cli::cli_alert_info("Verifique a resposta da consulta com a fun\u00E7\u00E3o `datajud_ler_processo` ou `datajud_ler_movimentacoes`")
-
-
-  assign(x = nome_saida,
-         value = conteudo,
-         envir = .GlobalEnv)
-
-  invisible(conteudo)
+  conteudo
 }
