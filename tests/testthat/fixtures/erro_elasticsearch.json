@@ -1,0 +1,15 @@
+{
+  "error": {
+    "type": "x_content_parse_exception",
+    "reason": "JSON inválido",
+    "root_cause": [
+      {
+        "type": "x_content_parse_exception",
+        "reason": "JSON inválido",
+        "line": 1,
+        "col": 2
+      }
+    ]
+  },
+  "status": 400
+}

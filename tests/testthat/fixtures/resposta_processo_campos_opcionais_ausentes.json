@@ -1,0 +1,11 @@
+{
+  "_index": "datajud",
+  "_id": "processo-exemplo-3",
+  "_source": {
+    "id": "processo-exemplo-3",
+    "tribunal": "TJSP",
+    "numeroProcesso": "1000003-45.2024.8.26.0100",
+    "classe": {"codigo": 1116, "nome": "Ação de conhecimento"},
+    "assuntos": []
+  }
+}
