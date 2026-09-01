@@ -77,12 +77,6 @@ aux_identifica_tribunal <- function(cnj) {
   if (length(cnj) != 1L || is.na(cnj)) stop("N\u00FAmero do processo inv\u00E1lido")
   cnj_limpo <- normalizar_numero_cnj(cnj)
 
-  # validar se tem 20 dígitos
-  if (nchar(cnj_limpo) != 20) {
-    stop("N\u00FAmero do processo inv\u00E1lido")
-    return(NULL)
-  }
-
   # extrair campo J e campo TR
   campo_j <- substr(cnj_limpo, start = 14, stop = 14)
   campo_tr <- substr(cnj_limpo, start = 15, stop = 16)
@@ -296,9 +290,17 @@ datajud_consultar_processo <- function(processo,
   }
 
   # checar se tribunal é null ou se têm o mesmo tamanho que processo
-  if (length(tribunal) == 0L || length(tribunal) > 1L && length(tribunal) != length(processo) ||
-      length(tribunal) > 1L && anyNA(tribunal)) {
+  if (length(tribunal) == 0L) {
+    cli::cli_abort("Tribunal n\u00E3o informado.")
+  }
+  if (length(tribunal) > 1L && anyNA(tribunal)) {
+    cli::cli_abort("Tribunal n\u00E3o pode misturar valores e NA.")
+  }
+  if (length(tribunal) > 1L && length(tribunal) != length(processo)) {
     cli::cli_abort("O campo Tribunal n\u00E3o tem o mesmo tamanho que o campo processo.")
+  }
+  if (length(tribunal) == 1L && !is.na(tribunal) && !nzchar(trimws(tribunal))) {
+    cli::cli_abort("Tribunal n\u00E3o pode ser vazio.")
   }
 
   # checar se sleep é válido
