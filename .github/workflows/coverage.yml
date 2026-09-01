@@ -1,9 +1,7 @@
 name: Cobertura de testes
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "30 3 * * 1"
+  pull_request:
 
 permissions:
   contents: read
