@@ -29,6 +29,7 @@ Esta função realiza uma pesquisa no Datajud, permitindo filtrar processos por 
 É possível especificar um tamanho máximo para a amostra de resultados retornados.
 }
 \examples{
+\dontrun{
 # Pesquisar processos no TJSP por classe de assunto 1116 e tamanho da amostra de 100
 datajud_pesquisar_classe_orgao(tribunal = "TJSP", classe_codigo = c(1116), size = 100)
 
@@ -37,4 +38,5 @@ datajud_pesquisar_classe_orgao(tribunal = "TJMG", orgao_codigo = c(13597))
 
 # Pesquisar processos no TJRJ por classe de assunto e órgão julgador especificados
 datajud_pesquisar_classe_orgao(tribunal = "TJRJ", classe_codigo = c(1116), orgao_codigo = c(13597), size = 500)
+}
 }

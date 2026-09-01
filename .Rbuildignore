@@ -3,3 +3,8 @@
 ^LICENSE\.md$
 ^README\.Rmd$
 ^data-raw$
+^\.cache$
+^roadmap$
+^scripts$
+^datajud\.Rcheck$
+^datajud_[0-9].*\.tar\.gz$

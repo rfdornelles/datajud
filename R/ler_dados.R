@@ -149,23 +149,25 @@ ler_processo <- function(dados) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
 #' datajud_ler_processo()
 #' # Ou, se a lista de processos estiver armazenada em uma variável customizada:
 #' datajud_ler_processo(base = minha_lista_processos)
+#' }
 
 
 datajud_ler_processo <- function(base = "datajud_resposta") {
 
   if (!is.list(base)) {
     if (!exists(base, envir = .GlobalEnv)) {
-      stop("Base de dados não encontrada")
+      stop("Base de dados n\u00E3o encontrada")
     }
     base <- get(base, envir = .GlobalEnv)
   }
 
   if (!is.list(base)) {
-    stop("Base não é uma lista ou o nome de uma lista existente")
+    stop("Base n\u00E3o \u00E9 uma lista ou o nome de uma lista existente")
   }
 
 # retornando os metadados do processo
@@ -202,23 +204,25 @@ datajud_ler_processo <- function(base = "datajud_resposta") {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
 #' datajud_ler_movimentacoes()
 #'
 #' # Se os dados das movimentações estiverem armazenados em uma variável customizada:
 #' datajud_ler_movimentacoes(base = minha_lista_movimentacoes)
+#' }
 
 datajud_ler_movimentacoes <- function(base = "datajud_resposta") {
 
   if (!is.list(base)) {
     if (!exists(base, envir = .GlobalEnv)) {
-      stop("Base de dados não encontrada")
+      stop("Base de dados n\u00E3o encontrada")
     }
     base <- get(base, envir = .GlobalEnv)
   }
 
   if (!is.list(base)) {
-    stop("Base não é uma lista ou o nome de uma lista existente")
+    stop("Base n\u00E3o \u00E9 uma lista ou o nome de uma lista existente")
   }
 
   # retornando os metadados do processo

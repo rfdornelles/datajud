@@ -8,7 +8,6 @@ Description: Pacote utilizado para extrair dados da API pública do Datajud.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
 URL: https://github.com/rfdornelles/datajud
 BugReports: https://github.com/rfdornelles/datajud/issues
 Imports: 
@@ -16,7 +15,6 @@ Imports:
     dplyr,
     glue,
     httr,
-    jsonlite,
     lubridate,
     purrr,
     rstudioapi,
@@ -26,3 +24,4 @@ Imports:
 Depends: 
     R (>= 4.1.0)
 LazyData: true
+Config/roxygen2/version: 8.0.0

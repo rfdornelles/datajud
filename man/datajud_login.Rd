@@ -22,9 +22,11 @@ através de uma expressão regular para garantir que está no formato correto. U
 o email é armazenado como uma variável de ambiente para uso posterior nas requisições ao Datajud.
 }
 \examples{
+\dontrun{
 # Configurar o email do usuário manualmente
 datajud_login(email = "seu.email@dominio.com")
 
 # Solicitar que o usuário forneça o email via caixa de diálogo (RStudio)
 datajud_login()
+}
 }

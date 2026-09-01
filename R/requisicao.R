@@ -44,9 +44,9 @@ aux_retorna_endpoint <- function(tribunal) {
       unique()
 
     if (length(url_tribunal) == 0) {
-      cli::cli_abort("Tribunal não encontrado ou não disponível no Datajud")
+      cli::cli_abort("Tribunal n\u00E3o encontrado ou n\u00E3o dispon\u00EDvel no Datajud")
     } else if (length(url_tribunal) > 1) {
-      cli::cli_abort("Múltiplas URLs encontradas para a sigla fornecida")
+      cli::cli_abort("M\u00FAltiplas URLs encontradas para a sigla fornecida")
     }
 
     return(url_tribunal[1])
@@ -78,7 +78,7 @@ aux_identifica_tribunal <- function(cnj) {
 
   # validar se tem 20 dígitos
   if (nchar(cnj_limpo) != 20) {
-    stop("Número do processo inválido")
+    stop("N\u00FAmero do processo inv\u00E1lido")
     return(NULL)
   }
 
@@ -172,14 +172,14 @@ datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
   }
 
   if(is.na(url_tribunal)) {
-    cli::cli_alert_danger(glue::glue("Tribunal {tribunal} não encontrado ou não disponível no Datajud"))
+    cli::cli_alert_danger(glue::glue("Tribunal {tribunal} n\u00E3o encontrado ou n\u00E3o dispon\u00EDvel no Datajud"))
     return(NULL)
   }
 
   # checa o numero do processo
   numero_cnj_limpo <- gsub("[^0-9]", "", processo)
   if(nchar(numero_cnj_limpo) != 20) {
-    stop("Número do processo inválido")
+    stop("N\u00FAmero do processo inv\u00E1lido")
     return(NULL)
   }
 
@@ -212,11 +212,11 @@ datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
   )
 
   if (requisicao$status_code != 200) {
-    cat(glue::glue("Erro na requisição: {requisicao$status_code}\n
+    cat(glue::glue("Erro na requisi\u00E7\u00E3o: {requisicao$status_code}\n
                    Processo: {numero_cnj_limpo}\n
                    Tribunal: {tribunal}\n"))
 
-    stop("Erro na requisição")
+    stop("Erro na requisi\u00E7\u00E3o")
     return(NULL)
   }
 
@@ -231,7 +231,7 @@ datajud_requisition <- function(processo, tribunal = NA, sleep = 0.1) {
                                 "numeroProcesso")
 
   if(is.null(cnj_localizado)) {
-    stop(glue::glue("Processo {processo} não encontrado no tribunal {tribunal}"))
+    stop(glue::glue("Processo {processo} n\u00E3o encontrado no tribunal {tribunal}"))
     return(NULL)
   }
 
@@ -262,7 +262,7 @@ aux_nomeia_saida <- function(nome_inicial = "datajud_resposta") {
   if(i > 20) {
     nome <- nome_inicial
     cli::cli_alert_info(glue::glue(
-      "Já existem +20 variáveis com o nome {nome}, sobrescrevendo a primeira."
+      "J\u00E1 existem +20 vari\u00E1veis com o nome {nome}, sobrescrevendo a primeira."
       )
     )
   }
@@ -294,12 +294,14 @@ aux_nomeia_saida <- function(nome_inicial = "datajud_resposta") {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Após realizar o login com datajud_login():
 #' datajud_consultar_processo(processo = "0000001-89.2020.8.26.0000", tribunal = "TJSP")
 #' # Para consultar múltiplos processos com intervalo de espera customizado:
 #' datajud_consultar_processo(processo = c("0000001-89.2020.8.26.0000", "0000002-30.2021.8.26.0000"),
 #'                            tribunal = c("TJSP", "TJSP"),
 #'                            sleep = 1)
+#' }
 
 datajud_consultar_processo <- function(processo,
                                        tribunal = NA,
@@ -309,26 +311,26 @@ datajud_consultar_processo <- function(processo,
   processo <- as.character(processo)
 
   if (length(processo) < 1 | any(processo == "")) {
-    cli::cli_alert_danger("Número do processo não informado")
+    cli::cli_alert_danger("N\u00FAmero do processo n\u00E3o informado")
     return()
   }
 
   # checar se tribunal é null ou se têm o mesmo tamanho que processo
   if(!is.na(tribunal) & length(tribunal) != length(processo)) {
-    cli::cli_alert_danger("O campo Tribunal não tem o mesmo tamanho que o campo processo.")
+    cli::cli_alert_danger("O campo Tribunal n\u00E3o tem o mesmo tamanho que o campo processo.")
     cli::cli_alert_info("Informe listas do mesmo tamanho ou deixe o campo tribunal em branco.")
     return()
   }
 
   # checar se sleep é válido
   if(!is.numeric(sleep) | sleep < 0 | sleep > 10000) {
-    cli::cli_alert_danger("Valor de sleep inválido. Informe número positivo inferior a 10.000.")
+    cli::cli_alert_danger("Valor de sleep inv\u00E1lido. Informe n\u00FAmero positivo inferior a 10.000.")
     return()
   }
 
   # checar se o login foi realizado
   if(datajud:::checar_identificacao_valida() == FALSE) {
-    cli::cli_alert_danger("Você precisa se identificar para realizar a consulta.")
+    cli::cli_alert_danger("Voc\u00EA precisa se identificar para realizar a consulta.")
     cli::cli_alert_info("Use datajud::datajud_login()")
     return()
   }
@@ -362,20 +364,20 @@ datajud_consultar_processo <- function(processo,
   respostas_validas <- sum((resposta |> purrr::map_int(length)) > 0)
 
   if (respostas_validas == 0) {
-    cli::cli_alert_danger("Nenhuma resposta válida encontrada.")
+    cli::cli_alert_danger("Nenhuma resposta v\u00E1lida encontrada.")
     return(NULL)
   }
 
   # informar que a requisição foi finalizada
   cli::cli_alert_info(
-    glue::glue("Requisição finalizada! {respostas_validas}/{length(processo)} processos consultados com sucesso!")
+    glue::glue("Requisi\u00E7\u00E3o finalizada! {respostas_validas}/{length(processo)} processos consultados com sucesso!")
   )
 
   # nomear a variável de saída
   nome_saida <- aux_nomeia_saida()
 
-  cli::cli_alert_success(glue::glue("Variável de saída: {nome_saida}"))
-  cli::cli_alert_info("Verifique a resposta da consulta com a função `datajud_ler_processo` ou `datajud_ler_movimentacoes`")
+  cli::cli_alert_success(glue::glue("Vari\u00E1vel de sa\u00EDda: {nome_saida}"))
+  cli::cli_alert_info("Verifique a resposta da consulta com a fun\u00E7\u00E3o `datajud_ler_processo` ou `datajud_ler_movimentacoes`")
 
 
   assign(x = nome_saida,

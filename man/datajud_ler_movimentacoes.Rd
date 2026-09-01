@@ -23,9 +23,11 @@ sobre uma lista de processos ou sobre o nome de uma variável global que contém
 É ideal para análises detalhadas das etapas processuais e suas características.
 }
 \examples{
+\dontrun{
 # Após realizar uma pesquisa e armazenar os resultados em 'datajud_resposta':
 datajud_ler_movimentacoes()
 
 # Se os dados das movimentações estiverem armazenados em uma variável customizada:
 datajud_ler_movimentacoes(base = minha_lista_movimentacoes)
+}
 }

@@ -41,19 +41,21 @@ checar_identificacao_valida <- function() {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Configurar o email do usuário manualmente
 #' datajud_login(email = "seu.email@dominio.com")
 #'
 #' # Solicitar que o usuário forneça o email via caixa de diálogo (RStudio)
 #' datajud_login()
+#' }
 
 datajud_login <- function(email = NULL) {
 
   if(is.null(email)) {
 
     email <- rstudioapi::showPrompt(
-      title = "Identificação",
-      message = "Por favor, forneça um email para identificação junto ao CNJ:",
+      title = "Identifica\u00E7\u00E3o",
+      message = "Por favor, forne\u00E7a um email para identifica\u00E7\u00E3o junto ao CNJ:",
       default = ""
     )
 
@@ -68,7 +70,7 @@ datajud_login <- function(email = NULL) {
     Sys.setenv(datajud_email_user = email)
     cat("Email configurado com sucesso:", email, "\n")
   } else {
-    stop("Email inválido. Por favor, forneça um email válido.\n")
+    stop("Email inv\u00E1lido. Por favor, forne\u00E7a um email v\u00E1lido.\n")
     return(FALSE)
   }
 
@@ -98,7 +100,7 @@ obter_key_cnj <- function() {
 
   if(email_user == FALSE) {
 
-    stop("Usuário não identificado.\nPor favor, identifique-se com um email válido usando datajud_login(seu_email).")
+    stop("Usu\u00E1rio n\u00E3o identificado.\nPor favor, identifique-se com um email v\u00E1lido usando datajud_login(seu_email).")
     return(FALSE)
   }
 
@@ -131,7 +133,7 @@ get_key <- function() {
     email_user <- checar_identificacao_valida()
 
     if(email_user == FALSE) {
-      stop("Usuário não identificado.\nPor favor, identifique-se com um email válido usando datajud_login(seu_email).")
+      stop("Usu\u00E1rio n\u00E3o identificado.\nPor favor, identifique-se com um email v\u00E1lido usando datajud_login(seu_email).")
       return(FALSE)
     }
 
