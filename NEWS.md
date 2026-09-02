@@ -1,5 +1,11 @@
 # datajud 0.0.0.9000
 
+* O contrato vigente da API Pública agora possui nota técnica e fixture
+  versionadas, distinguindo evidência oficial de comportamento apenas
+  observado em probes sanitizados.
+* Um downloader reproduzível mantém a Wiki completa em
+  `.cache/datajud-wiki/` e versiona somente o manifesto com status, data e hash
+  de cada página.
 * Todo o tráfego HTTP passa por uma camada interna única baseada em `httr2`;
   consultas são listas R serializadas de forma estruturada e a autenticação é
   redigida ao imprimir requisições.
