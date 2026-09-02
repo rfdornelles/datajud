@@ -1,0 +1,54 @@
+{
+  "versao_esquema": 1,
+  "registrado_em": "2026-09-02",
+  "campos": {
+    "id": "text/keyword",
+    "numeroProcesso": "text/keyword",
+    "assuntos.codigo": "long",
+    "classe.codigo": "long",
+    "orgaoJulgador.codigo": "long",
+    "@timestamp": "datetime"
+  },
+  "identificadores": {
+    "consulta_processo": "numeroProcesso",
+    "chave_unica_pacote": "id"
+  },
+  "operadores": {
+    "documentados": ["match", "bool.must"],
+    "observados_http_200": ["match", "term", "terms"],
+    "semantica_planejada": "OR dentro de cada vetor e AND entre categorias"
+  },
+  "size": {
+    "padrao_documentado": 10,
+    "minimo_textual_documentado": 10,
+    "maximo_documentado": 10000,
+    "valores_observados_http_200": [0, 1],
+    "acima_maximo_observado": 10001,
+    "status_acima_maximo": 400
+  },
+  "paginacao": {
+    "mecanismo_documentado": "search_after",
+    "ordenacao_api_publica_documentada": "@timestamp",
+    "ordenacao_id_keyword_observada_status": 200,
+    "ordenacao_id_direto_observada_status": 400,
+    "cursor_formato": "array sort do ultimo hit"
+  },
+  "total": {
+    "caminho": "hits.total",
+    "campos": ["value", "relation"],
+    "relations_documentadas": ["eq", "gte"]
+  },
+  "erros": {
+    "formato_documentado": false,
+    "status_consulta_invalida_observado": 400,
+    "campos_topo_observados": ["error", "status"],
+    "error_tipo_observado": "object"
+  },
+  "fontes": [
+    "https://datajud-wiki.cnj.jus.br/api-publica/glossario/",
+    "https://datajud-wiki.cnj.jus.br/api-publica/exemplos/exemplo1/",
+    "https://datajud-wiki.cnj.jus.br/api-publica/exemplos/exemplo2/",
+    "https://datajud-wiki.cnj.jus.br/api-publica/exemplos/exemplo3/",
+    "https://datajud-wiki.cnj.jus.br/para-tribunais/Datajud/Api-elastic/"
+  ]
+}

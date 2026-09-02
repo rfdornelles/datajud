@@ -111,6 +111,15 @@ movimentacoes <- datajud_ler_movimentacoes(respostas)
 assuntos <- datajud_desaninhar_assuntos(processos)
 ```
 
+## Contrato da API e cache da Wiki
+
+As decisões sobre campos, tipos, operadores, limites e paginação são
+rastreáveis na [nota técnica do contrato](inst/contrato-api-publica.md).
+O repositório também contém scripts para atualizar o cache local da Wiki
+e executar um probe real sanitizado. O HTML completo permanece em
+`.cache/datajud-wiki/`, fora do Git; somente o manifesto de URLs, status
+e hashes é versionado.
+
 ## Termos da API e licença do pacote
 
 São regimes distintos:
