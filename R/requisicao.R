@@ -37,8 +37,11 @@ aux_retorna_endpoint <- function(tribunal) {
       tribunal_limpo <- paste0(stringr::str_extract(tribunal_limpo, "^(trf|trt)"), digitos)
     }
 
-    # Buscar o endpoint na tabela
-    indice <- stringr::str_to_lower(datajud::tribunais$sigla) == tribunal_limpo
+    # Buscar o endpoint com a mesma normalização aplicada aos dois lados.
+    siglas_normalizadas <- datajud::tribunais$sigla |>
+      stringr::str_remove_all("[^a-zA-Z0-9]") |>
+      stringr::str_to_lower()
+    indice <- siglas_normalizadas == tribunal_limpo
     url_tribunal <- unique(datajud::tribunais$url[indice])
 
     if (length(url_tribunal) == 0) {
