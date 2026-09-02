@@ -14,7 +14,7 @@ Um vetor com duas posições: a sigla do tribunal e a URL do endpoint correspond
 }
 \description{
 A função analisa o número CNJ de um processo e retorna a sigla do tribunal correspondente,
-bem como o endpoint para consulta na API pública do DataJud.
+bem como o endpoint para consulta na API pública do Datajud.
 }
 \examples{
 aux_identifica_tribunal("0000102-03.2004.8.26.0000")

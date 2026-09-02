@@ -14,7 +14,7 @@ Caractere com a URL do endpoint correspondente ao tribunal informado.
 }
 \description{
 Esta função auxiliar é destinada a identificar e retornar a URL do endpoint
-específico de um tribunal para consulta na API pública do DataJud.
+específico de um tribunal para consulta na API pública do Datajud.
 }
 \examples{
 aux_retorna_endpoint("TST")

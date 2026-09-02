@@ -9,7 +9,7 @@
 #' Retorna o endpoint correspondente ao tribunal informado
 #'
 #' Esta função auxiliar é destinada a identificar e retornar a URL do endpoint
-#' específico de um tribunal para consulta na API pública do DataJud.
+#' específico de um tribunal para consulta na API pública do Datajud.
 #'
 #' @param tribunal Um caractere que representa o código ou sigla do tribunal.
 #'
@@ -38,10 +38,8 @@ aux_retorna_endpoint <- function(tribunal) {
     }
 
     # Buscar o endpoint na tabela
-    url_tribunal <- datajud::tribunais |>
-      dplyr::filter(stringr::str_to_lower(sigla) == tribunal_limpo) |>
-      dplyr::pull(url) |>
-      unique()
+    indice <- stringr::str_to_lower(datajud::tribunais$sigla) == tribunal_limpo
+    url_tribunal <- unique(datajud::tribunais$url[indice])
 
     if (length(url_tribunal) == 0) {
       cli::cli_abort("Tribunal n\u00E3o encontrado ou n\u00E3o dispon\u00EDvel no Datajud")
@@ -61,7 +59,7 @@ aux_retorna_endpoint <- function(tribunal) {
 #' Identifica o tribunal com base no número CNJ de um processo
 #'
 #' A função analisa o número CNJ de um processo e retorna a sigla do tribunal correspondente,
-#' bem como o endpoint para consulta na API pública do DataJud.
+#' bem como o endpoint para consulta na API pública do Datajud.
 #'
 #' @param cnj Um caractere que representa o número CNJ de um processo.
 #'
@@ -94,6 +92,15 @@ aux_identifica_tribunal <- function(cnj) {
     campo_j == "9" ~ "tjm"
   )
 
+  siglas_uf <- c(
+    "01" = "ac", "02" = "al", "03" = "ap", "04" = "am", "05" = "ba",
+    "06" = "ce", "07" = "dft", "08" = "es", "09" = "go", "10" = "ma",
+    "11" = "mt", "12" = "ms", "13" = "mg", "14" = "pa", "15" = "pb",
+    "16" = "pr", "17" = "pe", "18" = "pi", "19" = "rj", "20" = "rn",
+    "21" = "rs", "22" = "ro", "23" = "rr", "24" = "sc", "25" = "se",
+    "26" = "sp", "27" = "to"
+  )
+
   # separar o tribunal
   segmento_regional <- dplyr::case_when(
     campo_tr == "00" ~ "originario",
@@ -101,39 +108,8 @@ aux_identifica_tribunal <- function(cnj) {
                             "tst",
                             "jm",
                             "trt") ~ campo_tr,
-    # se for estadual, eleitoral, militar estadual será a sigla
-    # do estado em ordem alfabetica
-    TRUE ~ dplyr::case_match(
-      campo_tr,
-      "01" ~ "ac",
-      "02" ~ "al",
-      "03" ~ "ap",
-      "04" ~ "am",
-      "05" ~ "ba",
-      "06" ~ "ce",
-      "07" ~ "dft",
-      "08" ~ "es",
-      "09" ~ "go",
-      "10" ~ "ma",
-      "11" ~ "mt",
-      "12" ~ "ms",
-      "13" ~ "mg",
-      "14" ~ "pa",
-      "15" ~ "pb",
-      "16" ~ "pr",
-      "17" ~ "pe",
-      "18" ~ "pi",
-      "19" ~ "rj",
-      "20" ~ "rn",
-      "21" ~ "rs",
-      "22" ~ "ro",
-      "23" ~ "rr",
-      "24" ~ "sc",
-      "25" ~ "se",
-      "26" ~ "sp",
-      "27" ~ "to",
-      .default = NA_character_
-    )
+    # Na Justiça estadual, eleitoral e militar estadual, usa a sigla da UF.
+    TRUE ~ unname(siglas_uf[campo_tr])
   )
 
   # distribuir o endpoint de acordo com o tribunal
@@ -258,9 +234,11 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
 #'                 Deve ser fornecido como um valor ou vetor de caracteres.
 #' @param cliente Objeto criado por `datajud_cliente()`.
 #' @param tribunal Identificador do tribunal correspondente ao(s) processo(s) sendo consultado(s).
-#'                 Se fornecido, deve ter o mesmo tamanho que o vetor `processo`.
+#'                 Pode ser um valor único, um valor por processo ou `NA`
+#'                 escalar para inferir todos automaticamente. Não é permitido
+#'                 misturar tribunais informados e `NA` no mesmo vetor.
 #' @param sleep Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
-#'              no servidor. O valor padrão é 0.1 segundos. Deve ser um número positivo.
+#'              no servidor. O valor padrão é 0.1 segundos. Deve estar entre 0 e 60.
 #'
 #' @return Uma lista com uma resposta por processo. Respostas que falharem podem ser `NULL`.
 #'
@@ -273,6 +251,7 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
 #' datajud_consultar_processo("0000001-89.2020.8.26.0000", cliente, tribunal = "TJSP")
 #' # Para consultar múltiplos processos com intervalo de espera customizado:
 #' datajud_consultar_processo(processo = c("0000001-89.2020.8.26.0000", "0000002-30.2021.8.26.0000"),
+#'                            cliente = cliente,
 #'                            tribunal = c("TJSP", "TJSP"),
 #'                            sleep = 1)
 #' }

@@ -26,7 +26,9 @@ obter_chave_publica_cnj <- function(
 
 #' Cria um cliente explícito para a API do Datajud
 #'
-#' @param api_key Chave da API. Quando omitida, usa `DATAJUD_API_KEY`.
+#' @param api_key Chave pública da API. Quando omitida, usa `DATAJUD_API_KEY`,
+#'   consulta a Wiki oficial e, se necessário, recorre à cópia vigente incluída
+#'   no pacote.
 #' @param email E-mail opcional para identificação no User-Agent. Quando omitido,
 #'   usa `DATAJUD_EMAIL`.
 #' @param timeout Tempo máximo de espera de cada requisição, em segundos.

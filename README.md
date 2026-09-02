@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Pacote Datajud
+# datajud
 
 <!-- badges: start -->
 
@@ -9,170 +9,132 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-O pacote Datajud é uma ferramenta não oficial desenvolvida para
-facilitar o acesso à API Pública do Datajud, disponibilizada pelo
-Conselho Nacional de Justiça (CNJ). Este documento fornece um guia sobre
-como instalar o pacote no R, aceitar os termos de uso do CNJ, e um fluxo
-básico de utilização do pacote.
+O `datajud` é um pacote R não oficial para consultar a API Pública do
+Datajud, disponibilizada pelo Conselho Nacional de Justiça (CNJ). A
+interface prioriza funções simples, retornos explícitos e composição com
+pipes, sem criar objetos automaticamente no ambiente global.
 
-O pacote ainda está em desenvolvimento e é normal que existam erros ou
-problemas. Por favor, reporte caso haja algum funcionamento inesperado
-ou indesejado, bem como suas sugestões.
-
-É bem possível que haja diversas modificações nessa fase inicial,
-portanto cuidado antes de utilizar em produção.
-
-## Termos de Uso do CNJ
-
-A utilização do pacote Datajud implica na aceitação tácita dos termos de
-uso estabelecidos pelo CNJ. Os principais pontos incluem:
-
-- **Aceitação Tacitamente**: Ao utilizar o pacote, você aceita
-  tacitamente as condições estabelecidas pelo CNJ.
-- **Responsabilidade do Usuário**: Você se responsabiliza pelo uso da
-  interface e das informações obtidas através dela.
-- **Uso Legal e Não Comercial**: O pacote deve ser utilizado
-  exclusivamente para fins legais e não comerciais.
-- **Proibição de Modificação e Exploração Comercial**: É proibido
-  modificar, distribuir, vender, ou explorar comercialmente a API ou
-  qualquer informação derivada dela.
-- **Obrigação de Notificação ao CNJ**: O usuário deve notificar o CNJ
-  sobre qualquer publicação de informação, notícia, estudo, ou documento
-  obtido através do uso da API.
-
-Para mais detalhes, visite os [termos de uso
-completos](https://datajud-wiki.cnj.jus.br/api-publica/termo-uso).
+O pacote está em desenvolvimento e sua interface pode mudar. Relate
+problemas e sugestões nas [issues do
+projeto](https://github.com/rfdornelles/datajud/issues).
 
 ## Instalação
 
-Para instalar o pacote Datajud do GitHub, você precisará ter o pacote
-`devtools` instalado no R. Se ainda não tiver, pode instalá-lo
-utilizando o comando `install.packages("devtools")`.
+Instale a versão de desenvolvimento a partir do GitHub:
 
 ``` r
- devtools::install_github("rfdornelles/datajud")
+install.packages("pak")
+pak::pak("rfdornelles/datajud")
 ```
-
-# Carregar o pacote
 
 ``` r
 library(datajud)
 ```
 
-# Fluxo Básico de Utilização
+## Cliente
 
-## 1. Identificação do Usuário
-
-Antes de utilizar as funcionalidades do pacote, é necessário realizar a
-identificação com seu email através do datajud_login.
-
-``` r
-datajud_login("seu.email@dominio.com")
-```
-
-## 2. Pesquisar Processos
-
-Você pode iniciar a pesquisa de processos judiciais especificando o
-número do processo e o tribunal. Se não souber o Tribunal, o código
-tentará advinhar automaticamente.
-
-É indiferente o uso de pontos/traços pois serão ignorados.
+A chave publicada pelo CNJ é pública. O pacote tenta obtê-la da Wiki
+oficial e mantém uma cópia da chave vigente como contingência. Também é
+possível informar a chave diretamente ou pela variável de ambiente
+`DATAJUD_API_KEY`.
 
 ``` r
-datajud_consultar_processo(processo = "numero_do_processo", tribunal = "sigla_do_tribunal")
+cliente <- datajud_cliente()
+
+# Alternativas explícitas:
+cliente <- datajud_cliente(api_key = "chave-publicada-pelo-cnj")
+Sys.setenv(DATAJUD_API_KEY = "chave-publicada-pelo-cnj")
+cliente <- datajud_cliente()
 ```
 
-É também possível pesquisar diversos processos em uma lista:
+O e-mail é opcional e, quando informado, compõe o `User-Agent`:
 
 ``` r
-lista_cnj <- c("00008323520184013202", 
-               "07223914020178070001",
-               "00073039720138070015",
-               "00356079220168070018")
-
-datajud_consultar_processo(processo = lista_cnj)
+cliente <- datajud_cliente(email = "seu.email@dominio.com")
 ```
 
-Para pesquisar por classe e órgão no tribunal especificado:
+## Consulta por número de processo
+
+A consulta pública recebe o número CNJ, com ou sem pontuação. O tribunal
+pode ser informado ou inferido do número. Para vários processos, use um
+tribunal único, um tribunal por processo ou `NA` escalar para inferir
+todos. Não misture tribunais informados e `NA` no mesmo vetor.
 
 ``` r
-datajud_pesquisar_classe_orgao(tribunal = "sigla_do_tribunal", lista_classe = c(1116), lista_orgao = c(13597))
+respostas <- datajud_consultar_processo(
+  processo = "0000001-89.2020.8.26.0000",
+  cliente = cliente,
+  tribunal = "TJSP"
+)
 ```
-
-As funções de pesquisa irão criar um objeto no seu ambiente chamado
-datajud_resposta. Caso já exista algum com esse nome, ele criará um
-sequencial como datajud_resposta_1, etc.
-
-## 3. Ler Dados dos Processos
-
-Após a pesquisa, você pode ler os dados dos processos ou as
-movimentações obtidas.
 
 ``` r
-datajud_ler_processo()
-datajud_ler_movimentacoes()
+numeros <- c(
+  "00008323520184013202",
+  "07223914020178070001"
+)
+
+respostas <- datajud_consultar_processo(
+  processo = numeros,
+  cliente = cliente,
+  tribunal = NA
+)
 ```
 
-# Filosofia
+O número CNJ é o parâmetro de consulta. O campo `id` devolvido pelo
+Datajud é preservado como chave interna do pacote.
 
-Esse pacote se presta a ser um facilitador no consumo dos dados da API
-Pública do Datajud e tem como público alvo pessoas pouco experientes com
-utilização de linguagem de programação. Por isso, o pacote pretende ser
-bastante simples e intuitivo, ainda que ao preço de limitado em suas
-funcionalidades.
+## Pesquisa por classe e órgão
 
-O pacote cria automaticamente no ambiente global objetos que podem ser
-utilizados para a leitura dos dados, mesmo sabendo que não é a melhor
-prática. Isso facilita o uso do público imaginado mas, certamente, pode
-ser rediscutido visando uma melhor usabilidade.
+Enquanto a interface geral de pesquisa não é publicada, a função
+existente aceita códigos de classe e/ou órgão julgador:
 
-Ele busca seguir as boas práticas de consumo de API pública, tais como
-identificação do usuário, pausa entre requisições, e impedimento de
-paralelismo; bem como tenta simplificar a vida da pessoa usuária ao
-tentar adivinhar o endpoint e o Tribunal a partir do número CNJ. Da
-mesma maneira, automatiza a criação das queries no ElasticSearch.
+``` r
+resultados <- datajud_pesquisar_classe_orgao(
+  tribunal = "TJSP",
+  cliente = cliente,
+  classe_codigo = 1116,
+  orgao_codigo = 13597,
+  size = 100
+)
+```
 
-# Autorização e Licença
+## Leitura dos resultados
 
-O autor do pacote Datajud autoriza o uso não comercial do mesmo nos
-termos da licença GPL-3.
+Os leitores recebem os resultados explicitamente e retornam tibbles.
+Assuntos são preservados em uma list-column para manter uma linha por
+processo.
 
-Não há qualquer compromisso ou responsabilidade do autor do pacote sobre
-sua utilização e/ou sobre os dados obtidos. Utilize com responsabilidade
-e consulte sempre uma pessoa jurista para melhor entender o contexto
-jurídico.
+``` r
+processos <- datajud_ler_processo(respostas)
+movimentacoes <- datajud_ler_movimentacoes(respostas)
+assuntos <- datajud_desaninhar_assuntos(processos)
+```
 
-# Contribuições
+## Termos da API e licença do pacote
 
-Contribuições são bem-vindas, assim como sugestões, críticas e PR! O
-pacote foi desenvolvido com foco na usabilidade e, por isso, algumas
-práticas não ideais foram seguidas (tais como criar objetos no global
-environment). A ideia é facilitar o uso dos dados públicos do CNJ por
-pessoas que não têm tanto conhecimento técnico.
+São regimes distintos:
 
-Por outro lado, fui bastante rigoroso com boas práticas de consumo de
-API pública exigindo a identificação da pessoa, impedindo paralelismo e
-pausando as requisições. O Datajud é uma demanda antiga e, por isso, é
-importante utilizá-lo com parcimônia e respeito!
+- o código-fonte do pacote `datajud` é software livre sob a licença
+  GPL-3-or-later, que permite usar, estudar, modificar e redistribuir o
+  software nas condições dessa licença;
+- o acesso à API Pública e o uso das informações do Datajud obedecem ao
+  [Termo de Uso do
+  CNJ](https://datajud-wiki.cnj.jus.br/api-publica/termo-uso/),
+  incluindo as restrições e responsabilidades definidas pelo próprio
+  CNJ.
 
-Em caso de contribuições, tenha isso em mente ;)
+Usar o pacote não substitui a leitura nem altera os termos do CNJ. O
+projeto não é afiliado ao CNJ e não oferece garantia sobre
+disponibilidade, precisão ou atualidade dos dados da API.
 
-# TODO’s / Ideias para o futuro
+## Filosofia e contribuições
 
-- [ ] melhoria da documentação com inclusão de vinhetas e exemplos, bem
-  como detalhar os campos das tabelas de resposta de acordo com o
-  dicionário de dados do CNJ
-- [ ] incorporar tabelas (TPU) de assuntos e de classes processuais
-- [ ] incorporar tabelas de órgãos jurisdicionais (não localizei nenhuma
-  TPU)
-- [ ] função para auxiliar na escolha de assuntos, classes e órgãos
-  dentro das tabelas unificadas
-- [ ] aprimorar as possibilidades de consulta ao Elastic Search do CNJ,
-  inclusive com parâmetros mais diveros
-- [ ] inclusão da funcionalidade de paginação
-- [ ] criação de widget Shiny para utilização no-code/low-code do
-  pacote, facilitando o acesso das pessoas leigas
-- [ ] funções para criação de gráficos e/ou análises comuns de interesse
-  (distribuição de tempo de tramitação, análise da movimentação para
-  identificação de eventos como audiência, sentença, interposição de
-  recurso, etc)
+O pacote busca facilitar o acesso programático ao Datajud para pessoas
+com diferentes níveis de experiência em R. Sua evolução segue práticas
+do tidyverse: argumentos explícitos, funções composáveis, retornos
+previsíveis e testes reproduzíveis sem rede.
+
+Contribuições, sugestões e relatos de erro são bem-vindos. Consulte o
+[roadmap](https://github.com/rfdornelles/datajud/issues?q=is%3Aissue+label%3Aroadmap)
+antes de propor mudanças maiores.
