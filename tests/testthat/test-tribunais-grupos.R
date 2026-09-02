@@ -33,6 +33,21 @@ test_that("eleitoral usa TRE e trabalho usa TRT", {
   expect_true(all(grepl("^trt", trabalho$sigla)))
 })
 
+test_that("todas as siglas listadas são aceitas pelo resolvedor", {
+  tribunais <- datajud::datajud_listar_tribunais()
+  endpoints <- vapply(
+    tribunais$sigla,
+    datajud::aux_retorna_endpoint,
+    character(1)
+  )
+
+  expect_identical(unname(endpoints), tribunais$url)
+  expect_identical(
+    datajud::aux_retorna_endpoint("TRE-BA"),
+    tribunais$url[tribunais$sigla == "tre-ba"]
+  )
+})
+
 test_that("múltiplos grupos são unidos sem duplicação", {
   resultado <- datajud::datajud_listar_tribunais(c("estadual", "federal"))
   comum <- datajud::datajud_listar_tribunais("justica_comum")
