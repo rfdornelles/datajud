@@ -57,7 +57,8 @@ cliente <- datajud_cliente(email = "seu.email@dominio.com")
 
 A consulta pública recebe o número CNJ, com ou sem pontuação. O tribunal
 pode ser informado ou inferido do número. Para vários processos, use um
-tribunal único, um tribunal por processo ou `NA` para inferência.
+tribunal único, um tribunal por processo ou `NA` escalar para inferir
+todos. Não misture tribunais informados e `NA` no mesmo vetor.
 
 ``` r
 respostas <- datajud_consultar_processo(

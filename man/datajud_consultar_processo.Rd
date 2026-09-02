@@ -13,8 +13,9 @@ Deve ser fornecido como um valor ou vetor de caracteres.}
 \item{cliente}{Objeto criado por \code{datajud_cliente()}.}
 
 \item{tribunal}{Identificador do tribunal correspondente ao(s) processo(s) sendo consultado(s).
-Pode ser um valor único, um valor por processo ou \code{NA} para
-inferência automática.}
+Pode ser um valor único, um valor por processo ou \code{NA}
+escalar para inferir todos automaticamente. Não é permitido
+misturar tribunais informados e \code{NA} no mesmo vetor.}
 
 \item{sleep}{Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
 no servidor. O valor padrão é 0.1 segundos. Deve estar entre 0 e 60.}

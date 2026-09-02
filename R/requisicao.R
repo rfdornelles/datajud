@@ -234,8 +234,9 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
 #'                 Deve ser fornecido como um valor ou vetor de caracteres.
 #' @param cliente Objeto criado por `datajud_cliente()`.
 #' @param tribunal Identificador do tribunal correspondente ao(s) processo(s) sendo consultado(s).
-#'                 Pode ser um valor único, um valor por processo ou `NA` para
-#'                 inferência automática.
+#'                 Pode ser um valor único, um valor por processo ou `NA`
+#'                 escalar para inferir todos automaticamente. Não é permitido
+#'                 misturar tribunais informados e `NA` no mesmo vetor.
 #' @param sleep Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
 #'              no servidor. O valor padrão é 0.1 segundos. Deve estar entre 0 e 60.
 #'
