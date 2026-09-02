@@ -24,7 +24,7 @@ test_that("construtor aceita cada filtro isoladamente", {
 
   expect_no_error(montar(classe_codigo = 1))
   expect_no_error(montar(orgao_codigo = 2))
-  expect_identical(montar()$query, list(match_all = list()))
+  expect_error(montar(), "ao menos um filtro")
 })
 
 test_that("pesquisa valida argumentos antes da rede", {
