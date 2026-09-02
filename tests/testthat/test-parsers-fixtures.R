@@ -39,6 +39,25 @@ test_that("processo sem movimentos retorna esquema vazio", {
   expect_true(all(c("tribunal", "numero_processo", "datahora_movimento") %in% names(movimentos)))
 })
 
+test_that("movimentos com campos opcionais ausentes mantêm o esquema", {
+  dados <- carregar_fixture("resposta_processo_valida.json")
+  dados$`_source`$movimentos <- list(list(codigo = 7L, nome = "Distribuição"))
+
+  movimentos <- datajud::datajud_ler_movimentacoes(list(dados))
+
+  expect_equal(nrow(movimentos), 1L)
+  expect_true(all(c("datahora_movimento", "codigo_tabelado",
+                    "nome_orgao_julgador") %in% names(movimentos)))
+  expect_true(is.na(movimentos$datahora_movimento))
+})
+
+test_that("id ausente é rejeitado pelo parser de processos", {
+  dados <- carregar_fixture("resposta_processo_valida.json")
+  dados$`_source`$id <- NULL
+
+  expect_error(datajud::datajud_ler_processo(list(dados)), "campo id é obrigatório")
+})
+
 test_that("fixtures de cardinalidade e campos opcionais ficam disponíveis", {
   multipla <- carregar_fixture("resposta_processo_multiplos_assuntos.json")
   opcionais <- carregar_fixture("resposta_processo_campos_opcionais_ausentes.json")

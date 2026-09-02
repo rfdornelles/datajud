@@ -1,5 +1,16 @@
 ## Funções auxiliares e de alto nível para leitura dos dados já baixados do Datajud
 
+esquema_movimentos_vazio <- function() {
+  tibble::tibble(
+    tribunal = character(), numero_processo = character(),
+    datahora_movimento = as.POSIXct(character(), tz = "UTC"),
+    codigo_tpu = integer(), nome_movimento = character(),
+    codigo_tabelado = integer(), descricao_tabelado = character(),
+    valor_tabelado = character(), nome_tabelado = character(),
+    codigo_orgao_julgador = integer(), nome_orgao_julgador = character()
+  )
+}
+
 ler_movimentos <- function(item) {
 
   item <- purrr::pluck(item, "_source", .default = list())
@@ -12,14 +23,7 @@ ler_movimentos <- function(item) {
   movimento <- purrr::pluck(item, "movimentos", .default = list())
 
   if (length(movimento) == 0L) {
-    return(tibble::tibble(
-      tribunal = character(), numero_processo = character(),
-      datahora_movimento = as.POSIXct(character()), codigo_tpu = integer(),
-      nome_movimento = character(), codigo_tabelado = integer(),
-      descricao_tabelado = character(), valor_tabelado = character(),
-      nome_tabelado = character(), codigo_orgao_julgador = integer(),
-      nome_orgao_julgador = character()
-    ))
+    return(esquema_movimentos_vazio())
   }
 
   #print(movimento)
@@ -31,17 +35,16 @@ ler_movimentos <- function(item) {
     .f = ~{
 
   tibble::tibble(
-    codigo_tpu = purrr::pluck(.x, "codigo"),
-    nome_movimento = purrr::pluck(.x, "nome"),
-    datahora_movimento = purrr::pluck(.x, "dataHora"),
-    codigo_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "codigo"),
-    descricao_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "descricao"),
-    valor_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "valor"),
-    nome_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "nome"),
-    codigo_orgao_julgador = purrr::pluck(.x, "orgaoJulgador", 1, "codigoOrgao"),
-    nome_orgao_julgador = purrr::pluck(.x, "orgaoJulgador", 1, "nomeOrgao")
-  ) |>
-    dplyr::mutate(dplyr::across(dplyr::everything(), ~ifelse(is.null(.x), NA, .x)))
+    codigo_tpu = purrr::pluck(.x, "codigo", .default = NA_integer_),
+    nome_movimento = purrr::pluck(.x, "nome", .default = NA_character_),
+    datahora_movimento = purrr::pluck(.x, "dataHora", .default = NA_character_),
+    codigo_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "codigo", .default = NA_integer_),
+    descricao_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "descricao", .default = NA_character_),
+    valor_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "valor", .default = NA_character_),
+    nome_tabelado = purrr::pluck(.x, "complementosTabelados", 1, "nome", .default = NA_character_),
+    codigo_orgao_julgador = purrr::pluck(.x, "orgaoJulgador", 1, "codigoOrgao", .default = NA_integer_),
+    nome_orgao_julgador = purrr::pluck(.x, "orgaoJulgador", 1, "nomeOrgao", .default = NA_character_)
+  )
   })
 
   tabela_movimentos <- tabela_movimentos |>
@@ -69,7 +72,10 @@ ler_processo <- function(dados) {
 
   id <- purrr::pluck(item, "id", .default = NA_character_)
 
-  # Verificar se o ID é nulo e retornar NULL se for
+  if (length(id) != 1L || is.na(id) || !nzchar(id)) {
+    rlang::abort("O campo id é obrigatório para identificar o processo.")
+  }
+
   ## Extrair os dados do processo
   tribunal <- purrr::pluck(item, "tribunal", .default = NA_character_)
   numero_processo <- purrr::pluck(item, "numeroProcesso", .default = NA_character_)
@@ -110,13 +116,7 @@ ler_processo <- function(dados) {
     orgao_julgador_codigo = orgao_julgador_codigo,
     orgao_julgador_nome = orgao_julgador_nome,
     orgao_julgador_ibge = orgao_julgador_ibge
-  ) |>
-    dplyr::mutate(
-      dplyr::across(
-        dplyr::everything(),
-        ~ifelse(is.null(.x), NA, .x)
-      )
-    )
+  )
 
   # Converter as colunas de data para formato datetime
   processo <- processo |>
@@ -139,7 +139,11 @@ datajud_desaninhar_assuntos <- function(dados) {
   }
   purrr::map_dfr(seq_len(nrow(dados)), function(i) {
     assuntos <- dados$assuntos[[i]]
-    if (is.null(assuntos) || nrow(assuntos) == 0L) return(tibble::tibble())
+    if (!is.data.frame(assuntos) || nrow(assuntos) == 0L) {
+      return(tibble::tibble(
+        id = character(), codigo = integer(), nome = character()
+      ))
+    }
     dplyr::mutate(assuntos, id = dados$id[[i]], .before = 1L)
   })
 }
