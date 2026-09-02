@@ -73,7 +73,7 @@ ler_processo <- function(dados) {
   id <- purrr::pluck(item, "id", .default = NA_character_)
 
   if (length(id) != 1L || is.na(id) || !nzchar(id)) {
-    rlang::abort("O campo id é obrigatório para identificar o processo.")
+    rlang::abort("O campo id \u00e9 obrigat\u00f3rio para identificar o processo.")
   }
 
   ## Extrair os dados do processo

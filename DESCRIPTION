@@ -17,6 +17,7 @@ Imports:
     httr,
     lubridate,
     purrr,
+    rlang,
     stringr,
     tibble,
     xml2
