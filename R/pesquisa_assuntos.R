@@ -7,27 +7,11 @@
 monta_consulta_elasticsearch <- function(classe_codigo = NULL,
                                          orgao_codigo = NULL,
                                          size = 1000) {
-  filtros <- list()
-
-  if (!is.null(classe_codigo) && length(classe_codigo) > 0L) {
-    filtros <- append(filtros, list(list(
-      terms = list("classe.codigo" = I(unname(classe_codigo)))
-    )))
-  }
-
-  if (!is.null(orgao_codigo) && length(orgao_codigo) > 0L) {
-    filtros <- append(filtros, list(list(
-      terms = list("orgaoJulgador.codigo" = I(unname(orgao_codigo)))
-    )))
-  }
-
-  query <- if (length(filtros) == 0L) {
-    list(match_all = list())
-  } else {
-    list(bool = list(filter = filtros))
-  }
-
-  list(size = as.integer(size), query = query)
+  criar_query_datajud(
+    classe_codigo = classe_codigo,
+    orgao_codigo = orgao_codigo,
+    size = size
+  )
 }
 
 

@@ -1,5 +1,8 @@
 # datajud 0.0.0.9000
 
+* Um construtor interno puro agora combina assuntos, classes e órgãos em
+  consultas estruturadas, valida códigos, tamanho e cursor e inclui ordenação
+  estável por `@timestamp` e `id.keyword`.
 * O contrato vigente da API Pública agora possui nota técnica e fixture
   versionadas, distinguindo evidência oficial de comportamento apenas
   observado em probes sanitizados.
