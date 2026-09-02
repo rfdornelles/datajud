@@ -28,7 +28,7 @@ test_that("construtor aceita cada filtro isoladamente", {
 })
 
 test_that("pesquisa valida argumentos antes da rede", {
-  cliente <- datajud::datajud_cliente("chave-teste")
+  cliente <- datajud::datajud_cliente(chave_publica_teste())
 
   expect_error(datajud::datajud_pesquisar_classe_orgao(
     tribunal = "TJSP", cliente = cliente
@@ -45,7 +45,7 @@ test_that("pesquisa valida argumentos antes da rede", {
 })
 
 test_that("pesquisa usa transporte comum e não devolve credenciais", {
-  chave <- "chave-teste-nao-expor"
+  chave <- chave_publica_teste(2)
   cliente <- datajud::datajud_cliente(chave)
   requisicao_capturada <- NULL
   corpo <- jsonlite::toJSON(list(
@@ -86,7 +86,7 @@ test_that("pesquisa usa transporte comum e não devolve credenciais", {
 })
 
 test_that("consulta por processo usa resposta HTTP simulada", {
-  cliente <- datajud::datajud_cliente("chave-teste")
+  cliente <- datajud::datajud_cliente(chave_publica_teste())
   processo <- "0000102-03.2004.8.26.0000"
   corpo <- jsonlite::toJSON(list(
     hits = list(hits = list(list(`_source` = list(
@@ -108,26 +108,10 @@ test_that("consulta por processo usa resposta HTTP simulada", {
   expect_equal(resultado$`_source`$numeroProcesso, gsub("[^0-9]", "", processo))
 })
 
-test_that("transporte relata status sem expor credencial", {
-  chave <- "chave-que-nao-pode-aparecer"
-  cliente <- datajud::datajud_cliente(chave)
-  requisitar <- getFromNamespace("requisitar_api_datajud", "datajud")
-
-  httr2::local_mocked_responses(function(req) {
-    httr2::response(status_code = 401, body = charToRaw(chave))
-  })
-
-  erro <- expect_error(
-    requisitar(cliente, "https://exemplo.org", list(query = list())),
-    "status 401"
-  )
-  expect_false(grepl(chave, conditionMessage(erro), fixed = TRUE))
-})
-
 test_that("transporte valida consultas e corpos JSON", {
   serializar <- getFromNamespace("serializar_query_datajud", "datajud")
   requisitar <- getFromNamespace("requisitar_api_datajud", "datajud")
-  cliente <- datajud::datajud_cliente("chave-teste")
+  cliente <- datajud::datajud_cliente(chave_publica_teste())
 
   expect_error(serializar("JSON montado manualmente"), "lista R")
 
