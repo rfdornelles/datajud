@@ -34,7 +34,8 @@ criar_requisicao_http <- function(url, metodo = "GET", cliente = NULL,
       httr2::req_headers_redacted(
         Authorization = paste("APIKey", cliente$api_key)
       ) |>
-      httr2::req_user_agent(cliente_user_agent(cliente))
+      httr2::req_user_agent(cliente_user_agent(cliente)) |>
+      httr2::req_retry(max_tries = cliente$max_tentativas)
     if (is.null(timeout)) {
       timeout <- cliente$timeout
     }
@@ -68,7 +69,7 @@ executar_requisicao_http <- function(url, metodo = "GET", cliente = NULL,
   status <- httr2::resp_status(resposta)
 
   if (status < 200L || status >= 300L) {
-    cli::cli_abort("A requisi\u00E7\u00E3o ao Datajud falhou com status HTTP {status}.")
+    cli::cli_abort("A requisi\u00E7\u00E3o HTTP falhou com status {status}.")
   }
 
   resposta

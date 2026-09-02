@@ -69,6 +69,7 @@ test_that("pesquisa usa transporte comum e não devolve credenciais", {
   expect_identical(requisicao_capturada$method, "POST")
   expect_match(requisicao_capturada$url, "api_publica_tjsp/_search$")
   expect_identical(requisicao_capturada$body$content_type, "application/json")
+  expect_identical(requisicao_capturada$policies$retry_max_tries, 3L)
 
   corpo_enviado <- jsonlite::fromJSON(
     rawToChar(requisicao_capturada$body$data), simplifyVector = FALSE
@@ -118,7 +119,7 @@ test_that("transporte relata status sem expor credencial", {
 
   erro <- expect_error(
     requisitar(cliente, "https://exemplo.org", list(query = list())),
-    "HTTP 401"
+    "status 401"
   )
   expect_false(grepl(chave, conditionMessage(erro), fixed = TRUE))
 })
