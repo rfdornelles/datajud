@@ -2,11 +2,21 @@
 DATAJUD_CHAVE_PUBLICA_ATUAL <- "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 
 chave_publica_valida <- function(chave) {
-  is.character(chave) &&
+  formato_valido <- is.character(chave) &&
     length(chave) == 1L &&
     !is.na(chave) &&
-    grepl("^[A-Za-z0-9_+/-]{20,}={0,2}$", chave) &&
+    grepl("^[A-Za-z0-9_+/-]{20,}={0,2}$", chave)
+
+  if (!formato_valido) {
+    return(FALSE)
+  }
+
+  possui_padding <- grepl("=", chave, fixed = TRUE)
+  if (possui_padding) {
     nchar(chave) %% 4L == 0L
+  } else {
+    nchar(chave) %% 4L != 1L
+  }
 }
 
 validar_chave_publica <- function(chave) {

@@ -39,7 +39,7 @@ abortar_status_http <- function(status, autenticada = FALSE) {
   } else if (status == 404L) {
     mensagem <- paste0(
       "O recurso solicitado n\u00E3o foi encontrado (HTTP 404). ",
-      "Confirme o tribunal ou a disponibilidade da p\u00E1gina."
+      "Confirme o endere\u00E7o e os par\u00E2metros informados."
     )
     classe <- "datajud_erro_nao_encontrado"
   } else if (status == 429L) {

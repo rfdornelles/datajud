@@ -158,7 +158,9 @@ test_that("API exige JSON e não reproduz o corpo inválido", {
 
 test_that("extração da chave valida contexto e formato", {
   extrair <- getFromNamespace("extrair_chave_publica_cnj", "datajud")
+  validar <- getFromNamespace("chave_publica_valida", "datajud")
   chave <- chave_publica_teste()
+  chave_sem_padding <- sub("=+$", "", chave)
 
   html_contexto <- paste0(
     "<html><strong>APIKey atual</strong><p><strong>",
@@ -173,6 +175,9 @@ test_that("extração da chave valida contexto e formato", {
 
   expect_identical(extrair(html_contexto), chave)
   expect_identical(extrair(html_fallback), chave)
+  expect_true(validar(chave))
+  expect_true(validar(chave_sem_padding))
+  expect_false(validar(paste(rep("A", 21L), collapse = "")))
   expect_error(
     extrair("<html><strong>APIKey antiga</strong><strong>sem-chave</strong></html>"),
     class = "datajud_erro_credencial"
