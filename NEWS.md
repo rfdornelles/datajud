@@ -1,5 +1,8 @@
 # datajud 0.0.0.9000
 
+* Todo o tráfego HTTP passa por uma camada interna única baseada em `httr2`;
+  consultas são listas R serializadas de forma estruturada e a autenticação é
+  redigida ao imprimir requisições.
 * A API pública passa a usar `datajud_cliente()` e deixa de criar ou consultar
   objetos no `.GlobalEnv`.
 * `datajud_login()` foi removida. Configure a chave por argumento ou pela

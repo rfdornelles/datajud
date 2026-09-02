@@ -15,7 +15,8 @@ Imports:
     cli,
     dplyr,
     glue,
-    httr,
+    httr2,
+    jsonlite,
     lubridate,
     purrr,
     rlang,
@@ -28,7 +29,6 @@ LazyData: true
 Config/roxygen2/version: 8.0.0
 Suggests:
     covr,
-    jsonlite,
     testthat (>= 3.0.0),
     withr
 Config/testthat/edition: 3

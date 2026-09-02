@@ -4,47 +4,30 @@
 
 ## Aqui a função de alto nível é a datajud_pesquisar_classe_orgao, as demais são auxiliares
 
-monta_consulta_elasticsearch <- function(assunto_codigo = NULL,
+monta_consulta_elasticsearch <- function(classe_codigo = NULL,
                                          orgao_codigo = NULL,
                                          size = 1000) {
+  filtros <- list()
 
-  # Partes da consulta para assuntos, se fornecidos
-  clausula_assuntos <- ""
-  if (!is.null(assunto_codigo) && length(assunto_codigo) > 0) {
-    partes_assuntos <- purrr::map_chr(assunto_codigo,
-                                      ~glue::glue('{{"match": {{"classe.codigo": {.x}}}}}'))
-    consulta_should_assuntos <- paste(partes_assuntos, collapse = ", ")
-    clausula_assuntos <- glue::glue('"should": [{consulta_should_assuntos}], "minimum_should_match": 1')
+  if (!is.null(classe_codigo) && length(classe_codigo) > 0L) {
+    filtros <- append(filtros, list(list(
+      terms = list("classe.codigo" = I(unname(classe_codigo)))
+    )))
   }
 
-  # Partes da consulta para unidades judiciárias, se fornecidas
-  clausula_unidades <- ""
-  if (!is.null(orgao_codigo) && length(orgao_codigo) > 0) {
-    partes_unidades <- purrr::map_chr(orgao_codigo,
-                                      ~glue::glue('{{"match": {{"orgaoJulgador.codigo": {.x}}}}}'))
-    consulta_filter_unidades <- paste(partes_unidades, collapse = ", ")
-    clausula_unidades <- glue::glue('"filter": [{{"bool": {{"should": [{consulta_filter_unidades}]}}}}]')
+  if (!is.null(orgao_codigo) && length(orgao_codigo) > 0L) {
+    filtros <- append(filtros, list(list(
+      terms = list("orgaoJulgador.codigo" = I(unname(orgao_codigo)))
+    )))
   }
 
-  # Combina as cláusulas na consulta, considerando a presença ou ausência delas
-  clausulas <- c(clausula_assuntos, clausula_unidades) |>
-    purrr::discard(~.x == "") |>
-    paste(collapse = ", ")
+  query <- if (length(filtros) == 0L) {
+    list(match_all = list())
+  } else {
+    list(bool = list(filter = filtros))
+  }
 
-  # Monta a consulta completa
-  consulta_completa <- glue::glue('
-    {{
-      "size": {size},
-      "query": {{
-        "bool": {{
-          {clausulas}
-        }}
-      }}
-    }}
-  ')
-
-  #print(consulta_completa)
-  return(consulta_completa)
+  list(size = as.integer(size), query = query)
 }
 
 
@@ -88,65 +71,37 @@ datajud_pesquisar_classe_orgao <- function(
     orgao_codigo = NULL,
     size = 100) {
 
-  if(is.na(tribunal)) stop("Tribunal n\u00E3o informado")
+  if (length(tribunal) != 1L || is.na(tribunal) || !nzchar(tribunal)) {
+    cli::cli_abort("Tribunal n\u00E3o informado")
+  }
 
-  if(is.null(classe_codigo) & is.null(orgao_codigo)) stop("Nenhum assunto ou unidade informados")
+  if (is.null(classe_codigo) && is.null(orgao_codigo)) {
+    cli::cli_abort("Nenhuma classe ou unidade informada")
+  }
 
-  if(!is.numeric(size)) stop("Tamanho da amostra deve ser um n\u00FAmero inteiro")
+  if (!is.numeric(size) || length(size) != 1L || !is.finite(size) ||
+      size != round(size)) {
+    cli::cli_abort("Tamanho da amostra deve ser um n\u00FAmero inteiro")
+  }
 
-  if(size < 1 | size > 10000) stop("Tamanho da amostra deve ser um n\u00FAmero inteiro entre 1 e 10000")
+  if (size < 1 || size > 10000) {
+    cli::cli_abort("Tamanho da amostra deve ser um n\u00FAmero inteiro entre 1 e 10000")
+  }
 
   validar_cliente(cliente)
 
 
-  # headers
-  headers = c(
-    'Authorization' = paste0('APIKey ', cliente$api_key),
-    'Content-Type' = 'application/json'
-  )
-
-
   # montar body
   body <- monta_consulta_elasticsearch(
-    assunto_codigo = classe_codigo,
+    classe_codigo = classe_codigo,
     orgao_codigo = orgao_codigo,
     size = round(size)
   )
 
 
   # tribunal
-  url = aux_retorna_endpoint(tribunal)
-  if(is.null(url)) stop("Tribunal n\u00E3o encontrado ou n\u00E3o dispon\u00EDvel no Datajud")
+  url <- aux_retorna_endpoint(tribunal)
 
-  # realizar requisicao
-  requisicao <- httr::POST(
-    url = url,
-    body = body,
-    httr::add_headers(headers),
-    cliente_user_agent(cliente),
-    httr::timeout(cliente$timeout)
-  )
-
-  # extrair conteudo
-  conteudo <- requisicao |>
-    httr::content() |>
-    purrr::pluck("hits", "hits")
-
-  # Verificar o resultado
-  if (is.null(conteudo) |
-      requisicao$status_code != "200") {
-
-    info_erro <- requisicao |>
-      httr::content() |>
-      purrr::pluck("error", "root_cause", 1)
-
-    cli::cli_alert_danger("Erro na requisi\u00E7\u00E3o ou retorno vazio!")
-    cli::cli_alert_warning(glue::glue("Status code: {requisicao$status_code}"))
-    cli::cli_inform(glue::glue("Tipo de erro: {info_erro$type}"))
-    cli::cli_inform(glue::glue("Raz\u00E3o: {info_erro$reason}"))
-    cli::cli_inform(glue::glue("Linha: {info_erro$line} | Coluna: {info_erro$col}"))
-    return()
-  }
-
-  conteudo
+  resposta <- requisitar_api_datajud(cliente, url, body)
+  purrr::pluck(resposta, "hits", "hits", .default = list())
 }

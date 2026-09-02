@@ -1,11 +1,12 @@
 test_that("normalização rejeita CNJs ausentes e com tamanho inválido", {
+  normalizar <- getFromNamespace("normalizar_numero_cnj", "datajud")
   expect_equal(
-    datajud:::normalizar_numero_cnj("0000102-03.2004.8.26.0000"),
+    normalizar("0000102-03.2004.8.26.0000"),
     "00001020320048260000"
   )
-  expect_error(datajud:::normalizar_numero_cnj(NA_character_), "inválido")
-  expect_error(datajud:::normalizar_numero_cnj(""), "inválido")
-  expect_error(datajud:::normalizar_numero_cnj("123"), "inválido")
+  expect_error(normalizar(NA_character_), "inválido")
+  expect_error(normalizar(""), "inválido")
+  expect_error(normalizar("123"), "inválido")
 })
 
 test_that("consulta vetorial valida tribunal e pausa antes da rede", {
