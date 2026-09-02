@@ -8,16 +8,23 @@ DATAJUD_CHAVE_PUBLICA_ATUAL <- "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1R
 #' @export
 obter_chave_publica_cnj <- function(
     url = "https://datajud-wiki.cnj.jus.br/api-publica/acesso/") {
-  resposta <- httr::GET(url, httr::timeout(20))
-  if (httr::status_code(resposta) != 200L) {
-    cli::cli_abort("N\u00E3o foi poss\u00EDvel obter a chave p\u00FAblica do CNJ (HTTP {httr::status_code(resposta)}).")
-  }
+  resposta <- executar_requisicao_http(url = url, timeout = 20)
+  pagina <- resposta |>
+    httr2::resp_body_string() |>
+    xml2::read_html()
+  no_chave <- xml2::xml_find_first(
+    pagina,
+    "//strong[normalize-space(.)='APIKey atual']/following::strong[1]"
+  )
+  chave <- xml2::xml_text(no_chave, trim = TRUE)
 
-  texto <- resposta |>
-    httr::content(as = "text", encoding = "UTF-8") |>
-    xml2::read_html() |>
-    xml2::xml_text()
-  chave <- stringr::str_match(texto, "APIKey\\s+([A-Za-z0-9+/=]{20,})")[, 2]
+  if (is.na(chave) || !nzchar(chave)) {
+    texto <- xml2::xml_text(pagina)
+    chave <- stringr::str_match(
+      texto,
+      "Authorization:\\s*APIKey\\s+([A-Za-z0-9+/]{20,}={1,2})"
+    )[, 2]
+  }
   if (is.na(chave) || !nzchar(chave)) {
     cli::cli_abort("A p\u00E1gina do CNJ n\u00E3o cont\u00E9m uma chave p\u00FAblica reconhec\u00EDvel.")
   }
@@ -73,9 +80,9 @@ print.datajud_cliente <- function(x, ...) {
 }
 
 cliente_user_agent <- function(cliente) {
-  texto <- "Pacote datajud para R"
+  texto <- paste0("datajud/", utils::packageVersion("datajud"), " R/", getRversion())
   if (nzchar(cliente$email)) texto <- paste0(texto, " - e-mail: ", cliente$email)
-  httr::user_agent(texto)
+  texto
 }
 
 validar_cliente <- function(cliente) {

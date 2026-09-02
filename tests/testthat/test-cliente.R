@@ -15,8 +15,9 @@ test_that("cliente usa argumento antes da variável de ambiente", {
 
 test_that("cliente sem e-mail não adiciona e-mail ao User-Agent", {
   cliente <- datajud::datajud_cliente("chave-teste", email = "")
+  user_agent <- getFromNamespace("cliente_user_agent", "datajud")
   expect_identical(cliente$email, "")
-  expect_false(any(grepl("e-mail", as.character(datajud:::cliente_user_agent(cliente)))))
+  expect_false(grepl("e-mail", user_agent(cliente)))
 })
 
 test_that("impressão do cliente não expõe a chave", {

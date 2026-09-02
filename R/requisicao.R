@@ -161,54 +161,21 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
   # checa o numero do processo
   numero_cnj_limpo <- normalizar_numero_cnj(processo)
 
-  # headers
-  headers = c(
-    'Authorization' = paste0('APIKey ', cliente$api_key),
-    'Content-Type' = 'application/json'
+  query <- list(
+    query = list(
+      match = list(numeroProcesso = numero_cnj_limpo)
+    )
   )
 
-  # body
-  body = glue::glue(
-    '{{
-      "query": {{
-        "match": {{
-          "numeroProcesso": "{numero_cnj_limpo}"
-        }}
-      }}
-    }}'
-  )
-
-  # requisicao
-  requisicao <- httr::POST(
-    url = url_tribunal,
-    body = body,
-    httr::add_headers(headers),
-    cliente_user_agent(cliente),
-    httr::timeout(cliente$timeout)
-  )
-
-  if (requisicao$status_code != 200) {
-    cat(glue::glue("Erro na requisi\u00E7\u00E3o: {requisicao$status_code}\n
-                   Processo: {numero_cnj_limpo}\n
-                   Tribunal: {tribunal}\n"))
-
-    stop("Erro na requisi\u00E7\u00E3o")
-    return(NULL)
-  }
-
-  resposta <- httr::content(requisicao) |>
-    purrr::pluck("hits", "hits", 1)
+  resposta <- requisitar_api_datajud(cliente, url_tribunal, query) |>
+    purrr::pluck("hits", "hits", 1, .default = NULL)
   # return(resposta)
-  cnj_localizado = purrr::pluck(resposta,
-                                # "hits",
-                                # "hits",
-                                # 1,
-                                "_source",
-                                "numeroProcesso")
+  cnj_localizado <- purrr::pluck(
+    resposta, "_source", "numeroProcesso", .default = NULL
+  )
 
   if(is.null(cnj_localizado)) {
     stop(glue::glue("Processo {processo} n\u00E3o encontrado no tribunal {tribunal}"))
-    return(NULL)
   }
 
   if (cnj_localizado != numero_cnj_limpo) {
