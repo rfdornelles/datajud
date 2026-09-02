@@ -3,7 +3,7 @@
 \docType{data}
 \name{tribunais}
 \alias{tribunais}
-\title{Endpoints dos Tribunais no DataJud}
+\title{Endpoints dos Tribunais no Datajud}
 \format{
 Um data frame com as seguintes colunas:
 \describe{
@@ -20,7 +20,7 @@ Um data frame com as seguintes colunas:
 tribunais
 }
 \description{
-Este conjunto de dados foi obtido da API pública do DataJud e contém os endpoints de diversos tribunais.
+Este conjunto de dados foi obtido da API pública do Datajud e contém os endpoints de diversos tribunais.
 Inclui a sigla do tribunal, o tipo de justiça a que pertence (como Estadual, Federal, Trabalhista, etc.),
 e o nome completo do tribunal. A extração e processamento dos dados são feitos através de uma função que consulta
 a API, extrai as siglas das URLs, classifica o ramo da justiça de cada tribunal e ajusta os nomes dos tribunais conforme necessário.

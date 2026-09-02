@@ -10,9 +10,8 @@ datajud_ler_movimentacoes(base)
 \item{base}{Lista contendo os dados dos processos retornados pela API.}
 }
 \value{
-Imprime e retorna um data frame consolidado com as movimentações de todos os
-processos fornecidos. Cada linha representa uma movimentação específica, incluindo
-metadados relevantes para análises subsequentes.
+Um tibble consolidado com uma linha por movimentação. Quando nenhum
+processo possui movimentações, retorna um tibble vazio com esquema estável.
 }
 \description{
 Esta função é utilizada para extrair e processar as movimentações dos processos
@@ -22,6 +21,10 @@ de processos fornecida diretamente.
 }
 \examples{
 \dontrun{
+cliente <- datajud_cliente()
+resposta <- datajud_consultar_processo(
+  "0000001-89.2020.8.26.0000", cliente, tribunal = "TJSP"
+)
 datajud_ler_movimentacoes(resposta)
 }
 }

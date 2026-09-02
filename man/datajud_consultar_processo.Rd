@@ -13,10 +13,11 @@ Deve ser fornecido como um valor ou vetor de caracteres.}
 \item{cliente}{Objeto criado por \code{datajud_cliente()}.}
 
 \item{tribunal}{Identificador do tribunal correspondente ao(s) processo(s) sendo consultado(s).
-Se fornecido, deve ter o mesmo tamanho que o vetor \code{processo}.}
+Pode ser um valor único, um valor por processo ou \code{NA} para
+inferência automática.}
 
 \item{sleep}{Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
-no servidor. O valor padrão é 0.1 segundos. Deve ser um número positivo.}
+no servidor. O valor padrão é 0.1 segundos. Deve estar entre 0 e 60.}
 }
 \value{
 Uma lista com uma resposta por processo. Respostas que falharem podem ser \code{NULL}.
@@ -34,6 +35,7 @@ cliente <- datajud_cliente(api_key = "sua-chave")
 datajud_consultar_processo("0000001-89.2020.8.26.0000", cliente, tribunal = "TJSP")
 # Para consultar múltiplos processos com intervalo de espera customizado:
 datajud_consultar_processo(processo = c("0000001-89.2020.8.26.0000", "0000002-30.2021.8.26.0000"),
+                           cliente = cliente,
                            tribunal = c("TJSP", "TJSP"),
                            sleep = 1)
 }

@@ -7,7 +7,9 @@
 datajud_cliente(api_key = NULL, email = NULL, timeout = 30, max_tentativas = 3)
 }
 \arguments{
-\item{api_key}{Chave da API. Quando omitida, usa \code{DATAJUD_API_KEY}.}
+\item{api_key}{Chave pública da API. Quando omitida, usa \code{DATAJUD_API_KEY},
+consulta a Wiki oficial e, se necessário, recorre à cópia vigente incluída
+no pacote.}
 
 \item{email}{E-mail opcional para identificação no User-Agent. Quando omitido,
 usa \code{DATAJUD_EMAIL}.}

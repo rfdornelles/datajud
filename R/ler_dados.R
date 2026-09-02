@@ -1,4 +1,4 @@
-## Funções auxiliares e de alto nível para leitura dos dados já baixados do Datajud
+## Funções auxiliares e de alto nível para leitura dos dados do Datajud
 
 esquema_movimentos_vazio <- function() {
   tibble::tibble(
@@ -52,13 +52,13 @@ ler_movimentos <- function(item) {
       tribunal = tribunal,
       numero_processo = numero_processo,
       datahora_movimento = lubridate::as_datetime(
-        datahora_movimento,
+        .data$datahora_movimento,
         tz = "UTC")
     ) |>
-    dplyr::arrange(datahora_movimento) |>
-    dplyr::relocate(tribunal,
-                    numero_processo,
-                    datahora_movimento)
+    dplyr::arrange(.data$datahora_movimento) |>
+    dplyr::relocate(dplyr::all_of(c(
+      "tribunal", "numero_processo", "datahora_movimento"
+    )))
 
     return(tabela_movimentos)
 }
@@ -162,7 +162,10 @@ datajud_desaninhar_assuntos <- function(dados) {
 #'
 #' @examples
 #' \dontrun{
-#' resposta <- datajud_consultar_processo(processo, cliente)
+#' cliente <- datajud_cliente()
+#' resposta <- datajud_consultar_processo(
+#'   "0000001-89.2020.8.26.0000", cliente, tribunal = "TJSP"
+#' )
 #' datajud_ler_processo(resposta)
 #' }
 
@@ -198,14 +201,18 @@ datajud_ler_processo <- function(base) {
 #'
 #' @param base Lista contendo os dados dos processos retornados pela API.
 #'
-#' @return Imprime e retorna um data frame consolidado com as movimentações de todos os
-#'         processos fornecidos. Cada linha representa uma movimentação específica, incluindo
-#'         metadados relevantes para análises subsequentes.
+#' @return Um tibble consolidado com uma linha por movimentação. Quando nenhum
+#'   processo possui movimentações, retorna um tibble vazio com esquema estável.
+#' @importFrom rlang .data
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
+#' cliente <- datajud_cliente()
+#' resposta <- datajud_consultar_processo(
+#'   "0000001-89.2020.8.26.0000", cliente, tribunal = "TJSP"
+#' )
 #' datajud_ler_movimentacoes(resposta)
 #' }
 
