@@ -17,7 +17,7 @@ datajud_pesquisar_classe_orgao(
 
 \item{cliente}{Objeto criado por \code{datajud_cliente()}.}
 
-\item{classe_codigo}{Vetor opcional de códigos de classe para filtrar os processos.}
+\item{classe_codigo}{Código opcional de uma única classe processual.}
 
 \item{orgao_codigo}{Vetor opcional de códigos de órgão julgador para filtrar os processos.}
 

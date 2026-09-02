@@ -164,6 +164,7 @@ test_that("demais argumentos inválidos produzem erros claros", {
     criar(assunto_codigo = 1, ordenacao = c("id.keyword", "@timestamp")),
     "ordenacao"
   )
+  expect_error(criar(classe_codigo = c(1, 2)), "único código")
 })
 
 test_that("códigos long do Elasticsearch não sofrem coerção para integer", {

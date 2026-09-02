@@ -15,8 +15,10 @@ criar_query_datajud(
 )
 }
 \arguments{
-\item{assunto_codigo, classe_codigo, orgao_codigo}{Vetores numéricos de
-códigos inteiros positivos.}
+\item{assunto_codigo, orgao_codigo}{Vetores numéricos de códigos inteiros
+positivos.}
+
+\item{classe_codigo}{Código numérico único de classe processual.}
 
 \item{size}{Quantidade de resultados, entre 1 e 10.000.}
 

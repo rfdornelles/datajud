@@ -1,5 +1,16 @@
 # datajud 0.0.0.9000
 
+* A nova `datajud_pesquisar_processos()` pesquisa uma página por assunto,
+  classe e/ou órgão e retorna `datajud_resultado`, com hits, consulta sanitizada,
+  total, relação do total, quantidade recebida e próximo cursor.
+* Vetores de assunto usam OR por padrão; `exigir_todos_assuntos` cria um filtro
+  por código para expressar AND. Classe aceita um único código, de acordo com a
+  cardinalidade do campo `classe.codigo`.
+* Resultados possuem impressão compacta e método `tibble::as_tibble()`, cuja
+  chave única é `id`; o número do processo permanece um campo informativo.
+* `datajud_listar_tribunais()` seleciona localmente tribunais estaduais,
+  federais, eleitorais, superiores, trabalhistas, militares estaduais ou toda
+  a Justiça comum, sem acessar a rede.
 * Um construtor interno puro agora combina assuntos, classes e órgãos em
   consultas estruturadas, valida códigos, tamanho e cursor e inclui ordenação
   estável por `@timestamp` e `id.keyword`.

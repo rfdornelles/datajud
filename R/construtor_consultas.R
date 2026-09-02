@@ -59,13 +59,22 @@ filtro_terms_datajud <- function(campo, codigos) {
   list(terms = stats::setNames(list(I(codigos)), campo))
 }
 
+validar_exigir_todos <- function(valor, argumento) {
+  if (!is.logical(valor) || length(valor) != 1L || is.na(valor)) {
+    cli::cli_abort("{.arg {argumento}} deve ser `TRUE` ou `FALSE`.")
+  }
+
+  valor
+}
+
 #' Criar uma consulta estruturada para a API Pública do Datajud
 #'
 #' Construtor interno e puro. Códigos dentro de uma categoria são
 #' combinados com OR; categorias diferentes são combinadas com AND.
 #'
-#' @param assunto_codigo,classe_codigo,orgao_codigo Vetores numéricos de
-#'   códigos inteiros positivos.
+#' @param assunto_codigo,orgao_codigo Vetores numéricos de códigos inteiros
+#'   positivos.
+#' @param classe_codigo Código numérico único de classe processual.
 #' @param size Quantidade de resultados, entre 1 e 10.000.
 #' @param cursor Cursor opaco `search_after` devolvido pela API.
 #' @param ordenacao Campos de ordenação estável confirmados no contrato.
@@ -87,14 +96,16 @@ criar_query_datajud <- function(
   )
   classe_codigo <- validar_codigos_consulta(classe_codigo, "classe_codigo")
   orgao_codigo <- validar_codigos_consulta(orgao_codigo, "orgao_codigo")
+  if (!is.null(classe_codigo) && length(classe_codigo) != 1L) {
+    cli::cli_abort("{.arg classe_codigo} deve conter um \u00FAnico c\u00F3digo.")
+  }
   size <- validar_size_consulta(size)
   ordenacao <- validar_ordenacao_consulta(ordenacao)
 
-  if (!is.logical(exigir_todos_assuntos) ||
-      length(exigir_todos_assuntos) != 1L ||
-      is.na(exigir_todos_assuntos)) {
-    cli::cli_abort("{.arg exigir_todos_assuntos} deve ser `TRUE` ou `FALSE`.")
-  }
+  exigir_todos_assuntos <- validar_exigir_todos(
+    exigir_todos_assuntos,
+    "exigir_todos_assuntos"
+  )
 
   if (all(vapply(
     list(assunto_codigo, classe_codigo, orgao_codigo),

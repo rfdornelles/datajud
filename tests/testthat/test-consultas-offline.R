@@ -3,7 +3,7 @@ test_that("construtor retorna lista e preserva arrays JSON", {
   serializar <- getFromNamespace("serializar_query_datajud", "datajud")
 
   consulta <- montar(
-    classe_codigo = c(1116, 9999),
+    classe_codigo = 1116,
     orgao_codigo = c(123, 456),
     size = 25
   )
@@ -11,7 +11,7 @@ test_that("construtor retorna lista e preserva arrays JSON", {
 
   expect_type(consulta, "list")
   expect_equal(json$size, 25)
-  expect_equal(json$query$bool$filter[[1]]$terms$`classe.codigo`, list(1116, 9999))
+  expect_equal(json$query$bool$filter[[1]]$terms$`classe.codigo`, list(1116))
   expect_equal(json$query$bool$filter[[2]]$terms$`orgaoJulgador.codigo`, list(123, 456))
 
   unitario <- montar(classe_codigo = 1116)

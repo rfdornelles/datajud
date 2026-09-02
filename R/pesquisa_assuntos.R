@@ -14,6 +14,96 @@ monta_consulta_elasticsearch <- function(classe_codigo = NULL,
   )
 }
 
+validar_tribunal_pesquisa <- function(tribunal) {
+  if (!is.character(tribunal) || length(tribunal) != 1L ||
+      is.na(tribunal) || !nzchar(trimws(tribunal))) {
+    cli::cli_abort("{.arg tribunal} deve ser uma sigla n\u00E3o vazia.")
+  }
+
+  toupper(trimws(tribunal))
+}
+
+#' Pesquisar processos por assunto, classe e órgão
+#'
+#' Executa uma página de pesquisa na API Pública do Datajud. Códigos dentro da
+#' mesma categoria são combinados com OR; categorias diferentes são combinadas
+#' com AND. A função retorna resultados e metadados diretamente, sem criar
+#' objetos no ambiente global.
+#'
+#' @param tribunal Sigla do tribunal a consultar.
+#' @param cliente Objeto criado por [datajud_cliente()].
+#' @param assunto_codigo Vetor opcional de códigos de assunto.
+#' @param classe_codigo Código opcional de uma única classe processual.
+#' @param orgao_codigo Vetor opcional de códigos de órgão julgador.
+#' @param size Número de resultados da página, entre 1 e 10.000.
+#' @param cursor Cursor opaco `search_after` retornado pela página anterior.
+#' @param exigir_todos_assuntos Se `TRUE`, exige a presença de todos os assuntos
+#'   informados; por padrão, qualquer assunto satisfaz o filtro.
+#'
+#' @return Objeto `datajud_resultado` com hits, consulta sanitizada e metadados.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' cliente <- datajud_cliente()
+#'
+#' # Somente assunto ou somente classe
+#' por_assunto <- datajud_pesquisar_processos(
+#'   "TJSP", cliente, assunto_codigo = 899
+#' )
+#' qualquer_assunto <- datajud_pesquisar_processos(
+#'   "TJSP", cliente, assunto_codigo = c(1, 2, 3, 4)
+#' )
+#' todos_assuntos <- datajud_pesquisar_processos(
+#'   "TJSP", cliente,
+#'   assunto_codigo = c(1, 2, 3, 4),
+#'   exigir_todos_assuntos = TRUE
+#' )
+#' por_classe <- datajud_pesquisar_processos(
+#'   "TJSP", cliente, classe_codigo = 1116
+#' )
+#' por_orgao <- datajud_pesquisar_processos(
+#'   "TJSP", cliente, orgao_codigo = 13597
+#' )
+#'
+#' # Vários assuntos, combinados com uma classe e um órgão
+#' combinada <- datajud_pesquisar_processos(
+#'   "TJSP", cliente,
+#'   assunto_codigo = c(899, 900),
+#'   classe_codigo = 1116,
+#'   orgao_codigo = 13597
+#' )
+#' tibble::as_tibble(combinada)
+#' }
+datajud_pesquisar_processos <- function(
+    tribunal,
+    cliente,
+    assunto_codigo = NULL,
+    classe_codigo = NULL,
+    orgao_codigo = NULL,
+    size = 100L,
+    cursor = NULL,
+    exigir_todos_assuntos = FALSE) {
+  validar_cliente(cliente)
+  tribunal <- validar_tribunal_pesquisa(tribunal)
+  consulta <- criar_query_datajud(
+    assunto_codigo = assunto_codigo,
+    classe_codigo = classe_codigo,
+    orgao_codigo = orgao_codigo,
+    size = size,
+    cursor = cursor,
+    exigir_todos_assuntos = exigir_todos_assuntos
+  )
+  endpoint <- aux_retorna_endpoint(tribunal)
+  resposta <- requisitar_api_datajud(cliente, endpoint, consulta)
+
+  novo_datajud_resultado(
+    resposta = resposta,
+    tribunal = tribunal,
+    consulta = consulta
+  )
+}
+
 
 ### funcao para requisicao por assunto / codigo
 #' Pesquisa processos no Datajud por classe e/ou órgão julgador
@@ -23,7 +113,7 @@ monta_consulta_elasticsearch <- function(classe_codigo = NULL,
 #'
 #' @param tribunal Identificador do tribunal a ser consultado.
 #' @param cliente Objeto criado por `datajud_cliente()`.
-#' @param classe_codigo Vetor opcional de códigos de classe para filtrar os processos.
+#' @param classe_codigo Código opcional de uma única classe processual.
 #' @param orgao_codigo Vetor opcional de códigos de órgão julgador para filtrar os processos.
 #' @param size Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.
 #'
@@ -74,18 +164,12 @@ datajud_pesquisar_classe_orgao <- function(
 
   validar_cliente(cliente)
 
-
-  # montar body
   body <- monta_consulta_elasticsearch(
     classe_codigo = classe_codigo,
     orgao_codigo = orgao_codigo,
     size = round(size)
   )
-
-
-  # tribunal
   url <- aux_retorna_endpoint(tribunal)
-
   resposta <- requisitar_api_datajud(cliente, url, body)
   purrr::pluck(resposta, "hits", "hits", .default = list())
 }

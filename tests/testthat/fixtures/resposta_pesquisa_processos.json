@@ -1,0 +1,36 @@
+{
+  "took": 12,
+  "hits": {
+    "total": {"value": 2, "relation": "eq"},
+    "hits": [
+      {
+        "_index": "api_publica_tjsp",
+        "_id": "processo-exemplo-1",
+        "_score": null,
+        "_source": {
+          "id": "processo-exemplo-1",
+          "tribunal": "TJSP",
+          "numeroProcesso": "1000001-23.2024.8.26.0100",
+          "classe": {"codigo": 1116, "nome": "Ação de conhecimento"},
+          "assuntos": [{"codigo": 899, "nome": "Indenização por dano moral"}],
+          "orgaoJulgador": {"codigo": 13597, "nome": "1ª Vara Cível"}
+        },
+        "sort": [1681366085550, "processo-exemplo-1"]
+      },
+      {
+        "_index": "api_publica_tjsp",
+        "_id": "processo-exemplo-2",
+        "_score": null,
+        "_source": {
+          "id": "processo-exemplo-2",
+          "tribunal": "TJSP",
+          "numeroProcesso": "1000002-34.2024.8.26.0100",
+          "classe": {"codigo": 1116, "nome": "Ação de conhecimento"},
+          "assuntos": [{"codigo": 900, "nome": "Responsabilidade civil"}],
+          "orgaoJulgador": {"codigo": 13597, "nome": "1ª Vara Cível"}
+        },
+        "sort": [1681366085560, "processo-exemplo-2"]
+      }
+    ]
+  }
+}
