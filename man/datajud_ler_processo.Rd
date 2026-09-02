@@ -10,12 +10,11 @@ datajud_ler_processo(base)
 \item{base}{Lista de respostas de processos retornadas pela API.}
 }
 \value{
-Imprime e retorna um data frame contendo os metadados dos processos.
+Um tibble contendo os metadados dos processos.
 }
 \description{
 Após realizar uma pesquisa de processos com \code{datajud_pesquisar_classe_orgao},
 esta função permite ler e manipular os dados dos processos retornados.
-Aceita tanto uma lista diretamente quanto o nome de uma variável global que contém a lista de processos.
 }
 \examples{
 \dontrun{
