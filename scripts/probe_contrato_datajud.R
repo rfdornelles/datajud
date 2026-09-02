@@ -1,11 +1,5 @@
 #!/usr/bin/env Rscript
 
-argumento_arquivo <- grep("^--file=", commandArgs(FALSE), value = TRUE)
-arquivo_script <- normalizePath(
-  sub("^--file=", "", argumento_arquivo[[1]]),
-  mustWork = TRUE
-)
-raiz <- dirname(dirname(arquivo_script))
 if (!requireNamespace("datajud", quietly = TRUE)) {
   cli::cli_abort(
     "Instale o pacote datajud antes de executar este probe opcional."

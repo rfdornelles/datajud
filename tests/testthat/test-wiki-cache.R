@@ -258,7 +258,7 @@ test_that("fixture registra o contrato sem depender da rede", {
   expect_identical(contrato$campos$`orgaoJulgador.codigo`, "long")
   expect_identical(contrato$identificadores$consulta_processo, "numeroProcesso")
   expect_identical(contrato$identificadores$chave_unica_pacote, "id")
-  expect_identical(contrato$size$maximo_documentado, 10000L)
+  expect_equal(contrato$size$maximo_documentado, 10000)
   expect_identical(contrato$paginacao$mecanismo_documentado, "search_after")
   expect_identical(contrato$total$campos, c("value", "relation"))
   expect_identical(contrato$erros$campos_topo_observados, c("error", "status"))

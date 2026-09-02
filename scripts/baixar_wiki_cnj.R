@@ -1,6 +1,11 @@
 #!/usr/bin/env Rscript
 
 argumento_arquivo <- grep("^--file=", commandArgs(FALSE), value = TRUE)
+if (length(argumento_arquivo) != 1L) {
+  cli::cli_abort(
+    "Execute este arquivo com `Rscript scripts/baixar_wiki_cnj.R`."
+  )
+}
 arquivo_script <- normalizePath(
   sub("^--file=", "", argumento_arquivo[[1]]),
   mustWork = TRUE
