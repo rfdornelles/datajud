@@ -1,17 +1,44 @@
 # Chave pública vigente publicada pelo CNJ em 01/09/2026.
 DATAJUD_CHAVE_PUBLICA_ATUAL <- "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 
-#' Obtém a chave pública vigente na Wiki do CNJ
-#'
-#' @param url URL da página oficial de acesso da API.
-#' @return A chave pública como caractere de comprimento um.
-#' @export
-obter_chave_publica_cnj <- function(
-    url = "https://datajud-wiki.cnj.jus.br/api-publica/acesso/") {
-  resposta <- executar_requisicao_http(url = url, timeout = 20)
-  pagina <- resposta |>
-    httr2::resp_body_string() |>
-    xml2::read_html()
+chave_publica_valida <- function(chave) {
+  formato_valido <- is.character(chave) &&
+    length(chave) == 1L &&
+    !is.na(chave) &&
+    grepl("^[A-Za-z0-9_+/-]{20,}={0,2}$", chave)
+
+  if (!formato_valido) {
+    return(FALSE)
+  }
+
+  possui_padding <- grepl("=", chave, fixed = TRUE)
+  if (possui_padding) {
+    nchar(chave) %% 4L == 0L
+  } else {
+    nchar(chave) %% 4L != 1L
+  }
+}
+
+validar_chave_publica <- function(chave) {
+  if (!chave_publica_valida(chave)) {
+    cli::cli_abort(
+      "api_key n\u00E3o possui o formato esperado para a chave p\u00FAblica do CNJ.",
+      class = "datajud_erro_credencial"
+    )
+  }
+  invisible(chave)
+}
+
+extrair_chave_publica_cnj <- function(html) {
+  pagina <- tryCatch(
+    xml2::read_html(html),
+    error = function(cnd) {
+      cli::cli_abort(
+        "N\u00E3o foi poss\u00EDvel interpretar a p\u00E1gina p\u00FAblica do CNJ.",
+        class = "datajud_erro_credencial"
+      )
+    }
+  )
   no_chave <- xml2::xml_find_first(
     pagina,
     "//strong[normalize-space(.)='APIKey atual']/following::strong[1]"
@@ -22,13 +49,28 @@ obter_chave_publica_cnj <- function(
     texto <- xml2::xml_text(pagina)
     chave <- stringr::str_match(
       texto,
-      "Authorization:\\s*APIKey\\s+([A-Za-z0-9+/]{20,}={1,2})"
+      "Authorization:\\s*APIKey\\s+([A-Za-z0-9_+/-]{20,}={1,2})"
     )[, 2]
   }
-  if (is.na(chave) || !nzchar(chave)) {
-    cli::cli_abort("A p\u00E1gina do CNJ n\u00E3o cont\u00E9m uma chave p\u00FAblica reconhec\u00EDvel.")
+  if (!chave_publica_valida(chave)) {
+    cli::cli_abort(
+      "A p\u00E1gina do CNJ n\u00E3o cont\u00E9m uma chave p\u00FAblica reconhec\u00EDvel.",
+      class = "datajud_erro_credencial"
+    )
   }
   chave
+}
+
+#' Obtém a chave pública vigente na Wiki do CNJ
+#'
+#' @param url URL da página oficial de acesso da API.
+#' @return A chave pública como caractere de comprimento um.
+#' @export
+obter_chave_publica_cnj <- function(
+    url = "https://datajud-wiki.cnj.jus.br/api-publica/acesso/") {
+  resposta <- executar_requisicao_http(url = url, timeout = 20)
+  validar_tipo_conteudo(resposta, "text/html", "A p\u00E1gina p\u00FAblica do CNJ")
+  extrair_chave_publica_cnj(httr2::resp_body_string(resposta))
 }
 
 #' Cria um cliente explícito para a API do Datajud
@@ -45,16 +87,16 @@ obter_chave_publica_cnj <- function(
 datajud_cliente <- function(api_key = NULL, email = NULL, timeout = 30,
                             max_tentativas = 3) {
   chave <- if (is.null(api_key)) Sys.getenv("DATAJUD_API_KEY", unset = "") else api_key
-  if (!nzchar(chave)) {
+  chave_ausente <- is.character(chave) && length(chave) == 1L &&
+    !is.na(chave) && !nzchar(chave)
+  if (chave_ausente) {
     chave <- tryCatch(
       obter_chave_publica_cnj(),
       error = function(e) DATAJUD_CHAVE_PUBLICA_ATUAL
     )
   }
   endereco <- if (is.null(email)) Sys.getenv("DATAJUD_EMAIL", unset = "") else email
-  if (!is.character(chave) || length(chave) != 1L || !nzchar(chave)) {
-    cli::cli_abort("Informe api_key ou configure DATAJUD_API_KEY.")
-  }
+  validar_chave_publica(chave)
   if (!is.character(endereco) || length(endereco) != 1L ||
       (nzchar(endereco) && !grepl("^[^@[:space:]]+@[^@[:space:]]+\\.[^@[:space:]]+$", endereco))) {
     cli::cli_abort("O e-mail informado \u00E9 inv\u00E1lido.")

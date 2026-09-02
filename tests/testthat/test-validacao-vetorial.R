@@ -10,7 +10,7 @@ test_that("normalização rejeita CNJs ausentes e com tamanho inválido", {
 })
 
 test_that("consulta vetorial valida tribunal e pausa antes da rede", {
-  cliente <- datajud::datajud_cliente("chave-teste")
+  cliente <- datajud::datajud_cliente(chave_publica_teste())
   processos <- c("0000102-03.2004.8.26.0000", "0000102-03.2004.8.26.0000")
 
   expect_error(
@@ -32,7 +32,7 @@ test_that("consulta vetorial valida tribunal e pausa antes da rede", {
 })
 
 test_that("tribunal escalar é reciclado em consulta vetorial", {
-  cliente <- datajud::datajud_cliente("chave-teste")
+  cliente <- datajud::datajud_cliente(chave_publica_teste())
   processos <- c("0000102-03.2004.8.26.0000", "0000102-03.2004.8.26.0000")
   chamadas <- character()
 

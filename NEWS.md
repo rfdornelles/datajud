@@ -3,6 +3,12 @@
 * Todo o tráfego HTTP passa por uma camada interna única baseada em `httr2`;
   consultas são listas R serializadas de forma estruturada e a autenticação é
   redigida ao imprimir requisições.
+* Erros HTTP agora possuem classes e mensagens acionáveis em português, sem
+  incluir URLs, corpos ou credenciais. Somente respostas transitórias (429,
+  500, 502, 503 e 504) são repetidas, respeitando `Retry-After` e o limite do
+  cliente.
+* A chave pública obtida da Wiki do CNJ tem formato e contexto validados antes
+  de ser usada; respostas não HTML ou páginas alteradas falham de modo claro.
 * A API pública passa a usar `datajud_cliente()` e deixa de criar ou consultar
   objetos no `.GlobalEnv`.
 * `datajud_login()` foi removida. Configure a chave por argumento ou pela
