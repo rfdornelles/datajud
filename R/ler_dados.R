@@ -152,9 +152,12 @@ datajud_desaninhar_assuntos <- function(dados) {
 
 #' Lê os dados de processos retornados pelo Datajud
 #'
-#' Após consultar processos com [datajud_consultar_processo()], esta função
-#' permite ler e manipular os dados retornados.
-#' @param base Lista de respostas de processos retornadas pela API.
+#' Lê a lista retornada por [datajud_consultar_processo()] ou a lista de hits
+#' em `resultado$hits`, quando `resultado` foi criado por
+#' [datajud_pesquisar_processos()]. O objeto `datajud_resultado` inteiro não é
+#' uma entrada válida nesta versão.
+#' @param base Lista de respostas de processos retornadas pela API. Para uma
+#'   pesquisa geral, informe `resultado$hits`.
 #'
 #' @return Um tibble contendo os metadados dos processos.
 #'
@@ -169,6 +172,9 @@ datajud_desaninhar_assuntos <- function(dados) {
 #'   cliente = cliente
 #' )
 #' datajud_ler_processo(resposta)
+#'
+#' pesquisa <- datajud_pesquisar_processos("TJSP", classe_codigo = 1116)
+#' datajud_ler_processo(pesquisa$hits)
 #' }
 
 

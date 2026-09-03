@@ -38,12 +38,15 @@ test_that("exemplo de migração executa offline com os mesmos filtros", {
     orgao_codigo = 13597,
     size = 500
   )
+  processos <- datajud::datajud_ler_processo(resultado$hits)
 
   filtros <- consulta_capturada$query$bool$filter
   campos <- unlist(lapply(filtros, function(filtro) {
     names(filtro$terms)
   }))
   expect_s3_class(resultado, "datajud_resultado")
+  expect_s3_class(processos, "tbl_df")
+  expect_identical(nrow(processos), 2L)
   expect_length(resultado$hits, 2L)
   expect_identical(consulta_capturada$size, 500L)
   expect_equal(unclass(filtros[[1]]$terms$`classe.codigo`), 1116)

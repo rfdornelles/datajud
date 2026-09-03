@@ -138,12 +138,17 @@ resultado <- datajud_pesquisar_processos(
   orgao_codigo = 13597,
   size = 500
 )
+
+# Os leitores recebem os hits, não o objeto de resultado inteiro:
+processos <- datajud_ler_processo(resultado$hits)
 ```
 
 A função antiga devolvia diretamente a lista de hits. A nova função
 devolve um `datajud_resultado`, que também preserva metadados, consulta
 e cursor. Para obter apenas a estrutura antiga, use `resultado$hits`;
-para análise tabular, use `tibble::as_tibble(resultado)`.
+para análise tabular, use `tibble::as_tibble(resultado)`. Nesta versão,
+os leitores também recebem `resultado$hits`, como no exemplo, e não o
+objeto `datajud_resultado` inteiro.
 
 ## Leitura dos resultados
 
