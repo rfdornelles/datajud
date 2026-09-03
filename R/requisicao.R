@@ -198,17 +198,20 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
 #' Esta função realiza consultas de processos judiciais no Datajud, permitindo aos usuários
 #' buscar informações detalhadas por número de processo e tribunal específico. A função
 #' também suporta um intervalo de espera (`sleep`) entre as requisições para evitar sobrecarga
-#' no servidor. É necessário fornecer um cliente criado por `datajud_cliente()`.
+#' no servidor. Quando `cliente` é omitido, a função cria um cliente transitório.
 #'
 #' @param processo Número do processo ou vetor de números dos processos a serem consultados.
 #'                 Deve ser fornecido como um valor ou vetor de caracteres.
-#' @param cliente Objeto criado por `datajud_cliente()`.
+#' @param ... Compatibilidade temporária com `cliente` na posição antiga. Novas
+#'   chamadas devem nomear os argumentos após `processo`.
 #' @param tribunal Identificador do tribunal correspondente ao(s) processo(s) sendo consultado(s).
 #'                 Pode ser um valor único, um valor por processo ou `NA`
 #'                 escalar para inferir todos automaticamente. Não é permitido
 #'                 misturar tribunais informados e `NA` no mesmo vetor.
 #' @param sleep Tempo de espera (em segundos) entre as requisições, para evitar sobrecarga
 #'              no servidor. O valor padrão é 0.1 segundos. Deve estar entre 0 e 60.
+#' @param cliente Objeto opcional criado por [datajud_cliente()]. Quando `NULL`,
+#'   um cliente transitório é criado automaticamente.
 #'
 #' @return Uma lista com uma resposta por processo. Respostas que falharem podem ser `NULL`.
 #'
@@ -216,20 +219,24 @@ datajud_requisition <- function(processo, cliente, tribunal = NA, sleep = 0.1) {
 #'
 #' @examples
 #' \dontrun{
-#' # Criar o cliente e consultar um processo:
-#' cliente <- datajud_cliente(api_key = "sua-chave")
-#' datajud_consultar_processo("0000001-89.2020.8.26.0000", cliente, tribunal = "TJSP")
+#' # Consulta simples, com cliente criado automaticamente:
+#' datajud_consultar_processo(
+#'   "0000001-89.2020.8.26.0000",
+#'   tribunal = "TJSP"
+#' )
 #' # Para consultar múltiplos processos com intervalo de espera customizado:
 #' datajud_consultar_processo(processo = c("0000001-89.2020.8.26.0000", "0000002-30.2021.8.26.0000"),
-#'                            cliente = cliente,
 #'                            tribunal = c("TJSP", "TJSP"),
-#'                            sleep = 1)
+#'                            sleep = 1,
+#'                            cliente = datajud_cliente(timeout = 60))
 #' }
 
 datajud_consultar_processo <- function(processo,
-                                       cliente,
+                                       ...,
                                        tribunal = NA,
-                                       sleep = 0.1) {
+                                       sleep = 0.1,
+                                       cliente = NULL) {
+  argumentos <- list(...)
 
   # checar se processo foi informado
   processo <- as.character(processo)
@@ -257,7 +264,11 @@ datajud_consultar_processo <- function(processo,
     cli::cli_abort("Valor de sleep inv\u00E1lido. Informe n\u00FAmero positivo entre 0 e 60.")
   }
 
-  validar_cliente(cliente)
+  cliente <- resolver_cliente_posicional(
+    argumentos,
+    cliente,
+    "datajud_consultar_processo"
+  )
 
 
   # informar que a requisição está sendo feita

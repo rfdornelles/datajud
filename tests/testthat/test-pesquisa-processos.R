@@ -28,10 +28,10 @@ test_that("pesquisa simulada aceita cada filtro e todas as combinações", {
     linha <- combinacoes[i, ]
     datajud::datajud_pesquisar_processos(
       tribunal = "tjsp",
-      cliente = cliente,
       assunto_codigo = if (linha$assunto) c(899, 900) else NULL,
       classe_codigo = if (linha$classe) 1116 else NULL,
-      orgao_codigo = if (linha$orgao) c(13597, 13598) else NULL
+      orgao_codigo = if (linha$orgao) c(13597, 13598) else NULL,
+      cliente = cliente
     )
   })
 
@@ -64,9 +64,9 @@ test_that("resultado preserva total eq, hits e próximo cursor", {
 
   resultado <- datajud::datajud_pesquisar_processos(
     " TJSP ",
-    cliente,
     assunto_codigo = 899,
-    size = 2
+    size = 2,
+    cliente = cliente
   )
 
   expect_s3_class(resultado, "datajud_resultado")
@@ -88,7 +88,7 @@ test_that("total gte é preservado sem ser tratado como valor exato", {
   httr2::local_mocked_responses(function(req) resposta_http_pesquisa(corpo))
 
   resultado <- datajud::datajud_pesquisar_processos(
-    "TJSP", cliente, classe_codigo = 1116
+    "TJSP", classe_codigo = 1116, cliente = cliente
   )
 
   expect_identical(resultado$metadados$total_valor, 10000L)
@@ -103,7 +103,7 @@ test_that("resposta vazia retorna objeto válido com zero hits", {
   httr2::local_mocked_responses(function(req) resposta_http_pesquisa(corpo))
 
   resultado <- datajud::datajud_pesquisar_processos(
-    "TJSP", cliente, orgao_codigo = 13597
+    "TJSP", orgao_codigo = 13597, cliente = cliente
   )
   tabela <- tibble::as_tibble(resultado)
 
@@ -122,7 +122,7 @@ test_that("impressão é compacta e conversão usa id como chave", {
   corpo <- carregar_fixture("resposta_pesquisa_processos.json")
   httr2::local_mocked_responses(function(req) resposta_http_pesquisa(corpo))
   resultado <- datajud::datajud_pesquisar_processos(
-    "TJSP", cliente, assunto_codigo = 899
+    "TJSP", assunto_codigo = 899, cliente = cliente
   )
 
   saida <- testthat::capture_messages(retorno <- print(resultado))
@@ -150,7 +150,7 @@ test_that("resultado não contém credenciais nem altera o ambiente global", {
   antes <- ls(envir = .GlobalEnv, all.names = TRUE)
 
   resultado <- datajud::datajud_pesquisar_processos(
-    "TJSP", cliente, assunto_codigo = 899
+    "TJSP", assunto_codigo = 899, cliente = cliente
   )
   depois <- ls(envir = .GlobalEnv, all.names = TRUE)
   serializado <- jsonlite::toJSON(unclass(resultado), auto_unbox = TRUE)
@@ -197,10 +197,10 @@ test_that("consulta armazena cursor e filtros, mas não o cliente", {
 
   resultado <- datajud::datajud_pesquisar_processos(
     "TJSP",
-    cliente,
     assunto_codigo = c(899, 900),
     cursor = cursor,
-    exigir_todos_assuntos = TRUE
+    exigir_todos_assuntos = TRUE,
+    cliente = cliente
   )
 
   expect_identical(unclass(resultado$consulta$search_after), cursor)
@@ -246,20 +246,24 @@ test_that("pesquisa valida tribunal e cliente antes da rede", {
   cliente <- datajud::datajud_cliente(chave_publica_teste())
 
   expect_error(
-    datajud::datajud_pesquisar_processos("", cliente, assunto_codigo = 1),
+    datajud::datajud_pesquisar_processos(
+      "", assunto_codigo = 1, cliente = cliente
+    ),
     "tribunal"
   )
   expect_error(
-    datajud::datajud_pesquisar_processos("TJSP", list(), assunto_codigo = 1),
+    datajud::datajud_pesquisar_processos(
+      "TJSP", assunto_codigo = 1, cliente = list()
+    ),
     "datajud_cliente"
   )
   expect_error(
-    datajud::datajud_pesquisar_processos("TJSP", cliente),
+    datajud::datajud_pesquisar_processos("TJSP", cliente = cliente),
     "ao menos um filtro"
   )
   expect_error(
     datajud::datajud_pesquisar_processos(
-      "TJSP", cliente, classe_codigo = c(1, 2)
+      "TJSP", classe_codigo = c(1, 2), cliente = cliente
     ),
     "único código"
   )

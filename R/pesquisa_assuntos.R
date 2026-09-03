@@ -31,7 +31,8 @@ validar_tribunal_pesquisa <- function(tribunal) {
 #' objetos no ambiente global.
 #'
 #' @param tribunal Sigla do tribunal a consultar.
-#' @param cliente Objeto criado por [datajud_cliente()].
+#' @param ... Compatibilidade temporária com `cliente` na posição antiga. Novas
+#'   chamadas devem nomear os argumentos após `tribunal`.
 #' @param assunto_codigo Vetor opcional de códigos de assunto.
 #' @param classe_codigo Código opcional de uma única classe processual.
 #' @param orgao_codigo Vetor opcional de códigos de órgão julgador.
@@ -39,52 +40,54 @@ validar_tribunal_pesquisa <- function(tribunal) {
 #' @param cursor Cursor opaco `search_after` retornado pela página anterior.
 #' @param exigir_todos_assuntos Se `TRUE`, exige a presença de todos os assuntos
 #'   informados; por padrão, qualquer assunto satisfaz o filtro.
+#' @param cliente Objeto opcional criado por [datajud_cliente()]. Quando `NULL`,
+#'   um cliente transitório é criado automaticamente.
 #'
 #' @return Objeto `datajud_resultado` com hits, consulta sanitizada e metadados.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' cliente <- datajud_cliente()
-#'
 #' # Somente assunto ou somente classe
 #' por_assunto <- datajud_pesquisar_processos(
-#'   "TJSP", cliente, assunto_codigo = 899
+#'   "TJSP", assunto_codigo = 899
 #' )
 #' qualquer_assunto <- datajud_pesquisar_processos(
-#'   "TJSP", cliente, assunto_codigo = c(1, 2, 3, 4)
+#'   "TJSP", assunto_codigo = c(1, 2, 3, 4)
 #' )
 #' todos_assuntos <- datajud_pesquisar_processos(
-#'   "TJSP", cliente,
+#'   "TJSP",
 #'   assunto_codigo = c(1, 2, 3, 4),
 #'   exigir_todos_assuntos = TRUE
 #' )
 #' por_classe <- datajud_pesquisar_processos(
-#'   "TJSP", cliente, classe_codigo = 1116
+#'   "TJSP", classe_codigo = 1116
 #' )
 #' por_orgao <- datajud_pesquisar_processos(
-#'   "TJSP", cliente, orgao_codigo = 13597
+#'   "TJSP", orgao_codigo = 13597
 #' )
 #'
-#' # Vários assuntos, combinados com uma classe e um órgão
+#' # Vários filtros e um cliente configurado explicitamente
 #' combinada <- datajud_pesquisar_processos(
-#'   "TJSP", cliente,
+#'   "TJSP",
 #'   assunto_codigo = c(899, 900),
 #'   classe_codigo = 1116,
-#'   orgao_codigo = 13597
+#'   orgao_codigo = 13597,
+#'   cliente = datajud_cliente(timeout = 60)
 #' )
 #' tibble::as_tibble(combinada)
 #' }
 datajud_pesquisar_processos <- function(
     tribunal,
-    cliente,
+    ...,
     assunto_codigo = NULL,
     classe_codigo = NULL,
     orgao_codigo = NULL,
     size = 100L,
     cursor = NULL,
-    exigir_todos_assuntos = FALSE) {
-  validar_cliente(cliente)
+    exigir_todos_assuntos = FALSE,
+    cliente = NULL) {
+  argumentos <- list(...)
   tribunal <- validar_tribunal_pesquisa(tribunal)
   consulta <- criar_query_datajud(
     assunto_codigo = assunto_codigo,
@@ -93,6 +96,11 @@ datajud_pesquisar_processos <- function(
     size = size,
     cursor = cursor,
     exigir_todos_assuntos = exigir_todos_assuntos
+  )
+  cliente <- resolver_cliente_posicional(
+    argumentos,
+    cliente,
+    "datajud_pesquisar_processos"
   )
   endpoint <- aux_retorna_endpoint(tribunal)
   resposta <- requisitar_api_datajud(cliente, endpoint, consulta)
@@ -112,10 +120,13 @@ datajud_pesquisar_processos <- function(
 #' É possível especificar um tamanho máximo para a amostra de resultados retornados.
 #'
 #' @param tribunal Identificador do tribunal a ser consultado.
-#' @param cliente Objeto criado por `datajud_cliente()`.
+#' @param ... Compatibilidade temporária com `cliente` na posição antiga. Novas
+#'   chamadas devem nomear os argumentos após `tribunal`.
 #' @param classe_codigo Código opcional de uma única classe processual.
 #' @param orgao_codigo Vetor opcional de códigos de órgão julgador para filtrar os processos.
 #' @param size Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.
+#' @param cliente Objeto opcional criado por [datajud_cliente()]. Quando `NULL`,
+#'   um cliente transitório é criado automaticamente.
 #'
 #' @return Uma lista com os processos encontrados pela consulta.
 #'
@@ -124,26 +135,28 @@ datajud_pesquisar_processos <- function(
 #' @examples
 #' \dontrun{
 #' # Pesquisar processos no TJSP por classe de assunto 1116 e tamanho da amostra de 100
-#' cliente <- datajud_cliente()
-#' datajud_pesquisar_classe_orgao(tribunal = "TJSP", cliente = cliente,
+#' datajud_pesquisar_classe_orgao(tribunal = "TJSP",
 #'                                classe_codigo = c(1116), size = 100)
 #'
 #' # Pesquisar processos no TJMG por órgão julgador 13597 com o tamanho padrão da amostra
-#' datajud_pesquisar_classe_orgao(tribunal = "TJMG", cliente = cliente,
+#' datajud_pesquisar_classe_orgao(tribunal = "TJMG",
 #'                                orgao_codigo = c(13597))
 #'
 #' # Pesquisar processos no TJRJ por classe de assunto e órgão julgador especificados
-#' datajud_pesquisar_classe_orgao(tribunal = "TJRJ", cliente = cliente,
+#' datajud_pesquisar_classe_orgao(tribunal = "TJRJ",
 #'                                classe_codigo = c(1116),
-#'                                orgao_codigo = c(13597), size = 500)
+#'                                orgao_codigo = c(13597), size = 500,
+#'                                cliente = datajud_cliente(timeout = 60))
 #' }
 
 datajud_pesquisar_classe_orgao <- function(
     tribunal,
-    cliente,
+    ...,
     classe_codigo = NULL,
     orgao_codigo = NULL,
-    size = 100) {
+    size = 100,
+    cliente = NULL) {
+  argumentos <- list(...)
 
   if (length(tribunal) != 1L || is.na(tribunal) || !nzchar(tribunal)) {
     cli::cli_abort("Tribunal n\u00E3o informado")
@@ -162,7 +175,11 @@ datajud_pesquisar_classe_orgao <- function(
     cli::cli_abort("Tamanho da amostra deve ser um n\u00FAmero inteiro entre 1 e 10000")
   }
 
-  validar_cliente(cliente)
+  cliente <- resolver_cliente_posicional(
+    argumentos,
+    cliente,
+    "datajud_pesquisar_classe_orgao"
+  )
 
   body <- monta_consulta_elasticsearch(
     classe_codigo = classe_codigo,

@@ -6,19 +6,21 @@
 \usage{
 datajud_pesquisar_processos(
   tribunal,
-  cliente,
+  ...,
   assunto_codigo = NULL,
   classe_codigo = NULL,
   orgao_codigo = NULL,
   size = 100L,
   cursor = NULL,
-  exigir_todos_assuntos = FALSE
+  exigir_todos_assuntos = FALSE,
+  cliente = NULL
 )
 }
 \arguments{
 \item{tribunal}{Sigla do tribunal a consultar.}
 
-\item{cliente}{Objeto criado por \code{\link[=datajud_cliente]{datajud_cliente()}}.}
+\item{...}{Compatibilidade temporária com \code{cliente} na posição antiga. Novas
+chamadas devem nomear os argumentos após \code{tribunal}.}
 
 \item{assunto_codigo}{Vetor opcional de códigos de assunto.}
 
@@ -32,6 +34,9 @@ datajud_pesquisar_processos(
 
 \item{exigir_todos_assuntos}{Se \code{TRUE}, exige a presença de todos os assuntos
 informados; por padrão, qualquer assunto satisfaz o filtro.}
+
+\item{cliente}{Objeto opcional criado por \code{\link[=datajud_cliente]{datajud_cliente()}}. Quando \code{NULL},
+um cliente transitório é criado automaticamente.}
 }
 \value{
 Objeto \code{datajud_resultado} com hits, consulta sanitizada e metadados.
@@ -44,33 +49,32 @@ objetos no ambiente global.
 }
 \examples{
 \dontrun{
-cliente <- datajud_cliente()
-
 # Somente assunto ou somente classe
 por_assunto <- datajud_pesquisar_processos(
-  "TJSP", cliente, assunto_codigo = 899
+  "TJSP", assunto_codigo = 899
 )
 qualquer_assunto <- datajud_pesquisar_processos(
-  "TJSP", cliente, assunto_codigo = c(1, 2, 3, 4)
+  "TJSP", assunto_codigo = c(1, 2, 3, 4)
 )
 todos_assuntos <- datajud_pesquisar_processos(
-  "TJSP", cliente,
+  "TJSP",
   assunto_codigo = c(1, 2, 3, 4),
   exigir_todos_assuntos = TRUE
 )
 por_classe <- datajud_pesquisar_processos(
-  "TJSP", cliente, classe_codigo = 1116
+  "TJSP", classe_codigo = 1116
 )
 por_orgao <- datajud_pesquisar_processos(
-  "TJSP", cliente, orgao_codigo = 13597
+  "TJSP", orgao_codigo = 13597
 )
 
-# Vários assuntos, combinados com uma classe e um órgão
+# Vários filtros e um cliente configurado explicitamente
 combinada <- datajud_pesquisar_processos(
-  "TJSP", cliente,
+  "TJSP",
   assunto_codigo = c(899, 900),
   classe_codigo = 1116,
-  orgao_codigo = 13597
+  orgao_codigo = 13597,
+  cliente = datajud_cliente(timeout = 60)
 )
 tibble::as_tibble(combinada)
 }

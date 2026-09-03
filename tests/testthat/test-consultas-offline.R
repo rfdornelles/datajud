@@ -34,13 +34,13 @@ test_that("pesquisa valida argumentos antes da rede", {
     tribunal = "TJSP", cliente = cliente
   ), "Nenhum")
   expect_error(datajud::datajud_pesquisar_classe_orgao(
-    tribunal = "TJSP", cliente = cliente, classe_codigo = 1, size = 0
+    tribunal = "TJSP", classe_codigo = 1, size = 0, cliente = cliente
   ), "entre 1 e 10000")
   expect_error(datajud::datajud_pesquisar_classe_orgao(
-    tribunal = "TJSP", cliente = cliente, classe_codigo = 1, size = 1.5
+    tribunal = "TJSP", classe_codigo = 1, size = 1.5, cliente = cliente
   ), "inteiro")
   expect_error(datajud::datajud_pesquisar_classe_orgao(
-    tribunal = "TJSP", cliente = list(), classe_codigo = 1
+    tribunal = "TJSP", classe_codigo = 1, cliente = list()
   ), "datajud_cliente")
 })
 
@@ -62,7 +62,7 @@ test_that("pesquisa usa transporte comum e não devolve credenciais", {
   })
 
   resultado <- datajud::datajud_pesquisar_classe_orgao(
-    tribunal = "TJSP", cliente = cliente, classe_codigo = 1116
+    tribunal = "TJSP", classe_codigo = 1116, cliente = cliente
   )
 
   expect_length(resultado, 1L)

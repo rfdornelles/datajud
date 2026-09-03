@@ -14,19 +14,27 @@ test_that("consulta vetorial valida tribunal e pausa antes da rede", {
   processos <- c("0000102-03.2004.8.26.0000", "0000102-03.2004.8.26.0000")
 
   expect_error(
-    datajud::datajud_consultar_processo(processos, cliente, tribunal = c("TJSP", NA)),
+    datajud::datajud_consultar_processo(
+      processos, tribunal = c("TJSP", NA), cliente = cliente
+    ),
     "misturar"
   )
   expect_error(
-    datajud::datajud_consultar_processo(processos, cliente, tribunal = "TJSP", sleep = c(0, 1)),
+    datajud::datajud_consultar_processo(
+      processos, tribunal = "TJSP", sleep = c(0, 1), cliente = cliente
+    ),
     "sleep"
   )
   expect_error(
-    datajud::datajud_consultar_processo(processos, cliente, tribunal = "TJSP", sleep = 61),
+    datajud::datajud_consultar_processo(
+      processos, tribunal = "TJSP", sleep = 61, cliente = cliente
+    ),
     "sleep"
   )
   expect_error(
-    datajud::datajud_consultar_processo(processos, cliente, tribunal = " "),
+    datajud::datajud_consultar_processo(
+      processos, tribunal = " ", cliente = cliente
+    ),
     "vazio"
   )
 })
@@ -43,7 +51,11 @@ test_that("tribunal escalar é reciclado em consulta vetorial", {
     },
     .package = "datajud"
   )
-  resultado <- datajud::datajud_consultar_processo(processos, cliente, tribunal = "TJSP")
+  resultado <- datajud::datajud_consultar_processo(
+    processos,
+    tribunal = "TJSP",
+    cliente = cliente
+  )
 
   expect_length(resultado, 2L)
   expect_identical(chamadas, c("TJSP", "TJSP"))
