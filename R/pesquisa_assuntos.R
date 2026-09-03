@@ -132,8 +132,11 @@ validar_resultado_paginacao <- function(resultado) {
     is.list(resultado$hits) &&
     is.list(resultado$consulta) &&
     is.list(resultado$metadados) &&
+    "proximo_cursor" %in% names(resultado$metadados) &&
     is.character(resultado$metadados$tribunal) &&
-    length(resultado$metadados$tribunal) == 1L
+    length(resultado$metadados$tribunal) == 1L &&
+    !is.na(resultado$metadados$tribunal) &&
+    nzchar(resultado$metadados$tribunal)
   if (!valido) {
     cli::cli_abort(
       "{.arg resultado} deve ser criado por datajud_pesquisar_processos()."

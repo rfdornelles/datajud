@@ -81,6 +81,8 @@ normalizar_cursor_datajud <- function(cursor) {
   }
   timestamp_valido <- length(valores) == 2L &&
     is.numeric(valores[[1]]) &&
+    !is.complex(valores[[1]]) &&
+    !is.object(valores[[1]]) &&
     length(valores[[1]]) == 1L &&
     is.finite(valores[[1]])
   id_valido <- length(valores) == 2L &&

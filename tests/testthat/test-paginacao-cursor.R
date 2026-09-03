@@ -197,6 +197,7 @@ test_that("cursores malformados falham antes da rede", {
     list("1000", "id"),
     list(1000, ""),
     list(1000, NA_character_),
+    list(as.POSIXct("2026-01-01", tz = "UTC"), "id"),
     environment()
   )
 
@@ -245,6 +246,18 @@ test_that("valida resultado, pausa e cliente antes de continuar", {
 
   expect_error(
     datajud::datajud_pesquisar_proxima_pagina(list()),
+    "datajud_pesquisar_processos"
+  )
+  pagina_sem_cursor <- pagina
+  pagina_sem_cursor$metadados$proximo_cursor <- NULL
+  expect_error(
+    datajud::datajud_pesquisar_proxima_pagina(pagina_sem_cursor),
+    "datajud_pesquisar_processos"
+  )
+  pagina_sem_tribunal <- pagina
+  pagina_sem_tribunal$metadados$tribunal <- NA_character_
+  expect_error(
+    datajud::datajud_pesquisar_proxima_pagina(pagina_sem_tribunal),
     "datajud_pesquisar_processos"
   )
   expect_error(
