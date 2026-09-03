@@ -30,7 +30,8 @@ chamadas devem nomear os argumentos após \code{tribunal}.}
 
 \item{size}{Número de resultados da página, entre 1 e 10.000.}
 
-\item{cursor}{Cursor opaco \code{search_after} retornado pela página anterior.}
+\item{cursor}{Cursor \code{search_after} da página anterior, com o timestamp
+numérico e o \code{id} textual retornados pela ordenação composta.}
 
 \item{exigir_todos_assuntos}{Se \code{TRUE}, exige a presença de todos os assuntos
 informados; por padrão, qualquer assunto satisfaz o filtro.}
