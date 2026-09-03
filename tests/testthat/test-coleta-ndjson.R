@@ -56,7 +56,10 @@ test_that("coleta completa grava NDJSON atômico e retorna apenas caminhos", {
   expect_true(file.exists(coleta$manifesto))
   expect_true(file.exists(coleta$arquivos))
   expect_length(readLines(coleta$arquivos, warn = FALSE), 2L)
-  expect_false(any(grepl("^\\.pagina-", list.files(diretorio))))
+  expect_false(any(grepl(
+    "^\\.pagina-",
+    list.files(diretorio, all.files = TRUE)
+  )))
   expect_false(file.exists(paste0(coleta$manifesto, ".anterior")))
   expect_identical(
     vapply(consultas[[1]]$sort, names, character(1)),
