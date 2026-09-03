@@ -20,7 +20,9 @@ esta função permite ler e manipular os dados dos processos retornados.
 \dontrun{
 cliente <- datajud_cliente()
 resposta <- datajud_consultar_processo(
-  "0000001-89.2020.8.26.0000", cliente, tribunal = "TJSP"
+  "0000001-89.2020.8.26.0000",
+  tribunal = "TJSP",
+  cliente = cliente
 )
 datajud_ler_processo(resposta)
 }

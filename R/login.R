@@ -133,3 +133,58 @@ validar_cliente <- function(cliente) {
   }
   invisible(cliente)
 }
+
+resolver_cliente_datajud <- function(cliente = NULL) {
+  if (is.null(cliente)) {
+    return(datajud_cliente())
+  }
+
+  validar_cliente(cliente)
+  cliente
+}
+
+resolver_cliente_posicional <- function(argumentos, cliente, funcao) {
+  if (length(argumentos) == 0L) {
+    return(resolver_cliente_datajud(cliente))
+  }
+
+  nomes <- names(argumentos)
+  if (is.null(nomes)) {
+    nomes <- rep("", length(argumentos))
+  }
+  argumentos_nomeados <- nomes[nzchar(nomes)]
+  if (length(argumentos_nomeados) > 0L) {
+    rotulo <- if (length(argumentos_nomeados) == 1L) {
+      "Argumento nomeado desconhecido"
+    } else {
+      "Argumentos nomeados desconhecidos"
+    }
+    cli::cli_abort(
+      paste0(
+        rotulo, " em ", funcao, "(): ",
+        paste(argumentos_nomeados, collapse = ", "), "."
+      )
+    )
+  }
+  cliente_legado <- length(argumentos) == 1L &&
+    !nzchar(nomes[[1]]) &&
+    inherits(argumentos[[1]], "datajud_cliente")
+
+  if (cliente_legado && is.null(cliente)) {
+    cli::cli_warn(
+      paste0(
+        "A posi\u00E7\u00E3o antiga de cliente em ", funcao, "() foi depreciada. ",
+        "Use cliente = cliente como \u00FAltimo argumento."
+      ),
+      class = "datajud_aviso_cliente_posicional"
+    )
+    return(argumentos[[1]])
+  }
+
+  cli::cli_abort(
+    paste0(
+      "Argumentos depois do argumento principal de ", funcao,
+      "() devem ser nomeados; use cliente como \u00FAltimo argumento."
+    )
+  )
+}

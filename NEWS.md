@@ -1,5 +1,9 @@
 # datajud 0.0.0.9000
 
+* Funções públicas de consulta agora mantêm `cliente = NULL` como último
+  argumento e criam um cliente transitório quando ele é omitido. O uso antigo
+  do cliente como segundo argumento continua temporariamente disponível com
+  aviso de depreciação.
 * A nova `datajud_pesquisar_processos()` pesquisa uma página por assunto,
   classe e/ou órgão e retorna `datajud_resultado`, com hits, consulta sanitizada,
   total, relação do total, quantidade recebida e próximo cursor.

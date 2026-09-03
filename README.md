@@ -36,18 +36,19 @@ library(datajud)
 A chave publicada pelo CNJ é pública. O pacote tenta obtê-la da Wiki
 oficial e mantém uma cópia da chave vigente como contingência. Também é
 possível informar a chave diretamente ou pela variável de ambiente
-`DATAJUD_API_KEY`.
+`DATAJUD_API_KEY`. Nas chamadas simples, não é necessário criar um
+cliente: as funções criam um cliente transitório automaticamente.
 
 ``` r
-cliente <- datajud_cliente()
-
 # Alternativas explícitas:
 cliente <- datajud_cliente(api_key = "chave-publicada-pelo-cnj")
 Sys.setenv(DATAJUD_API_KEY = "chave-publicada-pelo-cnj")
 cliente <- datajud_cliente()
 ```
 
-O e-mail é opcional e, quando informado, compõe o `User-Agent`:
+Crie um cliente explicitamente apenas quando quiser configurar chave,
+e-mail, timeout ou tentativas. O e-mail, quando informado, compõe o
+`User-Agent`:
 
 ``` r
 cliente <- datajud_cliente(email = "seu.email@dominio.com")
@@ -63,7 +64,6 @@ todos. Não misture tribunais informados e `NA` no mesmo vetor.
 ``` r
 respostas <- datajud_consultar_processo(
   processo = "0000001-89.2020.8.26.0000",
-  cliente = cliente,
   tribunal = "TJSP"
 )
 ```
@@ -76,7 +76,6 @@ numeros <- c(
 
 respostas <- datajud_consultar_processo(
   processo = numeros,
-  cliente = cliente,
   tribunal = NA
 )
 ```
@@ -84,18 +83,30 @@ respostas <- datajud_consultar_processo(
 O número CNJ é o parâmetro de consulta. O campo `id` devolvido pelo
 Datajud é preservado como chave interna do pacote.
 
-## Pesquisa por classe e órgão
+## Pesquisa por assunto, classe e órgão
 
-Enquanto a interface geral de pesquisa não é publicada, a função
-existente aceita códigos de classe e/ou órgão julgador:
+A pesquisa geral aceita vários assuntos, uma classe e um ou mais órgãos.
+Dentro de vetores de assunto ou órgão, a combinação padrão é OR;
+categorias diferentes são combinadas com AND.
 
 ``` r
-resultados <- datajud_pesquisar_classe_orgao(
+resultados <- datajud_pesquisar_processos(
   tribunal = "TJSP",
-  cliente = cliente,
+  assunto_codigo = c(899, 900),
   classe_codigo = 1116,
   orgao_codigo = 13597,
   size = 100
+)
+```
+
+Quando for necessário configurar o transporte, informe `cliente` por
+último:
+
+``` r
+resultados <- datajud_pesquisar_processos(
+  tribunal = "TJSP",
+  assunto_codigo = 899,
+  cliente = datajud_cliente(timeout = 60)
 )
 ```
 

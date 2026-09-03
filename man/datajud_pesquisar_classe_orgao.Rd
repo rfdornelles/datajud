@@ -6,22 +6,27 @@
 \usage{
 datajud_pesquisar_classe_orgao(
   tribunal,
-  cliente,
+  ...,
   classe_codigo = NULL,
   orgao_codigo = NULL,
-  size = 100
+  size = 100,
+  cliente = NULL
 )
 }
 \arguments{
 \item{tribunal}{Identificador do tribunal a ser consultado.}
 
-\item{cliente}{Objeto criado por \code{datajud_cliente()}.}
+\item{...}{Compatibilidade temporária com \code{cliente} na posição antiga. Novas
+chamadas devem nomear os argumentos após \code{tribunal}.}
 
 \item{classe_codigo}{Código opcional de uma única classe processual.}
 
 \item{orgao_codigo}{Vetor opcional de códigos de órgão julgador para filtrar os processos.}
 
 \item{size}{Tamanho máximo da amostra de resultados a ser retornada, com um valor padrão de 100. O tamanho máximo permitido é 10000.}
+
+\item{cliente}{Objeto opcional criado por \code{\link[=datajud_cliente]{datajud_cliente()}}. Quando \code{NULL},
+um cliente transitório é criado automaticamente.}
 }
 \value{
 Uma lista com os processos encontrados pela consulta.
@@ -33,17 +38,17 @@ Esta função realiza uma pesquisa no Datajud, permitindo filtrar processos por 
 \examples{
 \dontrun{
 # Pesquisar processos no TJSP por classe de assunto 1116 e tamanho da amostra de 100
-cliente <- datajud_cliente()
-datajud_pesquisar_classe_orgao(tribunal = "TJSP", cliente = cliente,
+datajud_pesquisar_classe_orgao(tribunal = "TJSP",
                                classe_codigo = c(1116), size = 100)
 
 # Pesquisar processos no TJMG por órgão julgador 13597 com o tamanho padrão da amostra
-datajud_pesquisar_classe_orgao(tribunal = "TJMG", cliente = cliente,
+datajud_pesquisar_classe_orgao(tribunal = "TJMG",
                                orgao_codigo = c(13597))
 
 # Pesquisar processos no TJRJ por classe de assunto e órgão julgador especificados
-datajud_pesquisar_classe_orgao(tribunal = "TJRJ", cliente = cliente,
+datajud_pesquisar_classe_orgao(tribunal = "TJRJ",
                                classe_codigo = c(1116),
-                               orgao_codigo = c(13597), size = 500)
+                               orgao_codigo = c(13597), size = 500,
+                               cliente = datajud_cliente(timeout = 60))
 }
 }
