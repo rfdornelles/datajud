@@ -30,9 +30,11 @@ O exemplo 3 da API Pública determina ordenação por `@timestamp`. A página
 - `id.keyword` retornou HTTP 200 e um cursor textual;
 - `id` sem o subcampo `.keyword` retornou HTTP 400.
 
-Como timestamps podem se repetir, a paginação determinística será definida na
-issue própria. Até lá, esta nota registra a divergência sem promover o
-comportamento observado a garantia oficial.
+Como timestamps podem se repetir, o pacote usa a ordenação composta por
+`@timestamp` e `id.keyword`. O primeiro campo segue a recomendação oficial; o
+segundo funciona como desempate determinístico com base no comportamento
+observado. Cada próxima requisição repete os dois valores do `sort` anterior em
+`search_after`.
 
 ## Cache reproduzível da Wiki
 

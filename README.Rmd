@@ -119,6 +119,35 @@ resultados <- datajud_pesquisar_processos(
 )
 ```
 
+### Paginação por cursor
+
+Cada chamada retorna uma página e preserva o cursor do último hit. Para buscar
+somente a página seguinte, use `datajud_pesquisar_proxima_pagina()`. A função
+faz no máximo uma requisição, de forma sequencial, e não acumula todas as
+páginas na memória.
+
+```{r, eval = FALSE}
+cliente <- datajud_cliente()
+pagina_1 <- datajud_pesquisar_processos(
+  tribunal = "TJSP",
+  assunto_codigo = 899,
+  size = 100,
+  cliente = cliente
+)
+pagina_2 <- datajud_pesquisar_proxima_pagina(
+  pagina_1,
+  pausa = 0.5,
+  cliente = cliente
+)
+```
+
+Quando uma página não possui cursor seguinte, a função retorna `NULL` sem
+acessar a rede. Cursores repetidos ou processos duplicados entre páginas
+adjacentes interrompem a paginação com erro, evitando loops e duplicação.
+Também é possível continuar manualmente passando
+`cursor = pagina_1$metadados$proximo_cursor` para
+`datajud_pesquisar_processos()`.
+
 ### Migração da pesquisa antiga
 
 `datajud_pesquisar_classe_orgao()` foi removida enquanto o pacote ainda está

@@ -31,7 +31,11 @@
     "ordenacao_api_publica_documentada": "@timestamp",
     "ordenacao_id_keyword_observada_status": 200,
     "ordenacao_id_direto_observada_status": 400,
-    "cursor_formato": "array sort do ultimo hit"
+    "ordenacao_composta_pacote": ["@timestamp", "id.keyword"],
+    "cursor_formato_documentado": "array sort do ultimo hit",
+    "cursor_formato_pacote": ["timestamp numerico", "id textual"],
+    "protecao_cursor_repetido": true,
+    "protecao_id_repetido_entre_paginas": true
   },
   "total": {
     "caminho": "hits.total",

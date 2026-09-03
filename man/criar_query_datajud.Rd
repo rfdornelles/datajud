@@ -22,7 +22,8 @@ positivos.}
 
 \item{size}{Quantidade de resultados, entre 1 e 10.000.}
 
-\item{cursor}{Cursor opaco \code{search_after} devolvido pela API.}
+\item{cursor}{Cursor \code{search_after} com o timestamp numérico e o \code{id}
+textual devolvidos pela ordenação composta.}
 
 \item{ordenacao}{Campos de ordenação estável confirmados no contrato.}
 
