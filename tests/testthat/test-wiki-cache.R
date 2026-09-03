@@ -260,6 +260,16 @@ test_that("fixture registra o contrato sem depender da rede", {
   expect_identical(contrato$identificadores$chave_unica_pacote, "id")
   expect_equal(contrato$size$maximo_documentado, 10000)
   expect_identical(contrato$paginacao$mecanismo_documentado, "search_after")
+  expect_identical(
+    contrato$paginacao$ordenacao_composta_pacote,
+    c("@timestamp", "id.keyword")
+  )
+  expect_identical(
+    contrato$paginacao$cursor_formato_pacote,
+    c("timestamp numerico", "id textual")
+  )
+  expect_true(contrato$paginacao$protecao_cursor_repetido)
+  expect_true(contrato$paginacao$protecao_id_repetido_entre_paginas)
   expect_identical(contrato$total$campos, c("value", "relation"))
   expect_identical(contrato$erros$campos_topo_observados, c("error", "status"))
 })

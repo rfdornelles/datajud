@@ -1,5 +1,9 @@
 # datajud 0.0.0.9000
 
+* `datajud_pesquisar_proxima_pagina()` continua uma pesquisa por `search_after`
+  com uma requisição sequencial por chamada, pausa configurável e proteção
+  contra cursor ou processos repetidos. Metadados agora registram página e
+  cursor utilizado.
 * `datajud_pesquisar_classe_orgao()` foi removida. Use
   `datajud_pesquisar_processos()` com os mesmos argumentos `tribunal`,
   `classe_codigo`, `orgao_codigo`, `size` e, quando necessário, `cliente`. A

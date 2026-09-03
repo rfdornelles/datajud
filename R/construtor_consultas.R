@@ -67,6 +67,40 @@ validar_exigir_todos <- function(valor, argumento) {
   valor
 }
 
+normalizar_cursor_datajud <- function(cursor) {
+  if (is.null(cursor)) {
+    return(NULL)
+  }
+
+  valores <- if (is.list(cursor)) {
+    unname(unclass(cursor))
+  } else if (is.atomic(cursor)) {
+    as.list(unname(cursor))
+  } else {
+    list()
+  }
+  timestamp_valido <- length(valores) == 2L &&
+    is.numeric(valores[[1]]) &&
+    length(valores[[1]]) == 1L &&
+    is.finite(valores[[1]])
+  id_valido <- length(valores) == 2L &&
+    is.character(valores[[2]]) &&
+    length(valores[[2]]) == 1L &&
+    !is.na(valores[[2]]) &&
+    nzchar(valores[[2]])
+
+  if (!timestamp_valido || !id_valido) {
+    cli::cli_abort(
+      paste0(
+        "{.arg cursor} deve conter exatamente dois valores: ",
+        "o timestamp num\u00E9rico e o id textual do \u00FAltimo resultado."
+      )
+    )
+  }
+
+  valores
+}
+
 #' Criar uma consulta estruturada para a API Pública do Datajud
 #'
 #' Construtor interno e puro. Códigos dentro de uma categoria são
@@ -76,7 +110,8 @@ validar_exigir_todos <- function(valor, argumento) {
 #'   positivos.
 #' @param classe_codigo Código numérico único de classe processual.
 #' @param size Quantidade de resultados, entre 1 e 10.000.
-#' @param cursor Cursor opaco `search_after` devolvido pela API.
+#' @param cursor Cursor `search_after` com o timestamp numérico e o `id`
+#'   textual devolvidos pela ordenação composta.
 #' @param ordenacao Campos de ordenação estável confirmados no contrato.
 #' @param exigir_todos_assuntos Se `TRUE`, cria um filtro para cada assunto.
 #'
@@ -101,6 +136,7 @@ criar_query_datajud <- function(
   }
   size <- validar_size_consulta(size)
   ordenacao <- validar_ordenacao_consulta(ordenacao)
+  cursor <- normalizar_cursor_datajud(cursor)
 
   exigir_todos_assuntos <- validar_exigir_todos(
     exigir_todos_assuntos,
@@ -113,11 +149,6 @@ criar_query_datajud <- function(
     logical(1)
   ))) {
     cli::cli_abort("Informe ao menos um filtro de assunto, classe ou \u00F3rg\u00E3o.")
-  }
-
-  if (!is.null(cursor) &&
-      (!(is.atomic(cursor) || is.list(cursor)) || length(cursor) == 0L)) {
-    cli::cli_abort("{.arg cursor} deve ser um vetor ou lista n\u00E3o vazia.")
   }
 
   filtros <- list()

@@ -138,6 +138,11 @@ test_that("impressão é compacta e conversão usa id como chave", {
   )
   expect_type(tabela$dados, "list")
 
+  resultado_sem_pagina <- resultado
+  resultado_sem_pagina$metadados$pagina <- NULL
+  saida_sem_pagina <- testthat::capture_messages(print(resultado_sem_pagina))
+  expect_true(any(grepl("Página: não determinada", saida_sem_pagina)))
+
   resultado$hits[[1]]$`_source`$numeroProcesso <- 123
   expect_true(is.na(tibble::as_tibble(resultado)$numero_processo[[1]]))
 })

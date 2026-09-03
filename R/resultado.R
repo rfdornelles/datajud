@@ -7,6 +7,17 @@ abortar_resposta_pesquisa <- function(mensagem) {
   )
 }
 
+abortar_paginacao_datajud <- function(mensagem) {
+  cli::cli_abort(
+    mensagem,
+    class = c(
+      "datajud_erro_paginacao",
+      "datajud_erro_conteudo",
+      "datajud_erro_http"
+    )
+  )
+}
+
 extrair_ids_hits <- function(hits) {
   ids <- vapply(hits, function(hit) {
     id <- purrr::pluck(hit, "_source", "id", .default = NA_character_)
@@ -72,7 +83,31 @@ sanitizar_consulta_datajud <- function(consulta) {
   consulta
 }
 
-novo_datajud_resultado <- function(resposta, tribunal, consulta) {
+extrair_cursor_resultado <- function(hit) {
+  cursor <- purrr::pluck(hit, "sort", .default = NULL)
+  if (is.null(cursor)) {
+    abortar_resposta_pesquisa(
+      paste0(
+        "A resposta da API cont\u00E9m cursor de pagina\u00E7\u00E3o ausente ou ",
+        "malformado."
+      )
+    )
+  }
+  tryCatch(
+    normalizar_cursor_datajud(cursor),
+    error = function(cnd) {
+      abortar_resposta_pesquisa(
+        paste0(
+          "A resposta da API cont\u00E9m cursor de pagina\u00E7\u00E3o ausente ou ",
+          "malformado."
+        )
+      )
+    }
+  )
+}
+
+novo_datajud_resultado <- function(resposta, tribunal, consulta,
+                                   pagina = NULL) {
   hits <- purrr::pluck(resposta, "hits", "hits", .default = NULL)
   if (!is.list(hits)) {
     abortar_resposta_pesquisa(
@@ -82,10 +117,28 @@ novo_datajud_resultado <- function(resposta, tribunal, consulta) {
 
   extrair_ids_hits(hits)
   total <- extrair_total_pesquisa(resposta)
+  cursor_utilizado <- purrr::pluck(
+    consulta,
+    "search_after",
+    .default = NULL
+  )
+  cursor_utilizado <- normalizar_cursor_datajud(cursor_utilizado)
   proximo_cursor <- if (length(hits) == 0L) {
     NULL
   } else {
-    purrr::pluck(hits[[length(hits)]], "sort", .default = NULL)
+    extrair_cursor_resultado(hits[[length(hits)]])
+  }
+  if (!is.null(cursor_utilizado) &&
+      identical(cursor_utilizado, proximo_cursor)) {
+    abortar_paginacao_datajud(
+      paste0(
+        "A API repetiu o cursor da p\u00E1gina anterior. ",
+        "A pagina\u00E7\u00E3o foi interrompida para evitar um loop infinito."
+      )
+    )
+  }
+  if (is.null(pagina)) {
+    pagina <- if (is.null(cursor_utilizado)) 1L else NA_integer_
   }
 
   structure(
@@ -97,6 +150,8 @@ novo_datajud_resultado <- function(resposta, tribunal, consulta) {
         total_valor = total$valor,
         total_relacao = total$relacao,
         quantidade_recebida = length(hits),
+        pagina = pagina,
+        cursor_utilizado = cursor_utilizado,
         proximo_cursor = proximo_cursor
       )
     ),
@@ -118,9 +173,21 @@ print.datajud_resultado <- function(x, ...) {
     as.character(x$metadados$total_valor)
   }
   cursor <- if (is.null(x$metadados$proximo_cursor)) "n\u00E3o" else "sim"
+  pagina_valor <- purrr::pluck(
+    x,
+    "metadados",
+    "pagina",
+    .default = NA_integer_
+  )
+  pagina <- if (!is.numeric(pagina_valor) || length(pagina_valor) != 1L ||
+      is.na(pagina_valor)) {
+    "n\u00E3o determinada"
+  } else {
+    as.character(pagina_valor)
+  }
 
   cli::cli_text("<datajud_resultado>")
-  cli::cli_text("Tribunal: {x$metadados$tribunal}")
+  cli::cli_text("Tribunal: {x$metadados$tribunal} | P\u00E1gina: {pagina}")
   cli::cli_text(
     "Resultados recebidos: {x$metadados$quantidade_recebida} | Total: {total}"
   )

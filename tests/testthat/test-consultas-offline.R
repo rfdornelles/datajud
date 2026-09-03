@@ -22,7 +22,10 @@ test_that("pesquisa usa transporte comum e não devolve credenciais", {
   corpo <- jsonlite::toJSON(list(
     hits = list(
       total = list(value = 1L, relation = "eq"),
-      hits = list(list(`_source` = list(id = "x")))
+      hits = list(list(
+        `_source` = list(id = "x"),
+        sort = list(1000, "x")
+      ))
     )
   ), auto_unbox = TRUE)
 

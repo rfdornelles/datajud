@@ -1,7 +1,8 @@
 test_that("cliente é o último argumento opcional das consultas públicas", {
   funcoes <- c(
     "datajud_consultar_processo",
-    "datajud_pesquisar_processos"
+    "datajud_pesquisar_processos",
+    "datajud_pesquisar_proxima_pagina"
   )
 
   for (nome in funcoes) {
