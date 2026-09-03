@@ -152,8 +152,8 @@ datajud_desaninhar_assuntos <- function(dados) {
 
 #' Lê os dados de processos retornados pelo Datajud
 #'
-#' Após realizar uma pesquisa de processos com `datajud_pesquisar_classe_orgao`,
-#' esta função permite ler e manipular os dados dos processos retornados.
+#' Após consultar processos com [datajud_consultar_processo()], esta função
+#' permite ler e manipular os dados retornados.
 #' @param base Lista de respostas de processos retornadas pela API.
 #'
 #' @return Um tibble contendo os metadados dos processos.

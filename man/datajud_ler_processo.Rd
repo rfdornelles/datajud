@@ -13,8 +13,8 @@ datajud_ler_processo(base)
 Um tibble contendo os metadados dos processos.
 }
 \description{
-Após realizar uma pesquisa de processos com \code{datajud_pesquisar_classe_orgao},
-esta função permite ler e manipular os dados dos processos retornados.
+Após consultar processos com \code{\link[=datajud_consultar_processo]{datajud_consultar_processo()}}, esta função
+permite ler e manipular os dados retornados.
 }
 \examples{
 \dontrun{

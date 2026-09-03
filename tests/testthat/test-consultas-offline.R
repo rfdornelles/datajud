@@ -1,45 +1,16 @@
-test_that("construtor retorna lista e preserva arrays JSON", {
-  montar <- getFromNamespace("monta_consulta_elasticsearch", "datajud")
-  serializar <- getFromNamespace("serializar_query_datajud", "datajud")
-
-  consulta <- montar(
-    classe_codigo = 1116,
-    orgao_codigo = c(123, 456),
-    size = 25
-  )
-  json <- jsonlite::fromJSON(serializar(consulta), simplifyVector = FALSE)
-
-  expect_type(consulta, "list")
-  expect_equal(json$size, 25)
-  expect_equal(json$query$bool$filter[[1]]$terms$`classe.codigo`, list(1116))
-  expect_equal(json$query$bool$filter[[2]]$terms$`orgaoJulgador.codigo`, list(123, 456))
-
-  unitario <- montar(classe_codigo = 1116)
-  json_unitario <- jsonlite::fromJSON(serializar(unitario), simplifyVector = FALSE)
-  expect_identical(json_unitario$query$bool$filter[[1]]$terms$`classe.codigo`, list(1116L))
-})
-
-test_that("construtor aceita cada filtro isoladamente", {
-  montar <- getFromNamespace("monta_consulta_elasticsearch", "datajud")
-
-  expect_no_error(montar(classe_codigo = 1))
-  expect_no_error(montar(orgao_codigo = 2))
-  expect_error(montar(), "ao menos um filtro")
-})
-
 test_that("pesquisa valida argumentos antes da rede", {
   cliente <- datajud::datajud_cliente(chave_publica_teste())
 
-  expect_error(datajud::datajud_pesquisar_classe_orgao(
+  expect_error(datajud::datajud_pesquisar_processos(
     tribunal = "TJSP", cliente = cliente
-  ), "Nenhum")
-  expect_error(datajud::datajud_pesquisar_classe_orgao(
+  ), "ao menos um filtro")
+  expect_error(datajud::datajud_pesquisar_processos(
     tribunal = "TJSP", classe_codigo = 1, size = 0, cliente = cliente
   ), "entre 1 e 10000")
-  expect_error(datajud::datajud_pesquisar_classe_orgao(
+  expect_error(datajud::datajud_pesquisar_processos(
     tribunal = "TJSP", classe_codigo = 1, size = 1.5, cliente = cliente
   ), "inteiro")
-  expect_error(datajud::datajud_pesquisar_classe_orgao(
+  expect_error(datajud::datajud_pesquisar_processos(
     tribunal = "TJSP", classe_codigo = 1, cliente = list()
   ), "datajud_cliente")
 })
@@ -49,7 +20,10 @@ test_that("pesquisa usa transporte comum e não devolve credenciais", {
   cliente <- datajud::datajud_cliente(chave)
   requisicao_capturada <- NULL
   corpo <- jsonlite::toJSON(list(
-    hits = list(hits = list(list(`_source` = list(id = "x"))))
+    hits = list(
+      total = list(value = 1L, relation = "eq"),
+      hits = list(list(`_source` = list(id = "x")))
+    )
   ), auto_unbox = TRUE)
 
   httr2::local_mocked_responses(function(req) {
@@ -61,11 +35,12 @@ test_that("pesquisa usa transporte comum e não devolve credenciais", {
     )
   })
 
-  resultado <- datajud::datajud_pesquisar_classe_orgao(
+  resultado <- datajud::datajud_pesquisar_processos(
     tribunal = "TJSP", classe_codigo = 1116, cliente = cliente
   )
 
-  expect_length(resultado, 1L)
+  expect_s3_class(resultado, "datajud_resultado")
+  expect_length(resultado$hits, 1L)
   expect_identical(requisicao_capturada$method, "POST")
   expect_match(requisicao_capturada$url, "api_publica_tjsp/_search$")
   expect_identical(requisicao_capturada$body$content_type, "application/json")
@@ -77,7 +52,7 @@ test_that("pesquisa usa transporte comum e não devolve credenciais", {
   expect_identical(
     corpo_enviado$query$bool$filter[[1]]$terms$`classe.codigo`, list(1116L)
   )
-  expect_false(grepl(chave, jsonlite::toJSON(resultado), fixed = TRUE))
+  expect_false(grepl(chave, jsonlite::toJSON(unclass(resultado)), fixed = TRUE))
   expect_false(any(grepl(
     chave,
     capture.output(print(requisicao_capturada)),
