@@ -34,7 +34,8 @@ executar_pesquisa_datajud <- function(tribunal, consulta, cliente,
 #' @param classe_codigo Código opcional de uma única classe processual.
 #' @param orgao_codigo Vetor opcional de códigos de órgão julgador.
 #' @param size Número de resultados da página, entre 1 e 10.000.
-#' @param cursor Cursor opaco `search_after` retornado pela página anterior.
+#' @param cursor Cursor `search_after` da página anterior, com o timestamp
+#'   numérico e o `id` textual retornados pela ordenação composta.
 #' @param exigir_todos_assuntos Se `TRUE`, exige a presença de todos os assuntos
 #'   informados; por padrão, qualquer assunto satisfaz o filtro.
 #' @param cliente Objeto opcional criado por [datajud_cliente()]. Quando `NULL`,
