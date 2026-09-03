@@ -24,6 +24,8 @@ tibbles sem alterar o protocolo de download.
 ## Arquivos
 
 - `manifesto.json`: estado e metadados da coleta;
+- `manifesto.json.anterior`: backup transitório usado somente durante a troca
+  atômica do manifesto;
 - `pagina-000001.ndjson`, `pagina-000002.ndjson`, ...: páginas concluídas;
 - arquivos iniciados por `.pagina-` ou `.manifesto-`: temporários, nunca são
   considerados páginas válidas.
@@ -32,6 +34,12 @@ Uma página só passa a existir depois que seu temporário é fechado e renomead
 Se o processo for interrompido entre essa renomeação e a atualização do
 manifesto, a próxima execução reconcilia a única página órfã sequencial antes
 de acessar a rede.
+
+Ao atualizar o manifesto, o pacote renomeia a versão vigente para
+`manifesto.json.anterior` e só então promove o novo temporário. Assim não há
+cópia parcial sobre o arquivo vigente, inclusive em sistemas nos quais uma
+renomeação não substitui um destino existente. Se a execução parar entre as
+duas renomeações, o backup é restaurado na retomada.
 
 ## Manifesto do esquema 1
 

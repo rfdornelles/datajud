@@ -17,11 +17,11 @@ escrever_pagina_ndjson <- function(hits, caminho) {
   tryCatch(
     {
       for (hit in hits) {
-        writeLines(
+        linha <- paste0(
           enc2utf8(as.character(serializar_objeto_coleta(hit))),
-          conexao,
-          useBytes = TRUE
+          "\n"
         )
+        writeBin(charToRaw(linha), conexao)
       }
     },
     finally = close(conexao)

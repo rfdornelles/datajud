@@ -57,6 +57,7 @@ test_that("coleta completa grava NDJSON atômico e retorna apenas caminhos", {
   expect_true(file.exists(coleta$arquivos))
   expect_length(readLines(coleta$arquivos, warn = FALSE), 2L)
   expect_false(any(grepl("^\\.pagina-", list.files(diretorio))))
+  expect_false(file.exists(paste0(coleta$manifesto, ".anterior")))
   expect_identical(
     vapply(consultas[[1]]$sort, names, character(1)),
     c("@timestamp", "id.keyword")
@@ -705,4 +706,32 @@ test_that("coleta completa rejeita página órfã posterior", {
     "coleta completa.*páginas órfãs",
     class = "datajud_erro_coleta_integridade"
   )
+})
+
+test_that("backup do manifesto é restaurado antes da retomada", {
+  diretorio <- withr::local_tempdir()
+  cliente <- datajud::datajud_cliente(chave_publica_teste())
+  chamadas <- 0L
+  testthat::local_mocked_bindings(
+    requisitar_api_datajud = function(cliente, endpoint, query) {
+      chamadas <<- chamadas + 1L
+      resposta_coleta_ndjson(character(), list(), 0L)
+    },
+    .package = "datajud"
+  )
+  coleta <- datajud::datajud_coletar_processos(
+    "TJSP", diretorio, assunto_codigo = 899, pausa = 0, cliente = cliente
+  )
+  backup <- paste0(coleta$manifesto, ".anterior")
+  expect_true(file.rename(coleta$manifesto, backup))
+  expect_false(file.exists(coleta$manifesto))
+
+  retomada <- datajud::datajud_coletar_processos(
+    "TJSP", diretorio, assunto_codigo = 899, pausa = 0, cliente = cliente
+  )
+
+  expect_true(file.exists(retomada$manifesto))
+  expect_false(file.exists(backup))
+  expect_identical(retomada$metadados$estado, "completa")
+  expect_identical(chamadas, 1L)
 })

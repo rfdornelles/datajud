@@ -169,6 +169,10 @@ chamada e o mesmo diretório para continuar depois da última página
 válida. Consultas incompatíveis e arquivos alterados são rejeitados, sem
 sobrescrever a coleta existente.
 
+As atualizações do manifesto também usam troca por renomeação no mesmo
+diretório, com um backup transitório restaurável, em vez de copiar
+parcialmente sobre o manifesto vigente.
+
 #### Por que NDJSON?
 
 NDJSON mantém um objeto JSON completo por linha. Isso permite gravar,

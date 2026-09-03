@@ -78,6 +78,7 @@ datajud_coletar_processos <- function(
     diretorio,
     NOME_MANIFESTO_COLETA_DATAJUD
   )
+  recuperar_manifesto_anterior(caminho_manifesto)
 
   if (file.exists(caminho_manifesto)) {
     if (!retomar) {

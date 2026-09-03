@@ -92,6 +92,7 @@ hash_consulta_coleta <- function(consulta) {
 
 salvar_manifesto_coleta <- function(manifesto, caminho) {
   temporario <- tempfile(".manifesto-", tmpdir = dirname(caminho))
+  anterior <- paste0(caminho, ".anterior")
   on.exit(unlink(temporario), add = TRUE)
   jsonlite::write_json(
     manifesto,
@@ -103,12 +104,40 @@ salvar_manifesto_coleta <- function(manifesto, caminho) {
     pretty = TRUE
   )
 
-  renomeado <- file.rename(temporario, caminho)
-  if (!renomeado) {
-    copiado <- file.copy(temporario, caminho, overwrite = TRUE)
-    if (!copiado) {
+  possuia_manifesto <- file.exists(caminho)
+  if (possuia_manifesto) {
+    if (file.exists(anterior) && unlink(anterior) != 0L) {
       abortar_coleta_datajud(
-        "N\u00E3o foi poss\u00EDvel atualizar o manifesto da coleta."
+        "N\u00E3o foi poss\u00EDvel remover o backup obsoleto do manifesto."
+      )
+    }
+    if (!file.rename(caminho, anterior)) {
+      abortar_coleta_datajud(
+        "N\u00E3o foi poss\u00EDvel preparar a troca at\u00F4mica do manifesto."
+      )
+    }
+  }
+  if (!file.rename(temporario, caminho)) {
+    if (possuia_manifesto) {
+      file.rename(anterior, caminho)
+    }
+    abortar_coleta_datajud(
+      "N\u00E3o foi poss\u00EDvel concluir a troca at\u00F4mica do manifesto."
+    )
+  }
+  if (possuia_manifesto && file.exists(anterior)) {
+    unlink(anterior)
+  }
+  invisible(caminho)
+}
+
+recuperar_manifesto_anterior <- function(caminho) {
+  anterior <- paste0(caminho, ".anterior")
+  if (!file.exists(caminho) && file.exists(anterior)) {
+    if (!file.rename(anterior, caminho)) {
+      abortar_coleta_datajud(
+        "N\u00E3o foi poss\u00EDvel restaurar o backup do manifesto.",
+        "datajud_erro_coleta_integridade"
       )
     }
   }
