@@ -140,6 +140,49 @@ duplicação. Também é possível continuar manualmente passando
 `cursor = pagina_1$metadados$proximo_cursor` para
 `datajud_pesquisar_processos()`.
 
+### Coleta incremental em disco
+
+Para volumes maiores, `datajud_coletar_processos()` exige um diretório
+exclusivo e grava uma página por vez. O retorno contém os caminhos e
+metadados, mas não mantém todos os hits na memória.
+
+``` r
+coleta <- datajud_coletar_processos(
+  tribunal = "TJSP",
+  diretorio = "dados/tjsp-assunto-899",
+  assunto_codigo = 899,
+  size = 500,
+  limite_registros = 10000,
+  limite_paginas = 100,
+  pausa = 0.5
+)
+
+coleta$arquivos
+coleta$manifesto
+```
+
+Cada página concluída é gravada primeiro em um arquivo temporário e
+depois renomeada atomicamente. O manifesto registra a consulta
+sanitizada, o hash da consulta, os cursores, as contagens e o checksum
+MD5 de cada arquivo. Se uma requisição falhar, execute novamente a mesma
+chamada e o mesmo diretório para continuar depois da última página
+válida. Consultas incompatíveis e arquivos alterados são rejeitados, sem
+sobrescrever a coleta existente.
+
+As atualizações do manifesto também usam troca por renomeação no mesmo
+diretório, com um backup transitório restaurável, em vez de copiar
+parcialmente sobre o manifesto vigente.
+
+#### Por que NDJSON?
+
+NDJSON mantém um objeto JSON completo por linha. Isso permite gravar,
+validar e processar uma página por vez, inclusive com ferramentas de
+linha de comando, sem reconstruir na memória um único documento JSON com
+toda a coleta. O formato também é simples, interoperável e não exige
+Arrow como dependência do pacote. Formatos colunares continuam sendo uma
+boa opção para a etapa posterior de análise; aqui, NDJSON funciona como
+formato transacional e retomável da coleta.
+
 ### Migração da pesquisa antiga
 
 `datajud_pesquisar_classe_orgao()` foi removida enquanto o pacote ainda

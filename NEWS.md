@@ -1,5 +1,8 @@
 # datajud 0.0.0.9000
 
+* `datajud_coletar_processos()` grava coletas extensas incrementalmente, com
+  um arquivo NDJSON atômico por página, manifesto versionado, checksums, limites
+  seguros e retomada após falhas sem carregar todos os hits na memória.
 * `datajud_pesquisar_proxima_pagina()` continua uma pesquisa por `search_after`
   com uma requisição sequencial por chamada, pausa configurável e proteção
   contra cursor ou processos repetidos. Metadados agora registram página e
