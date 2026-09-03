@@ -7,14 +7,17 @@
 datajud_ler_processo(base)
 }
 \arguments{
-\item{base}{Lista de respostas de processos retornadas pela API.}
+\item{base}{Lista de respostas de processos retornadas pela API. Para uma
+pesquisa geral, informe \code{resultado$hits}.}
 }
 \value{
 Um tibble contendo os metadados dos processos.
 }
 \description{
-Após realizar uma pesquisa de processos com \code{datajud_pesquisar_classe_orgao},
-esta função permite ler e manipular os dados dos processos retornados.
+Lê a lista retornada por \code{\link[=datajud_consultar_processo]{datajud_consultar_processo()}} ou a lista de hits
+em \code{resultado$hits}, quando \code{resultado} foi criado por
+\code{\link[=datajud_pesquisar_processos]{datajud_pesquisar_processos()}}. O objeto \code{datajud_resultado} inteiro não é
+uma entrada válida nesta versão.
 }
 \examples{
 \dontrun{
@@ -25,5 +28,8 @@ resposta <- datajud_consultar_processo(
   cliente = cliente
 )
 datajud_ler_processo(resposta)
+
+pesquisa <- datajud_pesquisar_processos("TJSP", classe_codigo = 1116)
+datajud_ler_processo(pesquisa$hits)
 }
 }

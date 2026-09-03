@@ -1,5 +1,9 @@
 # datajud 0.0.0.9000
 
+* `datajud_pesquisar_classe_orgao()` foi removida. Use
+  `datajud_pesquisar_processos()` com os mesmos argumentos `tribunal`,
+  `classe_codigo`, `orgao_codigo`, `size` e, quando necessário, `cliente`. A
+  nova função retorna `datajud_resultado`; os hits brutos ficam em `$hits`.
 * Funções públicas de consulta agora mantêm `cliente = NULL` como último
   argumento e criam um cliente transitório quando ele é omitido. O uso antigo
   do cliente como segundo argumento continua temporariamente disponível com
@@ -38,8 +42,6 @@
 * `datajud_login()` foi removida. Configure a chave por argumento ou pela
   variável `DATAJUD_API_KEY`; na ausência de ambas, o pacote consulta a chave
   pública na Wiki do CNJ e possui uma cópia vigente como contingência.
-* `datajud_consultar_processo()` e `datajud_pesquisar_classe_orgao()` agora
-  exigem um `cliente` explícito e retornam os resultados diretamente.
 * `datajud_ler_processo()` e `datajud_ler_movimentacoes()` agora exigem a lista
   de respostas em `base`, retornam tibbles diretamente e não imprimem o objeto.
 * A leitura de processos preserva o `id` como chave interna, mantém assuntos

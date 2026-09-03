@@ -119,6 +119,44 @@ resultados <- datajud_pesquisar_processos(
 )
 ```
 
+### Migração da pesquisa antiga
+
+`datajud_pesquisar_classe_orgao()` foi removida enquanto o pacote ainda está
+em fase experimental. A substituição direta é `datajud_pesquisar_processos()`:
+
+| Argumento antigo | Argumento atual | Observação |
+| --- | --- | --- |
+| `tribunal` | `tribunal` | Mantém a sigla do tribunal. |
+| `classe_codigo` | `classe_codigo` | Aceita um único código de classe. |
+| `orgao_codigo` | `orgao_codigo` | Mantém um ou mais códigos de órgão. |
+| `size` | `size` | Mantém o limite de 1 a 10.000 resultados por página. |
+| `cliente` | `cliente` | Agora é opcional e, quando usado, deve ser o último argumento. |
+
+```{r, eval = FALSE}
+# Antes:
+# datajud_pesquisar_classe_orgao(
+#   tribunal = "TJRJ", cliente = cliente,
+#   classe_codigo = 1116, orgao_codigo = 13597, size = 500
+# )
+
+# Agora:
+resultado <- datajud_pesquisar_processos(
+  tribunal = "TJRJ",
+  classe_codigo = 1116,
+  orgao_codigo = 13597,
+  size = 500
+)
+
+# Os leitores recebem os hits, não o objeto de resultado inteiro:
+processos <- datajud_ler_processo(resultado$hits)
+```
+
+A função antiga devolvia diretamente a lista de hits. A nova função devolve
+um `datajud_resultado`, que também preserva metadados, consulta e cursor. Para
+obter apenas a estrutura antiga, use `resultado$hits`; para análise tabular,
+use `tibble::as_tibble(resultado)`. Nesta versão, os leitores também recebem
+`resultado$hits`, como no exemplo, e não o objeto `datajud_resultado` inteiro.
+
 ## Leitura dos resultados
 
 Os leitores recebem os resultados explicitamente e retornam tibbles. Assuntos

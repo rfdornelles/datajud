@@ -1,8 +1,7 @@
 test_that("cliente é o último argumento opcional das consultas públicas", {
   funcoes <- c(
     "datajud_consultar_processo",
-    "datajud_pesquisar_processos",
-    "datajud_pesquisar_classe_orgao"
+    "datajud_pesquisar_processos"
   )
 
   for (nome in funcoes) {
@@ -121,16 +120,6 @@ test_that("posição antiga do cliente funciona com aviso de depreciação", {
   expect_s3_class(resultado, "datajud_resultado")
 
   expect_warning(
-    legado <- datajud::datajud_pesquisar_classe_orgao(
-      "TJSP",
-      cliente,
-      classe_codigo = 1116
-    ),
-    class = "datajud_aviso_cliente_posicional"
-  )
-  expect_length(legado, 2L)
-
-  expect_warning(
     processo <- datajud::datajud_consultar_processo(
       "0000102-03.2004.8.26.0000",
       cliente,
@@ -187,7 +176,7 @@ test_that("argumentos nomeados desconhecidos identificam o possível erro", {
     "Argumento nomeado desconhecido.*sleeep"
   )
   expect_error(
-    datajud::datajud_pesquisar_classe_orgao(
+    datajud::datajud_pesquisar_processos(
       "TJSP",
       filtro = 1,
       limite = 100,
