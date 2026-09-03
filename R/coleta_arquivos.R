@@ -220,13 +220,19 @@ resultado_coleta_datajud <- function(manifesto, diretorio,
       diretorio = diretorio,
       manifesto = caminho_manifesto,
       arquivos = unname(arquivos),
+      consulta = sanitizar_consulta_datajud(manifesto$consulta),
+      paginas = manifesto$paginas,
       metadados = list(
+        tribunal = manifesto$tribunal,
+        versao_esquema = as.integer(manifesto$versao_esquema),
         estado = manifesto$estado,
         registros = as.integer(manifesto$contagens$registros),
         paginas = as.integer(manifesto$contagens$paginas),
         requisicoes = as.integer(manifesto$contagens$requisicoes),
         proximo_cursor = manifesto$proximo_cursor,
-        falha = manifesto$falha
+        falha = manifesto$falha,
+        criado_em = manifesto$criado_em,
+        atualizado_em = manifesto$atualizado_em
       )
     ),
     class = "datajud_coleta"

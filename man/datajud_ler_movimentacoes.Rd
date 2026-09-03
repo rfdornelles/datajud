@@ -7,7 +7,8 @@
 datajud_ler_movimentacoes(base)
 }
 \arguments{
-\item{base}{Lista contendo os dados dos processos retornados pela API.}
+\item{base}{Lista contendo os dados retornados pela API ou objeto
+\code{datajud_resultado} criado por uma pesquisa ou pela leitura de uma página.}
 }
 \value{
 Um tibble consolidado com uma linha por movimentação. Quando nenhum

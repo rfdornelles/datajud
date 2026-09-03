@@ -67,3 +67,17 @@ Nenhum arquivo incompatível é sobrescrito automaticamente.
 
 O manifesto nunca armazena a chave pública, headers de autenticação ou o objeto
 do cliente HTTP. Mensagens de falha também removem a chave antes da gravação.
+
+## Abertura e materialização
+
+`datajud_abrir_coleta()` lê o manifesto, valida a estrutura e a integridade dos
+arquivos e retorna apenas caminhos, consulta sanitizada e metadados. Os hits
+continuam fora da memória. `print.datajud_coleta()` opera exclusivamente sobre
+esses metadados e não abre qualquer página NDJSON.
+
+`datajud_ler_pagina()` é a fronteira explícita de materialização: ela confere o
+checksum e lê somente o arquivo da página solicitada. O retorno é um
+`datajud_resultado`, portanto pode seguir para `tibble::as_tibble()`,
+`datajud_ler_processo()` ou `datajud_ler_movimentacoes()` sem conversões
+intermediárias. O pacote não fornece leitura implícita de todas as páginas; uma
+iteração completa precisa declarar cada página e controlar o volume em memória.
