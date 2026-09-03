@@ -152,6 +152,20 @@ resolver_cliente_posicional <- function(argumentos, cliente, funcao) {
   if (is.null(nomes)) {
     nomes <- rep("", length(argumentos))
   }
+  argumentos_nomeados <- nomes[nzchar(nomes)]
+  if (length(argumentos_nomeados) > 0L) {
+    rotulo <- if (length(argumentos_nomeados) == 1L) {
+      "Argumento nomeado desconhecido"
+    } else {
+      "Argumentos nomeados desconhecidos"
+    }
+    cli::cli_abort(
+      paste0(
+        rotulo, " em ", funcao, "(): ",
+        paste(argumentos_nomeados, collapse = ", "), "."
+      )
+    )
+  }
   cliente_legado <- length(argumentos) == 1L &&
     !nzchar(nomes[[1]]) &&
     inherits(argumentos[[1]], "datajud_cliente")

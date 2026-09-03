@@ -40,8 +40,6 @@ possível informar a chave diretamente ou pela variável de ambiente
 cliente: as funções criam um cliente transitório automaticamente.
 
 ``` r
-cliente <- datajud_cliente()
-
 # Alternativas explícitas:
 cliente <- datajud_cliente(api_key = "chave-publicada-pelo-cnj")
 Sys.setenv(DATAJUD_API_KEY = "chave-publicada-pelo-cnj")

@@ -165,6 +165,39 @@ test_that("argumentos posicionais ambíguos produzem erro acionável", {
   )
 })
 
+test_that("argumentos nomeados desconhecidos identificam o possível erro", {
+  cliente <- datajud::datajud_cliente(chave_publica_teste())
+
+  expect_error(
+    datajud::datajud_pesquisar_processos(
+      "TJSP",
+      tribunall = "TJSP",
+      assunto_codigo = 899,
+      cliente = cliente
+    ),
+    "Argumento nomeado desconhecido.*tribunall"
+  )
+  expect_error(
+    datajud::datajud_consultar_processo(
+      "0000102-03.2004.8.26.0000",
+      sleeep = 0,
+      tribunal = "TJSP",
+      cliente = cliente
+    ),
+    "Argumento nomeado desconhecido.*sleeep"
+  )
+  expect_error(
+    datajud::datajud_pesquisar_classe_orgao(
+      "TJSP",
+      filtro = 1,
+      limite = 100,
+      classe_codigo = 1116,
+      cliente = cliente
+    ),
+    "Argumentos nomeados desconhecidos.*filtro, limite"
+  )
+})
+
 test_that("cliente implícito não cria objetos no ambiente global", {
   withr::local_envvar(
     DATAJUD_API_KEY = chave_publica_teste(),

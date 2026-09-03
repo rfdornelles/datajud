@@ -51,8 +51,6 @@ simples, não é necessário criar um cliente: as funções criam um cliente
 transitório automaticamente.
 
 ```{r, eval = FALSE}
-cliente <- datajud_cliente()
-
 # Alternativas explícitas:
 cliente <- datajud_cliente(api_key = "chave-publicada-pelo-cnj")
 Sys.setenv(DATAJUD_API_KEY = "chave-publicada-pelo-cnj")
