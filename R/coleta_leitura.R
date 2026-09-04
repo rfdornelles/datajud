@@ -61,9 +61,10 @@ validar_numero_pagina_coleta <- function(pagina, total) {
 
 #' Abrir uma coleta do Datajud gravada em disco
 #'
-#' Lê e valida o manifesto e devolve um objeto leve com caminhos e metadados.
-#' Os hits dos arquivos NDJSON não são materializados. Para ler somente uma
-#' página, use [datajud_ler_pagina()].
+#' Lê e valida a estrutura do manifesto, os caminhos e a ausência de páginas
+#' órfãs. A função não lê o conteúdo dos arquivos NDJSON nem recalcula todos os
+#' checksums. Para validar e materializar somente uma página, use
+#' [datajud_ler_pagina()].
 #'
 #' @param diretorio Diretório que contém `manifesto.json` e as páginas NDJSON.
 #'
@@ -115,8 +116,19 @@ datajud_abrir_coleta <- function(diretorio) {
     manifesto,
     diretorio,
     tribunal,
-    manifesto$consulta_hash
+    manifesto$consulta_hash,
+    verificar_checksums = FALSE
   )
+  orfaos <- listar_paginas_orfas(manifesto, diretorio)
+  if (length(orfaos) > 0L) {
+    abortar_coleta_datajud(
+      paste0(
+        "A coleta cont\u00E9m p\u00E1gina NDJSON n\u00E3o registrada no manifesto. ",
+        "Retome-a com {.fun datajud_coletar_processos} antes de abri-la."
+      ),
+      "datajud_erro_coleta_integridade"
+    )
+  }
   resultado_coleta_datajud(manifesto, diretorio, caminho_manifesto)
 }
 

@@ -2,7 +2,8 @@
 
 * `datajud_abrir_coleta()` reabre coletas gravadas sem materializar hits, e
   `datajud_ler_pagina()` lê explicitamente um único arquivo NDJSON como
-  `datajud_resultado`.
+  `datajud_resultado`. A abertura rejeita páginas órfãs e adia a validação do
+  conteúdo e do checksum para a leitura da página selecionada.
 * Objetos `datajud_coleta` e `datajud_resultado` agora têm invariantes
   centralizadas e impressão compacta. Os leitores de processos e movimentações
   aceitam diretamente resultados de pesquisa ou páginas de uma coleta, mas

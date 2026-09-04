@@ -115,8 +115,7 @@ atualizar_contagens_manifesto <- function(manifesto) {
   manifesto
 }
 
-reconciliar_paginas_orfas <- function(manifesto, diretorio,
-                                       caminho_manifesto) {
+listar_paginas_orfas <- function(manifesto, diretorio) {
   arquivos <- list.files(
     diretorio,
     pattern = "^pagina-[0-9]{6,}\\.ndjson$",
@@ -127,7 +126,12 @@ reconciliar_paginas_orfas <- function(manifesto, diretorio,
     function(pagina) pagina$arquivo,
     character(1)
   )
-  orfaos <- setdiff(arquivos, referenciados)
+  setdiff(arquivos, referenciados)
+}
+
+reconciliar_paginas_orfas <- function(manifesto, diretorio,
+                                       caminho_manifesto) {
+  orfaos <- listar_paginas_orfas(manifesto, diretorio)
   if (length(orfaos) > 0L && identical(manifesto$estado, "completa")) {
     abortar_coleta_datajud(
       "Uma coleta completa n\u00E3o pode conter p\u00E1ginas \u00F3rf\u00E3s.",

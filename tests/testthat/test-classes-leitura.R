@@ -18,27 +18,38 @@ resposta_classes_leitura <- function(ids, inicio, total = 4L) {
   ))
 }
 
+resposta_http_classes_leitura <- function(corpo) {
+  httr2::response(
+    status_code = 200,
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw(jsonlite::toJSON(
+      corpo,
+      auto_unbox = TRUE,
+      null = "null"
+    ))
+  )
+}
+
 criar_coleta_classes_leitura <- function(diretorio) {
   respostas <- list(
     resposta_classes_leitura(c("id-1", "id-2"), 1000L),
     resposta_classes_leitura(c("id-3", "id-4"), 2000L)
   )
   chamada <- 0L
-  testthat::local_mocked_bindings(
+  testthat::with_mocked_bindings(
+    datajud::datajud_coletar_processos(
+      "TJSP",
+      diretorio,
+      assunto_codigo = 899,
+      size = 2,
+      pausa = 0,
+      cliente = datajud::datajud_cliente(chave_publica_teste())
+    ),
     requisitar_api_datajud = function(cliente, endpoint, query) {
       chamada <<- chamada + 1L
       respostas[[chamada]]
     },
-    .package = "datajud",
-    .env = parent.frame()
-  )
-  datajud::datajud_coletar_processos(
-    "TJSP",
-    diretorio,
-    assunto_codigo = 899,
-    size = 2,
-    pausa = 0,
-    cliente = datajud::datajud_cliente(chave_publica_teste())
+    .package = "datajud"
   )
 }
 
@@ -107,11 +118,15 @@ test_that("resultado em memória e página têm conversões equivalentes", {
   diretorio <- withr::local_tempdir()
   coleta <- criar_coleta_classes_leitura(diretorio)
   pagina <- datajud::datajud_ler_pagina(coleta, 1)
-  construir <- getFromNamespace("construir_datajud_resultado", "datajud")
-  resultado <- construir(
-    pagina$hits,
-    pagina$consulta,
-    pagina$metadados
+  corpo <- resposta_classes_leitura(c("id-1", "id-2"), 1000L)
+  httr2::local_mocked_responses(function(req) {
+    resposta_http_classes_leitura(corpo)
+  })
+  resultado <- datajud::datajud_pesquisar_processos(
+    "TJSP",
+    assunto_codigo = 899,
+    size = 2,
+    cliente = datajud::datajud_cliente(chave_publica_teste())
   )
 
   expect_identical(
@@ -188,6 +203,60 @@ test_that("abertura e seleção de página rejeitam entradas inválidas", {
   expect_error(
     datajud::datajud_ler_pagina(metadados_incompativeis, 1),
     "não corresponde aos metadados"
+  )
+})
+
+test_that("abertura detecta páginas órfãs em qualquer estado", {
+  for (estado in c("completa", "parcial", "em_andamento")) {
+    diretorio <- withr::local_tempdir()
+    coleta <- criar_coleta_classes_leitura(diretorio)
+    manifesto <- jsonlite::read_json(
+      coleta$manifesto,
+      simplifyVector = FALSE
+    )
+    if (!identical(estado, "completa")) {
+      manifesto$estado <- estado
+      manifesto["proximo_cursor"] <- list(
+        manifesto$paginas[[length(manifesto$paginas)]]$proximo_cursor
+      )
+      manifesto$motivo_termino <- NULL
+      jsonlite::write_json(
+        manifesto,
+        coleta$manifesto,
+        auto_unbox = TRUE,
+        null = "null",
+        na = "null",
+        digits = NA,
+        pretty = TRUE
+      )
+    }
+    writeLines(
+      "{}",
+      file.path(diretorio, "pagina-000003.ndjson"),
+      useBytes = TRUE
+    )
+
+    expect_error(
+      datajud::datajud_abrir_coleta(diretorio),
+      "página NDJSON não registrada.*Retome-a",
+      class = "datajud_erro_coleta_integridade",
+      info = paste("estado:", estado)
+    )
+  }
+})
+
+test_that("abertura adia checksum do conteúdo para a leitura da página", {
+  diretorio <- withr::local_tempdir()
+  coleta <- criar_coleta_classes_leitura(diretorio)
+  writeLines("conteúdo alterado", coleta$arquivos[[1]], useBytes = TRUE)
+
+  aberta <- datajud::datajud_abrir_coleta(diretorio)
+
+  expect_s3_class(aberta, "datajud_coleta")
+  expect_error(
+    datajud::datajud_ler_pagina(aberta, 1),
+    "checksum inválido",
+    class = "datajud_erro_coleta_integridade"
   )
 })
 

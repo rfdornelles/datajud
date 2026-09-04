@@ -157,7 +157,8 @@ ler_manifesto_coleta <- function(caminho) {
   )
 }
 
-validar_checksum_pagina <- function(pagina, diretorio) {
+validar_checksum_pagina <- function(pagina, diretorio,
+                                     verificar_conteudo = TRUE) {
   arquivo <- pagina$arquivo
   valido <- is.character(arquivo) &&
     length(arquivo) == 1L &&
@@ -177,7 +178,8 @@ validar_checksum_pagina <- function(pagina, diretorio) {
     !is.na(checksum) &&
     grepl("^[a-f0-9]{32}$", checksum)
   if (!file.exists(caminho) || !checksum_valido ||
-      !identical(unname(tools::md5sum(caminho)), checksum)) {
+      (verificar_conteudo &&
+       !identical(unname(tools::md5sum(caminho)), checksum))) {
     abortar_coleta_datajud(
       paste0(
         "A p\u00E1gina ", arquivo,
@@ -206,7 +208,8 @@ normalizar_cursor_manifesto <- function(cursor, contexto) {
 }
 
 validar_pagina_manifesto <- function(pagina, indice, diretorio,
-                                      cursor_esperado) {
+                                      cursor_esperado,
+                                      verificar_checksums = TRUE) {
   obrigatorios <- c(
     "numero", "arquivo", "registros", "primeiro_id", "ultimo_id",
     "cursor_utilizado", "proximo_cursor", "checksum_md5", "recuperada"
@@ -263,12 +266,17 @@ validar_pagina_manifesto <- function(pagina, indice, diretorio,
       "datajud_erro_coleta_integridade"
     )
   }
-  validar_checksum_pagina(pagina, diretorio)
+  validar_checksum_pagina(
+    pagina,
+    diretorio,
+    verificar_conteudo = verificar_checksums
+  )
   list(registros = as.integer(registros), proximo_cursor = proximo_cursor)
 }
 
 validar_manifesto_coleta <- function(manifesto, diretorio, tribunal,
-                                      consulta_hash) {
+                                      consulta_hash,
+                                      verificar_checksums = TRUE) {
   obrigatorios <- c(
     "versao_esquema", "tribunal", "consulta", "consulta_hash",
     "estado", "paginas", "contagens", "proximo_cursor"
@@ -329,7 +337,8 @@ validar_manifesto_coleta <- function(manifesto, diretorio, tribunal,
       paginas[[indice]],
       indice,
       diretorio,
-      cursor_esperado
+      cursor_esperado,
+      verificar_checksums = verificar_checksums
     )
     registros_paginas[[indice]] <- validada$registros
     cursor_esperado <- validada$proximo_cursor

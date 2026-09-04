@@ -13,9 +13,10 @@ datajud_abrir_coleta(diretorio)
 Objeto \code{datajud_coleta}, sem hits em memória e sem credenciais.
 }
 \description{
-Lê e valida o manifesto e devolve um objeto leve com caminhos e metadados.
-Os hits dos arquivos NDJSON não são materializados. Para ler somente uma
-página, use \code{\link[=datajud_ler_pagina]{datajud_ler_pagina()}}.
+Lê e valida a estrutura do manifesto, os caminhos e a ausência de páginas
+órfãs. A função não lê o conteúdo dos arquivos NDJSON nem recalcula todos os
+checksums. Para validar e materializar somente uma página, use
+\code{\link[=datajud_ler_pagina]{datajud_ler_pagina()}}.
 }
 \examples{
 \dontrun{

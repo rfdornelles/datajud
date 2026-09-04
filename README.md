@@ -191,11 +191,12 @@ boa opção para a etapa posterior de análise; aqui, NDJSON funciona como
 formato transacional e retomável da coleta.
 
 `print(coleta)` usa apenas os metadados já presentes no objeto e não
-abre os arquivos NDJSON. `datajud_abrir_coleta()` valida o manifesto e
-os arquivos, mas continua sem materializar hits. A materialização
-acontece explicitamente em `datajud_ler_pagina(coleta, numero)`, sempre
-para uma única página. Não existe uma operação implícita que leia a
-coleta inteira para a memória.
+abre os arquivos NDJSON. `datajud_abrir_coleta()` valida a estrutura, a
+existência dos arquivos e a ausência de páginas órfãs sem ler o conteúdo
+de todas as páginas. O checksum e a materialização acontecem
+explicitamente em `datajud_ler_pagina(coleta, numero)`, sempre para uma
+única página. Não existe uma operação implícita que leia a coleta
+inteira para a memória.
 
 ### Migração da pesquisa antiga
 
