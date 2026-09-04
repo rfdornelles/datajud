@@ -106,6 +106,122 @@ extrair_cursor_resultado <- function(hit) {
   )
 }
 
+construir_datajud_resultado <- function(hits, consulta, metadados) {
+  if (!is.list(hits)) {
+    abortar_resposta_pesquisa(
+      "Os hits do resultado devem ser armazenados em uma lista."
+    )
+  }
+  extrair_ids_hits(hits)
+  if (!is.list(consulta)) {
+    abortar_resposta_pesquisa(
+      "A consulta do resultado deve ser armazenada em uma lista."
+    )
+  }
+
+  campos <- c(
+    "tribunal", "total_valor", "total_relacao", "quantidade_recebida",
+    "cursor_utilizado", "proximo_cursor"
+  )
+  if (!is.list(metadados) || !all(campos %in% names(metadados))) {
+    abortar_resposta_pesquisa(
+      "Os metadados do resultado est\u00E3o incompletos."
+    )
+  }
+  total_valido <- is.numeric(metadados$total_valor) &&
+    length(metadados$total_valor) == 1L &&
+    is.finite(metadados$total_valor) &&
+    metadados$total_valor >= 0 &&
+    metadados$total_valor == floor(metadados$total_valor)
+  quantidade_valida <- is.numeric(metadados$quantidade_recebida) &&
+    length(metadados$quantidade_recebida) == 1L &&
+    identical(
+      as.integer(metadados$quantidade_recebida),
+      as.integer(length(hits))
+    )
+  if (!total_valido ||
+      !identical(metadados$total_relacao %in% c("eq", "gte"), TRUE) ||
+      !quantidade_valida) {
+    abortar_resposta_pesquisa(
+      paste0(
+        "As contagens do resultado s\u00E3o inv\u00E1lidas ou ",
+        "incompat\u00EDveis com os hits."
+      )
+    )
+  }
+  if (!"pagina" %in% names(metadados)) {
+    metadados$pagina <- NA_integer_
+  }
+  tribunal_valido <- is.character(metadados$tribunal) &&
+    length(metadados$tribunal) == 1L &&
+    !is.na(metadados$tribunal) &&
+    nzchar(metadados$tribunal)
+  pagina_valida <- is.numeric(metadados$pagina) &&
+    length(metadados$pagina) == 1L &&
+    (is.na(metadados$pagina) ||
+       (is.finite(metadados$pagina) &&
+          metadados$pagina >= 1 &&
+          metadados$pagina == floor(metadados$pagina)))
+  if (!tribunal_valido || !pagina_valida ||
+      metadados$total_valor < length(hits)) {
+    abortar_resposta_pesquisa(
+      paste0(
+        "Os metadados de tribunal, p\u00E1gina ou total do resultado ",
+        "s\u00E3o inv\u00E1lidos."
+      )
+    )
+  }
+  metadados["cursor_utilizado"] <- list(normalizar_cursor_datajud(
+    metadados$cursor_utilizado
+  ))
+  metadados["proximo_cursor"] <- list(normalizar_cursor_datajud(
+    metadados$proximo_cursor
+  ))
+  cursor_esperado <- if (length(hits) == 0L) {
+    NULL
+  } else {
+    extrair_cursor_resultado(hits[[length(hits)]])
+  }
+  if (!identical(metadados$proximo_cursor, cursor_esperado)) {
+    abortar_resposta_pesquisa(
+      paste0(
+        "O pr\u00F3ximo cursor do resultado n\u00E3o corresponde ao ",
+        "\u00FAltimo hit."
+      )
+    )
+  }
+
+  structure(
+    list(
+      hits = hits,
+      consulta = sanitizar_consulta_datajud(consulta),
+      metadados = metadados
+    ),
+    class = "datajud_resultado"
+  )
+}
+
+validar_datajud_resultado <- function(x) {
+  if (!inherits(x, "datajud_resultado") ||
+      !is.list(x) ||
+      !all(c("hits", "consulta", "metadados") %in% names(x))) {
+    abortar_resposta_pesquisa(
+      "O objeto `datajud_resultado` \u00E9 inv\u00E1lido."
+    )
+  }
+  resultado <- construir_datajud_resultado(
+    x$hits,
+    x$consulta,
+    x$metadados
+  )
+  if (!identical(resultado$consulta, x$consulta)) {
+    abortar_resposta_pesquisa(
+      "O resultado cont\u00E9m dados sens\u00EDveis em sua consulta."
+    )
+  }
+  invisible(x)
+}
+
 novo_datajud_resultado <- function(resposta, tribunal, consulta,
                                    pagina = NULL) {
   hits <- purrr::pluck(resposta, "hits", "hits", .default = NULL)
@@ -141,21 +257,18 @@ novo_datajud_resultado <- function(resposta, tribunal, consulta,
     pagina <- if (is.null(cursor_utilizado)) 1L else NA_integer_
   }
 
-  structure(
-    list(
-      hits = hits,
-      consulta = sanitizar_consulta_datajud(consulta),
-      metadados = list(
-        tribunal = tribunal,
-        total_valor = total$valor,
-        total_relacao = total$relacao,
-        quantidade_recebida = length(hits),
-        pagina = pagina,
-        cursor_utilizado = cursor_utilizado,
-        proximo_cursor = proximo_cursor
-      )
-    ),
-    class = "datajud_resultado"
+  construir_datajud_resultado(
+    hits = hits,
+    consulta = consulta,
+    metadados = list(
+      tribunal = tribunal,
+      total_valor = total$valor,
+      total_relacao = total$relacao,
+      quantidade_recebida = length(hits),
+      pagina = pagina,
+      cursor_utilizado = cursor_utilizado,
+      proximo_cursor = proximo_cursor
+    )
   )
 }
 
@@ -167,6 +280,7 @@ novo_datajud_resultado <- function(resposta, tribunal, consulta,
 #' @return O próprio objeto, invisivelmente.
 #' @export
 print.datajud_resultado <- function(x, ...) {
+  validar_datajud_resultado(x)
   total <- if (identical(x$metadados$total_relacao, "gte")) {
     paste("pelo menos", x$metadados$total_valor)
   } else {
@@ -207,6 +321,7 @@ print.datajud_resultado <- function(x, ...) {
 #' @return Tibble com as colunas `id`, `numero_processo` e `dados`.
 #' @export
 as_tibble.datajud_resultado <- function(x, ...) {
+  validar_datajud_resultado(x)
   fontes <- lapply(
     x$hits,
     function(hit) purrr::pluck(hit, "_source", .default = list())

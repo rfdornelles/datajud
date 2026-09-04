@@ -7,17 +7,17 @@
 datajud_ler_processo(base)
 }
 \arguments{
-\item{base}{Lista de respostas de processos retornadas pela API. Para uma
-pesquisa geral, informe \code{resultado$hits}.}
+\item{base}{Lista de respostas retornadas pela API ou objeto
+\code{datajud_resultado}.}
 }
 \value{
 Um tibble contendo os metadados dos processos.
 }
 \description{
-Lê a lista retornada por \code{\link[=datajud_consultar_processo]{datajud_consultar_processo()}} ou a lista de hits
-em \code{resultado$hits}, quando \code{resultado} foi criado por
-\code{\link[=datajud_pesquisar_processos]{datajud_pesquisar_processos()}}. O objeto \code{datajud_resultado} inteiro não é
-uma entrada válida nesta versão.
+Lê a lista retornada por \code{\link[=datajud_consultar_processo]{datajud_consultar_processo()}} ou um objeto
+\code{datajud_resultado} criado por \code{\link[=datajud_pesquisar_processos]{datajud_pesquisar_processos()}} ou
+\code{\link[=datajud_ler_pagina]{datajud_ler_pagina()}}. Uma \code{datajud_coleta} inteira não é materializada
+implicitamente.
 }
 \examples{
 \dontrun{
@@ -30,6 +30,6 @@ resposta <- datajud_consultar_processo(
 datajud_ler_processo(resposta)
 
 pesquisa <- datajud_pesquisar_processos("TJSP", classe_codigo = 1116)
-datajud_ler_processo(pesquisa$hits)
+datajud_ler_processo(pesquisa)
 }
 }

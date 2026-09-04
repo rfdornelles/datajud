@@ -1,5 +1,26 @@
 ## Funções auxiliares e de alto nível para leitura dos dados do Datajud
 
+normalizar_base_leitura <- function(base) {
+  if (inherits(base, "datajud_resultado")) {
+    validar_datajud_resultado(base)
+    return(base$hits)
+  }
+  if (inherits(base, "datajud_coleta")) {
+    cli::cli_abort(c(
+      "Uma coleta completa n\u00E3o \u00E9 materializada implicitamente.",
+      "i" = paste0(
+        "Use {.fun datajud_ler_pagina} e forne\u00E7a a p\u00E1gina ao leitor."
+      )
+    ))
+  }
+  if (!is.list(base)) {
+    cli::cli_abort(
+      "{.arg base} deve ser uma lista ou um objeto `datajud_resultado`."
+    )
+  }
+  base
+}
+
 esquema_movimentos_vazio <- function() {
   tibble::tibble(
     tribunal = character(), numero_processo = character(),
@@ -152,12 +173,12 @@ datajud_desaninhar_assuntos <- function(dados) {
 
 #' Lê os dados de processos retornados pelo Datajud
 #'
-#' Lê a lista retornada por [datajud_consultar_processo()] ou a lista de hits
-#' em `resultado$hits`, quando `resultado` foi criado por
-#' [datajud_pesquisar_processos()]. O objeto `datajud_resultado` inteiro não é
-#' uma entrada válida nesta versão.
-#' @param base Lista de respostas de processos retornadas pela API. Para uma
-#'   pesquisa geral, informe `resultado$hits`.
+#' Lê a lista retornada por [datajud_consultar_processo()] ou um objeto
+#' `datajud_resultado` criado por [datajud_pesquisar_processos()] ou
+#' [datajud_ler_pagina()]. Uma `datajud_coleta` inteira não é materializada
+#' implicitamente.
+#' @param base Lista de respostas retornadas pela API ou objeto
+#'   `datajud_resultado`.
 #'
 #' @return Um tibble contendo os metadados dos processos.
 #'
@@ -174,15 +195,12 @@ datajud_desaninhar_assuntos <- function(dados) {
 #' datajud_ler_processo(resposta)
 #'
 #' pesquisa <- datajud_pesquisar_processos("TJSP", classe_codigo = 1116)
-#' datajud_ler_processo(pesquisa$hits)
+#' datajud_ler_processo(pesquisa)
 #' }
 
 
 datajud_ler_processo <- function(base) {
-
-  if (!is.list(base)) {
-    stop("base deve ser uma lista de respostas do Datajud")
-  }
+  base <- normalizar_base_leitura(base)
 
 # retornando os metadados do processo
   resposta <- purrr::map_df(
@@ -207,7 +225,8 @@ datajud_ler_processo <- function(base) {
 #' de processos fornecida diretamente.
 #' É ideal para análises detalhadas das etapas processuais e suas características.
 #'
-#' @param base Lista contendo os dados dos processos retornados pela API.
+#' @param base Lista contendo os dados retornados pela API ou objeto
+#'   `datajud_resultado` criado por uma pesquisa ou pela leitura de uma página.
 #'
 #' @return Um tibble consolidado com uma linha por movimentação. Quando nenhum
 #'   processo possui movimentações, retorna um tibble vazio com esquema estável.
@@ -227,10 +246,7 @@ datajud_ler_processo <- function(base) {
 #' }
 
 datajud_ler_movimentacoes <- function(base) {
-
-  if (!is.list(base)) {
-    stop("base deve ser uma lista de respostas do Datajud")
-  }
+  base <- normalizar_base_leitura(base)
 
   # retornando os metadados do processo
   resposta <- purrr::map_df(

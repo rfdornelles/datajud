@@ -159,6 +159,13 @@ coleta <- datajud_coletar_processos(
 
 coleta$arquivos
 coleta$manifesto
+
+# Em uma nova sessão, reabra somente o manifesto e os metadados:
+coleta <- datajud_abrir_coleta("dados/tjsp-assunto-899")
+
+# Somente este arquivo NDJSON é materializado:
+pagina_1 <- datajud_ler_pagina(coleta, 1)
+processos_1 <- datajud_ler_processo(pagina_1)
 ```
 
 Cada página concluída é gravada primeiro em um arquivo temporário e
@@ -182,6 +189,14 @@ toda a coleta. O formato também é simples, interoperável e não exige
 Arrow como dependência do pacote. Formatos colunares continuam sendo uma
 boa opção para a etapa posterior de análise; aqui, NDJSON funciona como
 formato transacional e retomável da coleta.
+
+`print(coleta)` usa apenas os metadados já presentes no objeto e não
+abre os arquivos NDJSON. `datajud_abrir_coleta()` valida a estrutura, a
+existência dos arquivos e a ausência de páginas órfãs sem ler o conteúdo
+de todas as páginas. O checksum e a materialização acontecem
+explicitamente em `datajud_ler_pagina(coleta, numero)`, sempre para uma
+única página. Não existe uma operação implícita que leia a coleta
+inteira para a memória.
 
 ### Migração da pesquisa antiga
 
@@ -212,16 +227,17 @@ resultado <- datajud_pesquisar_processos(
   size = 500
 )
 
-# Os leitores recebem os hits, não o objeto de resultado inteiro:
-processos <- datajud_ler_processo(resultado$hits)
+# Os leitores recebem diretamente o objeto de resultado:
+processos <- datajud_ler_processo(resultado)
 ```
 
 A função antiga devolvia diretamente a lista de hits. A nova função
 devolve um `datajud_resultado`, que também preserva metadados, consulta
 e cursor. Para obter apenas a estrutura antiga, use `resultado$hits`;
-para análise tabular, use `tibble::as_tibble(resultado)`. Nesta versão,
-os leitores também recebem `resultado$hits`, como no exemplo, e não o
-objeto `datajud_resultado` inteiro.
+para análise tabular, use `tibble::as_tibble(resultado)`. Os leitores
+aceitam tanto essa lista de hits quanto o próprio `datajud_resultado`,
+inclusive quando ele representa uma página aberta por
+`datajud_ler_pagina()`.
 
 ## Leitura dos resultados
 
@@ -233,6 +249,9 @@ processo.
 processos <- datajud_ler_processo(respostas)
 movimentacoes <- datajud_ler_movimentacoes(respostas)
 assuntos <- datajud_desaninhar_assuntos(processos)
+
+# Um resultado de pesquisa também pode ser fornecido diretamente:
+processos <- datajud_ler_processo(resultado)
 ```
 
 ## Contrato da API e cache da Wiki

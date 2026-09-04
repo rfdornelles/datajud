@@ -115,8 +115,7 @@ atualizar_contagens_manifesto <- function(manifesto) {
   manifesto
 }
 
-reconciliar_paginas_orfas <- function(manifesto, diretorio,
-                                       caminho_manifesto) {
+listar_paginas_orfas <- function(manifesto, diretorio) {
   arquivos <- list.files(
     diretorio,
     pattern = "^pagina-[0-9]{6,}\\.ndjson$",
@@ -127,7 +126,12 @@ reconciliar_paginas_orfas <- function(manifesto, diretorio,
     function(pagina) pagina$arquivo,
     character(1)
   )
-  orfaos <- setdiff(arquivos, referenciados)
+  setdiff(arquivos, referenciados)
+}
+
+reconciliar_paginas_orfas <- function(manifesto, diretorio,
+                                       caminho_manifesto) {
+  orfaos <- listar_paginas_orfas(manifesto, diretorio)
   if (length(orfaos) > 0L && identical(manifesto$estado, "completa")) {
     abortar_coleta_datajud(
       "Uma coleta completa n\u00E3o pode conter p\u00E1ginas \u00F3rf\u00E3s.",
@@ -220,13 +224,19 @@ resultado_coleta_datajud <- function(manifesto, diretorio,
       diretorio = diretorio,
       manifesto = caminho_manifesto,
       arquivos = unname(arquivos),
+      consulta = sanitizar_consulta_datajud(manifesto$consulta),
+      paginas = manifesto$paginas,
       metadados = list(
+        tribunal = manifesto$tribunal,
+        versao_esquema = as.integer(manifesto$versao_esquema),
         estado = manifesto$estado,
         registros = as.integer(manifesto$contagens$registros),
         paginas = as.integer(manifesto$contagens$paginas),
         requisicoes = as.integer(manifesto$contagens$requisicoes),
         proximo_cursor = manifesto$proximo_cursor,
-        falha = manifesto$falha
+        falha = manifesto$falha,
+        criado_em = manifesto$criado_em,
+        atualizado_em = manifesto$atualizado_em
       )
     ),
     class = "datajud_coleta"
