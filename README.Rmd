@@ -342,5 +342,9 @@ argumentos explícitos, funções composáveis, retornos previsíveis e testes
 reproduzíveis sem rede.
 
 Contribuições, sugestões e relatos de erro são bem-vindos. Consulte o
+[guia de contribuição](CONTRIBUTING.md), a
+[política de compatibilidade](COMPATIBILIDADE.md) e o
+[checklist de release](RELEASE.md). Revisão final, merge e publicação são
+responsabilidade do mantenedor. Consulte também o
 [roadmap](https://github.com/rfdornelles/datajud/issues?q=is%3Aissue+label%3Aroadmap)
 antes de propor mudanças maiores.

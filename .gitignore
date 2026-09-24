@@ -7,3 +7,7 @@
 draft/*
 .cache/datajud-wiki/
 .cache/tpu/
+.Renviron
+.env
+.env.*
+!.env.example

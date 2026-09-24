@@ -1,5 +1,9 @@
 # datajud 0.0.0.9000
 
+* Define guias de contribuição, compatibilidade após 1.0.0 e checklist de
+  release, com revisão e merge manuais pelo mantenedor. Versiona a configuração
+  de proteção da branch principal e adiciona auditoria de regras e links.
+
 * Adiciona quatro vinhetas sobre autenticação e erros, pesquisa e leitura,
   paginação e retomada, e o dicionário dos retornos. Exemplos sintéticos permitem
   executar os fluxos locais sem rede. O dicionário CSV é verificado contra os
