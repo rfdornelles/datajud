@@ -118,7 +118,9 @@ mantenedor ainda precisa revisar; não implica autorização para merge.
 
 A branch deve estar atualizada com `main`, com os checks `R 4.2` e
 `Medir cobertura no R 4.2` verdes e conversas resolvidas. O mantenedor revisa e
-realiza o merge manual. A configuração e a exceção para PRs de autoria do próprio
-mantenedor estão em [.github/rulesets/README.md](.github/rulesets/README.md).
+realiza o merge manual. A aprovação de CODEOWNERS é obrigatória no fluxo normal;
+o mantenedor pode integrar os próprios PRs usando sua exceção limitada a PRs,
+sempre com a CI aprovada. A configuração está em
+[.github/rulesets/README.md](.github/rulesets/README.md).
 O [checklist de release](RELEASE.md) é aplicado em uma branch de preparação;
 agentes não criam tags nem publicam releases.

@@ -37,9 +37,11 @@ def ler_configuracoes():
     exigir({"deletion", "non_fast_forward", "required_signatures", "pull_request"} <= regras.keys(),
            "Proteções existentes ausentes")
     pr = regras["pull_request"]["parameters"]
-    exigir(pr["required_approving_review_count"] >= 1 and pr["require_code_owner_review"]
-           and pr["dismiss_stale_reviews_on_push"] and pr["required_review_thread_resolution"],
-           "Revisão obrigatória incompleta")
+    exigir(pr["required_approving_review_count"] == 0 and pr["require_code_owner_review"]
+           and not pr["require_last_push_approval"]
+           and not pr["require_extra_approval_for_unattributed_changes"]
+           and not pr["required_reviewers"] and pr["required_review_thread_resolution"],
+           "CODEOWNERS deve ser obrigatório, sem aprovação genérica adicional; a exceção do mantenedor é por PR")
     for nome, config in configs.items():
         checks = next(r for r in config["rules"] if r["type"] == "required_status_checks")["parameters"]
         exigir(checks["strict_required_status_checks_policy"], f"CI deve exigir branch atualizada: {nome}")

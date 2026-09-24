@@ -8,9 +8,10 @@ configurações remotas automaticamente. Consulte os
 ## Regras e exceções
 
 - `protect.json` mantém as regras existentes de bloqueio de exclusão e force push,
-  commits assinados, revisão de CODEOWNERS, conversas resolvidas, CI e revisão
-  automática do Copilot. Exige uma aprovação e invalida aprovações após novos
-  commits. O único ator de bypass é `rfdornelles`, limitado a `pull_request`.
+  commits assinados, conversas resolvidas, CI e revisão automática do Copilot.
+  Exige PR e aprovação de CODEOWNERS. A contagem genérica é zero, sem exigir
+  aprovação adicional do último push ou de mudanças atribuídas ao Copilot.
+  O único ator de bypass é `rfdornelles`, limitado a `pull_request`.
 - `main-ci-obrigatoria.json` exige `R 4.2` e `Medir cobertura no R 4.2`, enviados
   pelo GitHub Actions (integration ID 15368), com branch atualizada. Sua lista de
   bypass é vazia: a exceção de `protect` não dispensa esses checks.
@@ -22,13 +23,14 @@ Rulesets que atingem a mesma branch são aplicados em conjunto. O modo de bypass
 [composição de regras](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)
 e a [configuração de bypass](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository).
 
-O GitHub não permite que alguém aprove seu próprio PR. Como o mantenedor é o
-único colaborador com escrita e pode ser autor dos PRs preparados com sua conta,
-ele conserva bypass de `protect` **somente em PRs**, após revisão manual do diff.
-Essa exceção abrange o ruleset `protect`, inclusive suas regras de aprovação e
-assinatura; não é uma aprovação técnica independente. A CI continua obrigatória
-pelo segundo ruleset. Para exigir revisão independente também nesses PRs, seria
-necessário outro revisor autorizado, fora do escopo desta entrega. Consulte as
+O GitHub não permite que alguém use “Approve” no próprio PR. A aprovação de
+`CODEOWNERS` continua obrigatória no fluxo normal. Para integrar seus próprios
+PRs, o mantenedor revisa o diff e usa sua exceção de `protect`, limitada ao fluxo
+de PR, com a CI aprovada. Essa exceção abrange as regras desse ruleset, inclusive
+aprovação e assinatura; a CI do segundo ruleset não tem bypass. Assim, os PRs
+de outros contribuidores exigem revisão de CODEOWNERS no fluxo normal, enquanto
+o mantenedor pode integrar os seus sem depender de autoaprovação.
+Consulte as
 [restrições de aprovação](https://docs.github.com/en/pull-requests/how-tos/review-pull-requests/approving-a-pull-request-with-required-reviews).
 
 Agente e pessoa usando a mesma credencial não são identidades distintas para o
