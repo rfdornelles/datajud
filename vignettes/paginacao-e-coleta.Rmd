@@ -1,0 +1,120 @@
+---
+title: "Paginação, coleta em disco e retomada"
+output:
+  rmarkdown::html_vignette:
+    mathjax: null
+vignette: >
+  %\VignetteIndexEntry{Paginação, coleta em disco e retomada}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(datajud)
+```
+
+## Percorrer páginas
+
+Uma [pesquisa](pesquisa-e-leitura.html) retorna uma página. A consulta ordena por
+`@timestamp` e `id.keyword`, ambos crescentes. O cursor é uma lista de dois
+valores: timestamp numérico em milissegundos e ID textual. Não o transforme em um
+vetor numérico nem monte cursores a partir do número do processo.
+
+```{r pagina-local}
+pagina <- readRDS(system.file("extdata", "exemplo-resultado.rds", package = "datajud"))
+pagina$metadados$proximo_cursor
+```
+
+A função seguinte preserva filtros e ordenação e faz no máximo uma requisição.
+Para não executar um laço ilimitado, escolha um máximo de páginas e interrompa
+quando receber `NULL` ou uma página vazia:
+
+```{r paginar-rede, eval=FALSE}
+cliente <- datajud_cliente()
+pagina <- datajud_pesquisar_processos("TJSP", assunto_codigo = 899,
+  size = 100, cliente = cliente)
+for (numero in seq_len(10)) {
+  if (is.null(pagina) || pagina$metadados$quantidade_recebida == 0L) break
+  processos <- datajud_ler_processo(pagina)
+  # Analise ou grave esta página aqui, antes de avançar.
+  if (numero < 10) {
+    pagina <- datajud_pesquisar_proxima_pagina(pagina, pausa = 0.5, cliente = cliente)
+  }
+}
+```
+
+`proximo_cursor` vem do último hit. Sua presença não garante que ainda existam
+resultados: uma requisição adicional pode retornar página vazia. Total `gte` é
+apenas limite inferior. O pacote interrompe cursor repetido ou IDs repetidos entre
+páginas consecutivas. O cursor não cria um snapshot remoto: atualizações na API
+podem alterar os resultados entre requisições.
+
+## Coletar em disco
+
+Para volumes maiores, `datajud_coletar_processos()` grava uma página por arquivo
+NDJSON, com um hit JSON por linha, e um manifesto. Mantém no máximo uma página de
+hits em memória. O retorno `datajud_coleta` contém caminhos e metadados.
+
+```{r coletar-rede, eval=FALSE}
+cliente <- datajud_cliente()
+coleta <- datajud_coletar_processos(
+  "TJSP", diretorio = "dados/tjsp-assunto-899", assunto_codigo = 899,
+  size = 100, limite_registros = 1000, limite_paginas = 20,
+  pausa = 0.5, cliente = cliente
+)
+coleta$metadados
+```
+
+Os limites padrão são 10.000 registros e 100 páginas. Eles limitam o total
+acumulado da coleta, incluindo o que já foi gravado. A última página pode ser
+menor para respeitar o limite de registros. Use um diretório exclusivo: uma pasta
+não vazia sem manifesto compatível é rejeitada.
+
+## Retomar após limite ou falha
+
+Uma falha de requisição preserva as páginas anteriores e registra o erro no
+manifesto. Para retomar, repita tribunal, filtros, `size` e diretório; aumente os
+limites se a interrupção foi causada por eles. `retomar = TRUE` é o padrão.
+Mudar filtros ou tamanho de página altera a consulta e exige outra pasta.
+
+```{r retomar-rede, eval=FALSE}
+coleta <- datajud_coletar_processos(
+  "TJSP", diretorio = "dados/tjsp-assunto-899", assunto_codigo = 899,
+  size = 100, limite_registros = 5000, limite_paginas = 60,
+  pausa = 0.5, retomar = TRUE, cliente = cliente
+)
+```
+
+A retomada verifica checksums e compatibilidade e tenta reconciliar uma página
+concluída que ainda não tenha sido registrada no manifesto. Uma coleta já completa
+é devolvida sem nova pesquisa. `retomar = FALSE` exige ausência de manifesto.
+Não edite manualmente cursores, checksums ou contagens para contornar erros.
+
+## Reabrir e ler somente uma página, offline
+
+A coleta sintética distribuída contém dois arquivos, com um processo em cada.
+Sua abertura não depende de cliente nem de rede:
+
+```{r reabrir-local}
+diretorio <- system.file("extdata", "exemplo-coleta", package = "datajud")
+coleta <- datajud_abrir_coleta(diretorio)
+coleta
+basename(coleta$arquivos)
+pagina_1 <- datajud_ler_pagina(coleta, 1)
+datajud_ler_processo(pagina_1)[c("id", "numero_processo")]
+```
+
+A abertura valida o manifesto, os caminhos e a ausência de páginas órfãs, sem
+carregar todos os hits nem recalcular todos os hashes. `datajud_ler_pagina()`
+valida o checksum e o conteúdo da página selecionada. Os leitores de processos e
+movimentos recebem essa página; não materializam uma coleta inteira implicitamente.
+A tentativa de ler página inexistente pode ser tratada sem rede:
+
+```{r erro-pagina}
+tryCatch(datajud_ler_pagina(coleta, 99),
+  datajud_erro_coleta_pagina = function(e) conditionMessage(e))
+```
+
+Consulte o [dicionário](dicionario-retornos.html) para os campos do manifesto e os
+[erros](autenticacao-e-erros.html) para distinguir falhas de rede e integridade.

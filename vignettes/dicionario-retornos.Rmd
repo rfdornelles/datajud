@@ -1,0 +1,71 @@
+---
+title: "Dicionário dos retornos"
+output:
+  rmarkdown::html_vignette:
+    mathjax: null
+vignette: >
+  %\VignetteIndexEntry{Dicionário dos retornos}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(datajud)
+dicionario <- read.csv(system.file("extdata", "dicionario-retornos.csv",
+  package = "datajud"), encoding = "UTF-8", check.names = FALSE)
+```
+
+## Como ler
+
+Este dicionário descreve os retornos do pacote e os campos persistidos no manifesto.
+O CSV que gera as tabelas é distribuído junto com o pacote e pode ser lido sem rede:
+
+```{r caminho-dicionario}
+basename(system.file("extdata", "dicionario-retornos.csv", package = "datajud"))
+```
+
+`numeric` admite armazenamento R `integer` ou `double`: os leitores legados
+preservam o tipo numérico recebido do JSON. Os datasets TPU exigem `integer` para
+códigos. `POSIXct` representa instantes em UTC; `Date`, datas sem horário.
+`NULL` significa ausência de objeto; `NA`, ausência de valor em uma coluna.
+Campos opcionais do JSON podem estar ausentes em vez de `null`. Cardinalidade
+refere-se ao valor dentro do objeto ou a cada linha da tabela, não ao total remoto.
+
+- `resultado`: lista S3 `datajud_resultado`, com hits, consulta e metadados.
+- `resultado_tibble`: uma linha por hit, produzida por `tibble::as_tibble()`.
+- `processos`: uma linha por processo lido, após remover linhas duplicadas.
+- `assuntos`: tibble de cada elemento da list-column; `assuntos_desaninhados`:
+  uma linha por associação entre processo e assunto.
+- `movimentos`: uma linha por movimento, após remoção de linhas duplicadas;
+  apenas o primeiro complemento tabelado e o primeiro órgão são extraídos.
+- `coleta`: lista S3 com caminhos e metadados, sem hits materializados.
+- `pagina`, `manifesto`, `limites`, `contagens` e `falha`: estruturas da coleta.
+- `tpu`: esquema compartilhado por assuntos, classes e buscas locais.
+
+Os objetos `hit` e `fonte` são estruturas remotas abertas: os campos listados são
+os consumidos pelos leitores e pelas fixtures, não uma restrição aos campos que
+a API pode acrescentar. Os objetos aninhados de formato, sistema, classe, assunto,
+órgão e movimento preservam os valores originais. `consulta$query$bool` contém
+`consulta_bool`; `consulta$sort` contém dois objetos com `order = "asc"`. Cursores
+são listas **sem nomes**; os nomes timestamp/id abaixo descrevem suas posições.
+
+Resultados tabulares vazios de `as_tibble()` e das buscas TPU preservam o esquema.
+Os leitores legados podem retornar zero colunas para uma lista de hits vazia;
+um processo sem movimentos retorna a tabela de movimentos tipada com zero linhas.
+Os atributos de proveniência das buscas TPU descrevem a base inteira, mesmo após
+filtragem. O atributo `tpu_ancestrais_sql` identifica os ancestrais recuperados do
+SQL: para eles as datas são `NA` e as listas de aplicabilidade são vazias.
+
+```{r tabelas, results='asis', echo=FALSE}
+for (objeto in unique(dicionario$objeto)) {
+  cat("\n\n## ", objeto, "\n\n", sep = "")
+  tabela <- dicionario[dicionario$objeto == objeto,
+    c("campo", "tipo", "cardinalidade", "descricao")]
+  print(knitr::kable(tabela, row.names = FALSE,
+    col.names = c("Campo", "Tipo R", "Cardinalidade", "Significado")))
+}
+```
+
+Volte aos exemplos de [pesquisa e leitura](pesquisa-e-leitura.html),
+[paginação e coleta](paginacao-e-coleta.html) ou [autenticação](autenticacao-e-erros.html).

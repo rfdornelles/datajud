@@ -1,0 +1,84 @@
+{
+  "versao_esquema": 1,
+  "pacote_versao": "0.0.0.9000",
+  "criado_em": "2024-01-15T12:00:00Z",
+  "atualizado_em": "2024-01-15T12:00:00Z",
+  "estado": "completa",
+  "tribunal": "TJSP",
+  "consulta": {
+    "size": 1,
+    "query": {
+      "bool": {
+        "filter": [
+          {
+            "terms": {
+              "assuntos.codigo": [899]
+            }
+          }
+        ]
+      }
+    },
+    "sort": [
+      {
+        "@timestamp": {
+          "order": "asc"
+        }
+      },
+      {
+        "id.keyword": {
+          "order": "asc"
+        }
+      }
+    ]
+  },
+  "consulta_hash": "97c80984be85a46f5d83e508b3e4f146",
+  "limites": {
+    "registros": 10000,
+    "paginas": 100,
+    "pausa_segundos": 0
+  },
+  "paginas": [
+    {
+      "numero": 1,
+      "arquivo": "pagina-000001.ndjson",
+      "registros": 1,
+      "primeiro_id": "processo-exemplo-1",
+      "ultimo_id": "processo-exemplo-1",
+      "cursor_utilizado": null,
+      "proximo_cursor": [
+        1705320000001,
+        "processo-exemplo-1"
+      ],
+      "checksum_md5": "80658d8e3273e3c1021882370f34f0a1",
+      "recuperada": false,
+      "total_valor": 2,
+      "total_relacao": "eq"
+    },
+    {
+      "numero": 2,
+      "arquivo": "pagina-000002.ndjson",
+      "registros": 1,
+      "primeiro_id": "processo-exemplo-2",
+      "ultimo_id": "processo-exemplo-2",
+      "cursor_utilizado": [
+        1705320000001,
+        "processo-exemplo-1"
+      ],
+      "proximo_cursor": [
+        1705320000002,
+        "processo-exemplo-2"
+      ],
+      "checksum_md5": "63e26e562f2305314b8c4925cd753316",
+      "recuperada": false,
+      "total_valor": 2,
+      "total_relacao": "eq"
+    }
+  ],
+  "contagens": {
+    "registros": 2,
+    "paginas": 2,
+    "requisicoes": 2
+  },
+  "proximo_cursor": null,
+  "motivo_termino": "total_informado"
+}

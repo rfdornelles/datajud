@@ -1,0 +1,106 @@
+---
+title: "Pesquisar códigos e ler processos"
+output:
+  rmarkdown::html_vignette:
+    mathjax: null
+vignette: >
+  %\VignetteIndexEntry{Pesquisar códigos e ler processos}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(datajud)
+```
+
+## Localizar os códigos
+
+Depois de configurar a [autenticação](autenticacao-e-erros.html), localize
+assuntos e classes sem acessar a rede. A busca ignora caixa e acentos; prioriza
+código exato, nome exato, prefixo e trecho do nome. Empates usam código crescente.
+
+```{r buscar-codigos}
+assuntos <- datajud_buscar_assunto("educacao", limite = 5)
+assuntos[c("codigo", "nome", "codigo_pai", "ativo")]
+classe <- datajud_buscar_classe("procedimento comum civel", limite = 1)
+classe[c("codigo", "nome")]
+```
+
+O padrão retorna até 20 itens ativos. `ativos = FALSE` busca somente inativos e
+`ativos = NULL` inclui ambos. `codigo_pai` seleciona filhos diretos; `NA`, raízes.
+`limite = Inf` remove o limite da busca local. Sem correspondência, o retorno tem
+zero linhas e preserva as colunas. Confira `nrow()` antes de enviar códigos à API.
+
+```{r navegar-hierarquia}
+datajud_buscar_assunto(codigo_pai = 12775, ativos = NULL, limite = 3)[
+  c("codigo", "nome", "ativo")]
+unique(attr(datajud_assuntos, "tpu_fontes")$versao)
+```
+
+A versão TPU acompanha o pacote. Atualização e proveniência são descritas em
+`?datajud_assuntos`. Os códigos de órgão julgador são específicos dos tribunais;
+o pacote não oferece busca local de órgãos. Um código observado em um resultado
+pode ser reutilizado no mesmo tribunal, depois de conferir o nome associado.
+
+## Pesquisar por assunto, classe e órgão
+
+Informe ao menos um filtro. Assuntos e órgãos aceitam vetores; classe aceita um
+único código. Dentro de uma categoria a combinação é OR; entre categorias é AND.
+`exigir_todos_assuntos = TRUE` muda os assuntos para AND.
+
+```{r pesquisar-rede, eval=FALSE}
+cliente <- datajud_cliente()
+stopifnot(nrow(assuntos) > 0, nrow(classe) == 1)
+pagina <- datajud_pesquisar_processos(
+  "TJSP", assunto_codigo = assuntos$codigo,
+  classe_codigo = classe$codigo, size = 100, cliente = cliente
+)
+# Exemplo de órgão obtido previamente em resultados do mesmo tribunal:
+por_orgao <- datajud_pesquisar_processos(
+  "TJSP", orgao_codigo = 1234, size = 100, cliente = cliente
+)
+```
+
+`1234` acima é um código ilustrativo; substitua-o por um código conferido nos
+seus resultados. Para buscar um número de processo conhecido, use
+`datajud_consultar_processo(numero_processo, tribunal = "TJSP", cliente = cliente)`.
+Essa consulta retorna uma lista de hits; a pesquisa geral retorna
+`datajud_resultado`. Ambos podem ser fornecidos aos leitores abaixo.
+
+## Ler um resultado local
+
+O pacote inclui um resultado **sintético**, gerado das fixtures dos testes, com
+dois processos e sem dados obtidos de uma consulta real. Nenhuma requisição é
+necessária para reproduzir esta parte:
+
+```{r resultado-local}
+pagina <- readRDS(system.file("extdata", "exemplo-resultado.rds", package = "datajud"))
+pagina
+pagina$metadados
+```
+
+`total_relacao = "eq"` indica total exato; `"gte"` indica limite inferior.
+`quantidade_recebida` é a quantidade nesta página. A chave única do pacote é
+`id`, não `numero_processo`. `tibble::as_tibble()` preserva a fonte completa na
+list-column `dados`; os leitores extraem tabelas para análise:
+
+```{r ler-tabelas}
+tibble::as_tibble(pagina)[c("id", "numero_processo")]
+processos <- datajud_ler_processo(pagina)
+processos[c("id", "classe_tpu", "assuntos_resumo", "orgao_julgador_codigo")]
+datajud_desaninhar_assuntos(processos)
+datajud_ler_movimentacoes(pagina)
+```
+
+`assuntos` preserva todos os assuntos por processo; `assuntos_resumo` é somente
+uma representação textual. Campos opcionais podem conter `NA`. Um processo sem
+assuntos contribui com zero linhas à tabela desaninhada; sem movimentos, com zero
+linhas de movimentos. Os leitores removem linhas integralmente duplicadas.
+O leitor de movimentos extrai somente o primeiro complemento tabelado e o primeiro
+órgão de cada movimento; consulte os hits brutos para preservar todos os elementos.
+Uma lista de hits totalmente vazia pode produzir um tibble sem colunas nos leitores
+legados; verifique a quantidade recebida antes de transformar páginas vazias.
+
+Veja os tipos e cardinalidades no [dicionário](dicionario-retornos.html) e continue
+com [paginação e coleta](paginacao-e-coleta.html).

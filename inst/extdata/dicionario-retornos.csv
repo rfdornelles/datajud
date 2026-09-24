@@ -1,0 +1,178 @@
+objeto,campo,tipo,cardinalidade,descricao
+resultado,hits,list,0..n hits,Hits brutos desta página; ver hit. Cada ID deve ser único na página.
+resultado,consulta,list,1,Consulta sanitizada enviada à API; ver consulta.
+resultado,metadados,list,1,Contagens e cursores; ver resultado_metadados.
+resultado_metadados,tribunal,character,1,Sigla do tribunal.
+resultado_metadados,total_valor,numeric,1,Total informado; limite inferior quando total_relacao é gte.
+resultado_metadados,total_relacao,character,1,eq (exato) ou gte (pelo menos).
+resultado_metadados,quantidade_recebida,integer,1,Número de hits nesta página.
+resultado_metadados,pagina,numeric,1; pode ser NA,Ordinal da página; NA quando não pode ser determinado.
+resultado_metadados,cursor_utilizado,list/NULL,0 ou 2 valores,Cursor usado na requisição; NULL na primeira página.
+resultado_metadados,proximo_cursor,list/NULL,0 ou 2 valores,"Cursor do último hit; NULL para página vazia, sem garantir esgotamento quando presente."
+cursor,timestamp,numeric,1,"Primeira posição: timestamp numérico em milissegundos, sem conversão para texto."
+cursor,id,character,1,Segunda posição: ID único usado no desempate.
+resultado_tibble,id,character,1 por linha,Chave única do hit; não é o número do processo.
+resultado_tibble,numero_processo,character,0..1 por linha; NA,"Número como texto, preservando zeros."
+resultado_tibble,dados,list,1 lista por linha,Fonte _source completa; campos remotos adicionais são preservados.
+hit,_index,character/NULL,0..1,"Índice remoto, quando informado."
+hit,_id,character/NULL,0..1,Identificador do mecanismo de pesquisa; a chave usada pelo pacote vem de _source.id.
+hit,_score,numeric/NULL,0..1,"Pontuação remota, não usada na ordenação por cursor."
+hit,_source,list,1,Objeto remoto aberto; ver fonte para os campos utilizados pelos leitores.
+hit,sort,list,2 valores,"Cursor composto deste hit, na ordem timestamp e ID."
+fonte,id,character,1,Identificador obrigatório para o pacote.
+fonte,tribunal,character/NULL,0..1,Sigla do tribunal.
+fonte,numeroProcesso,character/NULL,0..1,Número do processo como texto.
+fonte,dataAjuizamento,character/NULL,0..1,"Data/hora remota, convertida pelo leitor."
+fonte,dataHoraUltimaAtualizacao,character/NULL,0..1,"Data/hora da última atualização, convertida pelo leitor."
+fonte,grau,character/NULL,0..1,Código do grau de jurisdição.
+fonte,nivelSigilo,numeric/NULL,0..1,Nível de sigilo informado.
+fonte,formato,list/NULL,0..1,Objeto remoto; o leitor utiliza nome.
+fonte,sistema,list/NULL,0..1,Objeto remoto; o leitor utiliza nome.
+fonte,classe,list/NULL,0..1,Objeto remoto com codigo e nome.
+fonte,assuntos,list/NULL,0..n,Objetos com codigo e nome; todos são preservados na coluna assuntos.
+fonte,orgaoJulgador,list/NULL,0..1,"Objeto com codigo, nome e codigoMunicipioIBGE."
+fonte,movimentos,list/NULL,0..n,"Objetos com codigo, nome, dataHora, complementosTabelados e orgaoJulgador. O leitor utiliza apenas o primeiro complemento e órgão de cada movimento."
+consulta,size,numeric,1,"Tamanho solicitado da página, de 1 a 10000."
+consulta,query,list,1,Objeto bool com filter; ver consulta_bool.
+consulta,sort,list,2 objetos,"@timestamp e id.keyword, cada um com order = asc."
+consulta,search_after,list/NULL,ausente ou 2 valores,Cursor composto; ausente na primeira requisição.
+consulta_bool,filter,list,1..n,"Cada elemento contém terms: nome do campo (assuntos.codigo, classe.codigo ou orgaoJulgador.codigo) mapeado a vetor de códigos numéricos. Filtros combinados com AND; valores de cada terms com OR."
+processos,id,character,1 por processo,Chave única obrigatória.
+processos,tribunal,character,0..1 por processo; NA,Sigla do tribunal.
+processos,numero_processo,character,0..1 por processo; NA,Número textual; não usar como chave única.
+processos,data_ajuizamento,POSIXct,0..1 por processo; NA,Data/hora de ajuizamento em UTC.
+processos,data_atualizacao,POSIXct,0..1 por processo; NA,Data/hora de atualização em UTC.
+processos,grau,character,0..1 por processo; NA,Código do grau informado pela API.
+processos,nivel_sigilo,numeric,0..1 por processo; NA,Nível informado pela API; códigos podem ser integer ou double conforme o JSON.
+processos,formato,character,0..1 por processo; NA,Nome do formato.
+processos,sistema,character,0..1 por processo; NA,Nome do sistema.
+processos,classe_tpu,numeric,0..1 por processo; NA,Código da classe.
+processos,classe_nome,character,0..1 por processo; NA,Nome da classe informado na resposta.
+processos,assuntos,list,1 tibble por processo; 0..n linhas,Todos os assuntos; colunas descritas em assuntos. Sem assuntos o tibble interno pode ter zero colunas.
+processos,assuntos_resumo,character,0..1 por processo; NA,"Representação textual dos assuntos, não uma chave."
+processos,orgao_julgador_codigo,numeric,0..1 por processo; NA,Código de órgão no tribunal.
+processos,orgao_julgador_nome,character,0..1 por processo; NA,Nome do órgão julgador.
+processos,orgao_julgador_ibge,numeric,0..1 por processo; NA,Código do município informado pela API.
+assuntos,codigo,numeric,0..1 por associação; NA,Código TPU do assunto.
+assuntos,nome,character,0..1 por associação; NA,Nome do assunto na resposta.
+assuntos_desaninhados,id,character,1 por associação,Chave do processo; repete quando há vários assuntos.
+assuntos_desaninhados,codigo,numeric,0..1 por associação; NA,Código TPU do assunto.
+assuntos_desaninhados,nome,character,0..1 por associação; NA,Nome do assunto na resposta.
+movimentos,tribunal,character,0..1 por movimento; NA,Sigla do tribunal.
+movimentos,numero_processo,character,0..1 por movimento; NA,Número textual; o leitor atual não inclui id.
+movimentos,datahora_movimento,POSIXct,0..1 por movimento; NA,Data/hora do movimento em UTC; ordenação crescente dentro do processo.
+movimentos,codigo_tpu,numeric,0..1 por movimento; NA,Código TPU do movimento.
+movimentos,nome_movimento,character,0..1 por movimento; NA,Nome informado pela API.
+movimentos,codigo_tabelado,numeric,0..1 por movimento; NA,Código do primeiro complemento tabelado.
+movimentos,descricao_tabelado,character,0..1 por movimento; NA,Descrição do primeiro complemento.
+movimentos,valor_tabelado,character,0..1 por movimento; NA,Valor textual do primeiro complemento.
+movimentos,nome_tabelado,character,0..1 por movimento; NA,Nome do primeiro complemento.
+movimentos,codigo_orgao_julgador,numeric,0..1 por movimento; NA,Código do primeiro órgão do movimento.
+movimentos,nome_orgao_julgador,character,0..1 por movimento; NA,Nome do primeiro órgão do movimento.
+coleta,diretorio,character,1,Caminho absoluto do diretório da coleta.
+coleta,manifesto,character,1,Caminho do manifesto JSON.
+coleta,arquivos,character,0..n páginas,"Caminhos dos arquivos NDJSON, na ordem das páginas."
+coleta,consulta,list,1,"Consulta base sanitizada, sem cursor de retomada."
+coleta,paginas,list,0..n páginas,Metadados de cada página; ver pagina.
+coleta,metadados,list,1,Resumo do manifesto; ver coleta_metadados.
+coleta_metadados,tribunal,character,1,Sigla do tribunal.
+coleta_metadados,versao_esquema,integer,1,"Versão do formato do manifesto, atualmente 1."
+coleta_metadados,estado,character,1,"em_andamento, parcial, completa, limite_registros ou limite_paginas."
+coleta_metadados,registros,integer,1,Número acumulado de hits gravados.
+coleta_metadados,paginas,integer,1,Número de arquivos de páginas gravados.
+coleta_metadados,requisicoes,integer,1,Requisições de pesquisa concluídas; não conta cada tentativa HTTP.
+coleta_metadados,proximo_cursor,list/NULL,0 ou 2 valores,Ponto de retomada; NULL quando esgotada ou ainda sem página.
+coleta_metadados,falha,list/NULL,0..1,"Última falha registrada, quando presente; ver falha."
+coleta_metadados,criado_em,character,1,Instante UTC ISO 8601 de criação.
+coleta_metadados,atualizado_em,character,1,Instante UTC ISO 8601 da última atualização do manifesto.
+pagina,numero,numeric,1,"Ordinal da página, começando em 1."
+pagina,arquivo,character,1,"Nome relativo pagina-NNNNNN.ndjson, sem subdiretórios."
+pagina,registros,numeric,1,Número positivo de hits no arquivo.
+pagina,primeiro_id,character,1,ID do primeiro hit.
+pagina,ultimo_id,character,1,ID do último hit.
+pagina,cursor_utilizado,list/NULL,0 ou 2 valores,Cursor anterior a esta página.
+pagina,proximo_cursor,list,2 valores,Cursor do último hit gravado.
+pagina,checksum_md5,character,1,Checksum hexadecimal dos bytes NDJSON; não é assinatura de autenticidade.
+pagina,recuperada,logical,1,TRUE quando reconciliada após interrupção antes da gravação do manifesto.
+pagina,total_valor,numeric/NULL,0..1,"Total remoto, quando disponível; pode faltar em página recuperada."
+pagina,total_relacao,character/NULL,0..1,"eq ou gte, quando disponível."
+manifesto,versao_esquema,numeric,1,Versão do formato em disco.
+manifesto,pacote_versao,character,1,Versão do pacote que iniciou a coleta.
+manifesto,criado_em,character,1,Instante UTC ISO 8601 de criação.
+manifesto,atualizado_em,character,1,Instante UTC ISO 8601 da última gravação.
+manifesto,estado,character,1,"Estado da coleta, conforme coleta_metadados."
+manifesto,tribunal,character,1,Sigla do tribunal.
+manifesto,consulta,list,1,Consulta base sanitizada.
+manifesto,consulta_hash,character,1,"MD5 da serialização da consulta, usado para compatibilidade da retomada."
+manifesto,limites,list,1,Limites acumulados e pausa; ver limites.
+manifesto,paginas,list,0..n,"Metadados dos arquivos gravados, em ordem."
+manifesto,contagens,list,1,Contagens acumuladas; ver contagens.
+manifesto,proximo_cursor,list/NULL,0 ou 2 valores,Ponto de retomada.
+manifesto,falha,list/NULL,opcional; 0..1,Ausente ou NULL se não houver falha; ver falha.
+manifesto,motivo_termino,character/NULL,opcional; 0..1,"total_informado, pagina_vazia, limite_registros ou limite_paginas."
+manifesto,pagina_terminal_vazia,numeric/NULL,opcional; 0..1,Ordinal da requisição vazia; não corresponde a um arquivo NDJSON.
+limites,registros,numeric,1,Máximo acumulado de registros.
+limites,paginas,numeric,1,Máximo acumulado de páginas com dados.
+limites,pausa_segundos,numeric,1,Espera entre requisições consecutivas.
+contagens,registros,numeric,1,Total de hits gravados.
+contagens,paginas,numeric,1,Total de arquivos de páginas.
+contagens,requisicoes,numeric,1,"Pesquisas concluídas, incluindo página terminal vazia."
+falha,pagina,integer,1,Ordinal da página interrompida.
+falha,mensagem,character,1,Mensagem com a chave do cliente removida quando encontrada.
+falha,classes,character,1..n,Classes da condição R capturada.
+tpu,codigo,integer,1 por código,"Código TPU único na base, crescente."
+tpu,nome,character,1 por código,Nome oficial em UTF-8.
+tpu,codigo_pai,integer,0..1 por código; NA,Código do pai; NA para raízes.
+tpu,ativo,logical,1 por código,Status segundo texto riscado no XLS ou situação no SQL para ancestrais complementados.
+tpu,data_publicacao,Date,0..1 por código; NA,Menor data publicada entre segmentos; variantes preservadas em atributo.
+tpu,data_alteracao,Date,0..1 por código; NA,Data de alteração sem horário.
+tpu,data_inativacao,Date,0..1 por código; NA,Data de inativação; ausência não implica atividade.
+tpu,data_reativacao,Date,0..1 por código; NA,Data de reativação sem horário.
+tpu,segmentos,list,0..n textos por código,Vetores ordenados de segmentos sem duplicatas; vazio se não informado para ancestral SQL.
+tpu,graus,list,0..n textos por código,"Vetores de rótulos completos com segmento e grau/órgão, sem duplicatas."
+tpu_atributos,tpu_fontes,data.frame,1 tabela,Uma linha por fonte e tipo; ver tpu_fontes.
+tpu_atributos,tpu_publicacoes_divergentes,data.frame,0..n linhas,Variantes por código e aplicação; ver tpu_publicacoes.
+tpu_atributos,tpu_ancestrais_sql,integer,0..n códigos,Códigos complementados via SQL; suas datas e aplicabilidade não são inferidas.
+tpu_fontes,tipo,character,1 por fonte,A para assuntos ou C para classes.
+tpu_fontes,versao,Date,1 por fonte,Data da versão publicada no catálogo.
+tpu_fontes,segmento,character,1 por fonte,Segmento do XLS; texto vazio para SQL completo.
+tpu_fontes,grau,character,1 por fonte,Rótulo completo da aplicação; vazio para SQL.
+tpu_fontes,url,character,1 por fonte,URL oficial do arquivo.
+tpu_fontes,arquivo,character,1 por fonte,Nome do arquivo no cache de manutenção.
+tpu_fontes,formato,character,1 por fonte,xls (HTML legado) ou sql.
+tpu_fontes,catalogo_url,character,1 por fonte,URL do catálogo usado na descoberta.
+tpu_fontes,catalogo_md5,character,1 por fonte,Checksum do catálogo consultado.
+tpu_fontes,baixado_em_utc,character,1 por fonte,Instante UTC ISO 8601 do download.
+tpu_fontes,md5,character,1 por fonte,Checksum do arquivo usado para reprodução.
+tpu_publicacoes,codigo,integer,1 por variante,Código TPU com datas de publicação divergentes.
+tpu_publicacoes,data_publicacao,Date,0..1 por variante; NA,Data informada pela fonte.
+tpu_publicacoes,segmento,character,1 por variante,Segmento da fonte.
+tpu_publicacoes,grau,character,1 por variante,Rótulo de aplicação da fonte.
+cliente,api_key,character,1,"Chave em memória; omitida na impressão, não salvar com resultados."
+cliente,email,character,1,E-mail opcional de identificação; texto vazio se não informado.
+cliente,timeout,numeric,1,Limite de espera por requisição em segundos.
+cliente,max_tentativas,integer,1,Máximo de tentativas HTTP incluindo a primeira.
+tribunais,tribunal,character,1 por tribunal,Nome completo do tribunal.
+tribunais,sigla,character,1 por tribunal,Sigla usada nas consultas.
+tribunais,tipo,character,1 por tribunal,Ramo da justiça.
+tribunais,url,character,1 por tribunal,Endpoint da API pública.
+fonte_nome,nome,character/NULL,0..1,Nome em formato ou sistema; outros campos remotos são preservados no hit bruto.
+fonte_codigo_nome,codigo,numeric/NULL,0..1,Código em classe ou assunto.
+fonte_codigo_nome,nome,character/NULL,0..1,Nome em classe ou assunto.
+fonte_orgao,codigo,numeric/NULL,0..1,Código do órgão julgador do processo.
+fonte_orgao,nome,character/NULL,0..1,Nome do órgão julgador do processo.
+fonte_orgao,codigoMunicipioIBGE,numeric/NULL,0..1,Código IBGE do município.
+fonte_movimento,codigo,numeric/NULL,0..1,Código TPU do movimento.
+fonte_movimento,nome,character/NULL,0..1,Nome do movimento.
+fonte_movimento,dataHora,character/NULL,0..1,Instante remoto em texto.
+fonte_movimento,complementosTabelados,list/NULL,0..n,Objetos fonte_complemento; somente o primeiro é extraído pelo leitor.
+fonte_movimento,orgaoJulgador,list/NULL,0..n,Objetos fonte_orgao_movimento; somente o primeiro é extraído pelo leitor.
+fonte_complemento,codigo,numeric/NULL,0..1,Código do complemento tabelado.
+fonte_complemento,descricao,character/NULL,0..1,Descrição do complemento.
+fonte_complemento,valor,character/NULL,0..1,Valor textual do complemento.
+fonte_complemento,nome,character/NULL,0..1,Nome do complemento.
+fonte_orgao_movimento,codigoOrgao,numeric/NULL,0..1,Código do órgão associado ao movimento.
+fonte_orgao_movimento,nomeOrgao,character/NULL,0..1,Nome do órgão associado ao movimento.
+consulta_query,bool,list,1,Objeto com a lista filter; ver consulta_bool.
+consulta_filtro,terms,list,1,"Objeto cujo nome é assuntos.codigo, classe.codigo ou orgaoJulgador.codigo; valor numérico de comprimento 1..n (apenas 1 para classe)."
+consulta_ordem,order,character,1,"asc, tanto para @timestamp como para id.keyword."

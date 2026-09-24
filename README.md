@@ -288,6 +288,26 @@ as listas de segmentos e graus e os atributos de auditoria para publicações
 divergentes e ancestrais recuperados do SQL. A atualização é explícita e
 está descrita em [data-raw/README-tpu.md](data-raw/README-tpu.md).
 
+## Guias e dicionário dos retornos
+
+As vinhetas incluem exemplos locais executáveis e chamadas à API que devem ser
+executadas manualmente. Depois de instalar o pacote com as vinhetas:
+
+```r
+vignette("autenticacao-e-erros", package = "datajud")
+vignette("pesquisa-e-leitura", package = "datajud")
+vignette("paginacao-e-coleta", package = "datajud")
+vignette("dicionario-retornos", package = "datajud")
+```
+
+Na instalação pelo GitHub, use `build_vignettes = TRUE` em
+`remotes::install_github("rfdornelles/datajud", build_vignettes = TRUE)`.
+Os fontes estão em [vignettes/](vignettes/). O dicionário também está disponível
+como CSV em `system.file("extdata", "dicionario-retornos.csv", package = "datajud")`.
+Para validar a documentação na raiz do repositório, execute
+`Rscript scripts/verificar_vinhetas.R`: o script instala o pacote em biblioteca
+temporária, bloqueia o transporte de rede e verifica os links entre as vinhetas.
+
 ## Contrato da API e cache da Wiki
 
 As decisões sobre campos, tipos, operadores, limites e paginação são

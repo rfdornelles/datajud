@@ -30,5 +30,8 @@ jobs:
           extra-packages: any::rcmdcheck
           cache: true
 
+      - name: Construir vinhetas sem rede e verificar links internos
+        run: Rscript scripts/verificar_vinhetas.R
+
       - name: Executar R CMD check
         uses: r-lib/actions/check-r-package@v2

@@ -1,0 +1,115 @@
+---
+title: "Autenticação, limites e erros"
+output:
+  rmarkdown::html_vignette:
+    mathjax: null
+vignette: >
+  %\VignetteIndexEntry{Autenticação, limites e erros}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(datajud)
+```
+
+## Começar
+
+O pacote consulta a API Pública do Datajud. As buscas de códigos TPU são locais;
+as pesquisas de processos acessam a API. Este guia não executa chamadas de rede.
+Continue com [Pesquisa e leitura](pesquisa-e-leitura.html),
+[Paginação e coleta](paginacao-e-coleta.html) e o
+[Dicionário dos retornos](dicionario-retornos.html).
+
+## Configurar o cliente
+
+`datajud_cliente()` aceita `api_key`, `email`, `timeout` e `max_tentativas`.
+A chave é resolvida nesta ordem: argumento explícito, variável de ambiente
+`DATAJUD_API_KEY`, consulta à Wiki oficial e cópia incluída no pacote se a Wiki
+não puder ser consultada. O e-mail é opcional e pode vir de `DATAJUD_EMAIL`.
+A chave pública e as instruções de acesso estão na
+[Wiki do CNJ](https://datajud-wiki.cnj.jus.br/api-publica/acesso/).
+
+Configure a chave vigente no arquivo `.Renviron` pessoal e reinicie o R.
+Não copie a chave para scripts de análise ou para o repositório:
+
+```text
+DATAJUD_API_KEY=valor_da_chave_publica_vigente
+DATAJUD_EMAIL=seu-email@exemplo.org
+```
+
+Este bloco usa a configuração do ambiente e deve ser executado manualmente:
+
+```{r cliente-real, eval=FALSE}
+cliente <- datajud_cliente(timeout = 60, max_tentativas = 3)
+```
+
+As funções de consulta também aceitam `cliente = NULL`: nesse caso criam um
+cliente transitório. Criar um cliente explícito facilita reutilizar as mesmas
+configurações. O exemplo abaixo usa uma chave **fictícia**, apenas para mostrar
+a estrutura sem consultar a Wiki ou a API:
+
+```{r cliente-offline}
+cliente_exemplo <- datajud_cliente(
+  api_key = "QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVo=",
+  email = "exemplo@example.org", timeout = 30, max_tentativas = 3
+)
+cliente_exemplo
+```
+
+A impressão omite a chave, mas o objeto a contém em memória. Não salve o cliente
+junto aos resultados. `datajud_resultado` e os manifestos das coletas preservam
+a consulta sanitizada, sem o cliente.
+
+## Limites e tentativas
+
+`size` é o tamanho solicitado de **uma página**, entre 1 e 10.000. Não significa
+que esse seja o total disponível nem um compromisso de que a API devolverá todas
+as linhas solicitadas. Para volumes maiores use paginação ou coleta em disco.
+`timeout` limita a espera de cada requisição. `max_tentativas` inclui a primeira
+tentativa; o padrão é 3. O transporte usa a política de espera do `httr2`, respeita
+`Retry-After` e considera transitórios HTTP 429, 500, 502, 503 e 504.
+Erros de parâmetros e autenticação não são resolvidos repetindo a mesma chamada.
+
+A paginação e a coleta são sequenciais e usam `pausa = 0.1` segundo por padrão;
+o argumento aceita de 0 a 60. Esse valor é uma configuração do pacote, não uma
+quota oficial da API. As coletas têm limites adicionais de registros e páginas.
+
+## Tratar erros por classe
+
+| Classe | Significado e ação |
+|:--|:--|
+| `datajud_erro_credencial` | Chave em formato inválido; confira a configuração. |
+| `datajud_erro_requisicao` | HTTP 400; revise os filtros. |
+| `datajud_erro_autenticacao` | HTTP 401/403; confira a chave vigente. |
+| `datajud_erro_nao_encontrado` | HTTP 404; confira tribunal e endpoint. |
+| `datajud_erro_limite` | HTTP 429 após as tentativas; aguarde antes de retomar. |
+| `datajud_erro_servidor` | HTTP 5xx; tente novamente mais tarde. |
+| `datajud_erro_conexao` | Falha de transporte; confira a conectividade. |
+| `datajud_erro_conteudo` | Resposta inesperada, tipo de conteúdo ou JSON inválido. |
+| `datajud_erro_paginacao` | Cursor ou IDs repetidos; a paginação é interrompida. |
+| `datajud_erro_coleta_integridade` | Manifesto/página inconsistente; preserve os arquivos para diagnóstico. |
+| `datajud_erro_coleta_incompativel` | Filtros ou configuração incompatíveis com o diretório existente. |
+| `datajud_erro_coleta_pagina` | Número de página inexistente na coleta. |
+| `datajud_erro_coleta_interrompida` | Coleta interrompida; páginas concluídas preservadas e causa original em `parent`. |
+
+Erros de transporte/conteúdo herdam de `datajud_erro_http`; erros da coleta
+herdam de `datajud_erro_coleta`. Validações comuns de argumentos podem ser erros
+sem uma classe específica do pacote. Evite transformar todo erro em resultado vazio.
+
+```{r tratar-erros, eval=FALSE}
+resultado <- tryCatch(
+  datajud_pesquisar_processos("TJSP", assunto_codigo = 899, cliente = cliente),
+  datajud_erro_limite = function(e) {
+    message("Limite atingido: aguarde antes de repetir a consulta.")
+    NULL
+  },
+  datajud_erro_autenticacao = function(e) {
+    stop("Confira DATAJUD_API_KEY antes de continuar.")
+  }
+)
+```
+
+Os blocos com `eval=FALSE` não são executados durante a construção das vinhetas.
+Os demais usam somente dados locais e configuração fictícia.
