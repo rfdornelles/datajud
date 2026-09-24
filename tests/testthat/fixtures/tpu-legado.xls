@@ -1,0 +1,7 @@
+<table><tr><td colspan="2">Assuntos</td><td>Código</td><td>Cód. Pai</td><td>Glossário</td><td>Data de Publicação</td><td>Data de Alteração</td><td>Data de Inativação</td><td>Data de Reativação</td></tr>
+<tr><td colspan="9">Legenda: itens alterados</td></tr>
+<td colspan="2"></td><td>888</td><td></td><td></td><td></td><td></td><td></td><td></td>
+<tr><td colspan="9">Legenda adicional</td></tr>
+<td colspan="2"><b>Área pública</b></td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td>
+<tr><td></td><td><font style="text-decoration: line-through">Ação antiga</font></td><td>2</td><td>1</td><td><table><tr><td>999</td><td><s>Não é um assunto</s></td></tr></table></td><td>2008-09-30 00:00:00</td><td></td><td>2020-01-01 12:00:00</td><td></td></tr>
+<tr><td></td><td></td><td>Ação reativada</td><td>3</td><td>1</td><td><s>Glossário riscado</s></td><td>2008-09-30 00:00:00</td><td>2021-01-01 00:00:00</td><td>2020-01-01 00:00:00</td><td>2021-01-01 00:00:00</td></tr></table>
