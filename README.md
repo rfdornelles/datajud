@@ -254,6 +254,23 @@ assuntos <- datajud_desaninhar_assuntos(processos)
 processos <- datajud_ler_processo(resultado)
 ```
 
+## Assuntos e classes disponíveis offline
+
+`datajud_assuntos` e `datajud_classes` incluem códigos ativos e inativos das
+Tabelas Processuais Unificadas do CNJ. O uso dos datasets não faz downloads:
+
+```r
+datajud::datajud_assuntos[c("codigo", "nome", "codigo_pai", "ativo")]
+datajud::datajud_classes[c("codigo", "nome", "codigo_pai", "ativo")]
+unique(attr(datajud::datajud_assuntos, "tpu_fontes")$versao)
+```
+
+A versão distribuída é de 12/09/2026 (SGT 83). O atributo `tpu_fontes`
+registra URLs e hashes. A documentação dos datasets descreve as datas,
+as listas de segmentos e graus e os atributos de auditoria para publicações
+divergentes e ancestrais recuperados do SQL. A atualização é explícita e
+está descrita em [data-raw/README-tpu.md](data-raw/README-tpu.md).
+
 ## Contrato da API e cache da Wiki
 
 As decisões sobre campos, tipos, operadores, limites e paginação são

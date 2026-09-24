@@ -6,3 +6,4 @@
 .quarto
 draft/*
 .cache/datajud-wiki/
+.cache/tpu/

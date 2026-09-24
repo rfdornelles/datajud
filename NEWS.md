@@ -1,5 +1,11 @@
 # datajud 0.0.0.9000
 
+* Adiciona `datajud_assuntos` e `datajud_classes`, datasets locais das TPU
+  oficiais, com atualização explícita e reproduzível, descoberta de versão,
+  manifesto de fontes e hashes. A geração lê HTML legado, recupera ancestrais
+  omitidos pelo XLS no SQL oficial e valida conflitos e hierarquia. Datas de
+  publicação divergentes entre segmentos são preservadas para auditoria.
+
 * `datajud_abrir_coleta()` reabre coletas gravadas sem materializar hits, e
   `datajud_ler_pagina()` lê explicitamente um único arquivo NDJSON como
   `datajud_resultado`. A abertura rejeita páginas órfãs e adia a validação do
