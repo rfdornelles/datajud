@@ -1,5 +1,10 @@
 # datajud 0.0.0.9000
 
+* Adiciona quatro vinhetas sobre autenticação e erros, pesquisa e leitura,
+  paginação e retomada, e o dicionário dos retornos. Exemplos sintéticos permitem
+  executar os fluxos locais sem rede. O dicionário CSV é verificado contra os
+  retornos das fixtures; a CI constrói as vinhetas com transporte bloqueado.
+
 * `datajud_buscar_assunto()` e `datajud_buscar_classe()` localizam códigos nas
   TPU locais sem acessar a rede. A busca ignora caixa e acentos, prioriza código,
   nome exato, prefixo e trecho do nome e permite filtros por status, pai e limite.
