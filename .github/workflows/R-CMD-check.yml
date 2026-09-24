@@ -17,6 +17,9 @@ jobs:
       - name: Baixar código
         uses: actions/checkout@v7
 
+      - name: Verificar políticas, rulesets versionados e links locais
+        run: python3 scripts/verificar_politicas.py
+
       - name: Configurar R
         uses: r-lib/actions/setup-r@v2
         with:

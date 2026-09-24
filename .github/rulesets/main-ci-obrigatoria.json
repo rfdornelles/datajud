@@ -1,0 +1,33 @@
+{
+  "name": "main-ci-obrigatoria",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": [
+        "~DEFAULT_BRANCH"
+      ]
+    }
+  },
+  "bypass_actors": [],
+  "rules": [
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "R 4.2",
+            "integration_id": 15368
+          },
+          {
+            "context": "Medir cobertura no R 4.2",
+            "integration_id": 15368
+          }
+        ]
+      }
+    }
+  ]
+}

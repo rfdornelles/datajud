@@ -2,6 +2,9 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^README\.Rmd$
+^CONTRIBUTING\.md$
+^COMPATIBILIDADE\.md$
+^RELEASE\.md$
 ^data-raw$
 ^\.cache$
 ^\.github$
