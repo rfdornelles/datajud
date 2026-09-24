@@ -265,6 +265,23 @@ datajud::datajud_classes[c("codigo", "nome", "codigo_pai", "ativo")]
 unique(attr(datajud::datajud_assuntos, "tpu_fontes")$versao)
 ```
 
+Use as buscas locais para encontrar códigos pelo nome, ignorando caixa e
+acentos. Por padrão, elas retornam até 20 itens ativos, ordenados por código
+exato, nome exato, prefixo e trecho do nome, com desempate por código crescente:
+
+```r
+datajud_buscar_assunto("educacao", limite = 5)
+datajud_buscar_classe("procedimento comum civel")
+datajud_buscar_assunto(899, ativos = NULL)
+
+# Filhos diretos, incluindo itens inativos; NA seleciona raízes.
+datajud_buscar_assunto(codigo_pai = 12775, ativos = NULL, limite = Inf)
+
+# O acesso à API ocorre somente nesta chamada de pesquisa:
+classe <- datajud_buscar_classe("procedimento comum civel", limite = 1)
+datajud_pesquisar_processos("TJSP", classe_codigo = classe$codigo)
+```
+
 A versão distribuída é de 12/09/2026 (SGT 83). O atributo `tpu_fontes`
 registra URLs e hashes. A documentação dos datasets descreve as datas,
 as listas de segmentos e graus e os atributos de auditoria para publicações

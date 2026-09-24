@@ -1,5 +1,10 @@
 # datajud 0.0.0.9000
 
+* `datajud_buscar_assunto()` e `datajud_buscar_classe()` localizam códigos nas
+  TPU locais sem acessar a rede. A busca ignora caixa e acentos, prioriza código,
+  nome exato, prefixo e trecho do nome e permite filtros por status, pai e limite.
+  `codigo_pai = NA` lista raízes; `ativos = NULL` inclui ativos e inativos.
+
 * Adiciona `datajud_assuntos` e `datajud_classes`, datasets locais das TPU
   oficiais, com atualização explícita e reproduzível, descoberta de versão,
   manifesto de fontes e hashes. A geração lê HTML legado, recupera ancestrais
